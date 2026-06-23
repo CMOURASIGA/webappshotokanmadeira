@@ -1,0 +1,21 @@
+{
+  "name": "Madeira Karate",
+  "short_name": "Madeira Karate",
+  "description": "Aplicativo da Madeira Karate Shotokan & Artes Marciais",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#111111",
+  "theme_color": "#111111",
+  "icons": [
+    {
+      "src": "https://i.imgur.com/FFeA342.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://i.imgur.com/FFeA342.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
