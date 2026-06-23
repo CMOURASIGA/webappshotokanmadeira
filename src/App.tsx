@@ -18,6 +18,7 @@ import { WhatIsKata } from "./views/WhatIsKata";
 import { Vocabulary } from "./views/Vocabulary";
 import { History } from "./views/History";
 import { KataSeries } from "./views/KataSeries";
+import { Schedule } from "./views/Schedule";
 
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
@@ -29,6 +30,7 @@ export default function App() {
         <Layout>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/schedule" element={<Schedule />} />
             <Route path="/katas" element={<KatasList />} />
             <Route path="/katas/:id" element={<KataDetail />} />
             <Route path="/techniques" element={<TechniquesList />} />

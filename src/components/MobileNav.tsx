@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "../lib/utils";
-import { BookOpen, Home, List, Shield, Menu, X, ChevronRight } from "lucide-react";
+import { BookOpen, Home, List, Shield, Menu, X, ChevronRight, Calendar } from "lucide-react";
 import { useState } from "react";
 
 export function MobileNav() {
@@ -14,6 +14,7 @@ export function MobileNav() {
   ];
 
   const moreLinks = [
+    { name: "Grade de Horários", path: "/schedule", icon: Calendar },
     { name: "Faixas", path: "/belts", icon: List },
     { name: "Série de Katas", path: "/kata-series", icon: BookOpen },
     { name: "Vocabulário", path: "/vocabulary", icon: BookOpen },

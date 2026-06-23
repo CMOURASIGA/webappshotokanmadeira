@@ -1,12 +1,13 @@
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "../lib/utils";
-import { BookOpen, Home, List, Shield, User } from "lucide-react";
+import { BookOpen, Home, List, Shield, User, Calendar } from "lucide-react";
 
 export function Sidebar() {
   const location = useLocation();
 
   const links = [
     { name: "Início", path: "/", icon: Home },
+    { name: "Grade de Horários", path: "/schedule", icon: Calendar },
     { name: "Série de Katas", path: "/kata-series", icon: BookOpen },
     { name: "Lista de Katas", path: "/katas", icon: BookOpen },
     { name: "Técnicas", path: "/techniques", icon: Shield },
