@@ -161,52 +161,11 @@ export function Schedule() {
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden">
-        {/* Mobile View */}
-        <div className="md:hidden flex flex-col">
-          <div className="flex overflow-x-auto gap-2 p-4 bg-neutral-50 border-b border-neutral-100 scrollbar-hide">
-            {days.map((day) => (
-              <button
-                key={day.key}
-                onClick={() => setSelectedDay(day.key)}
-                className={`px-4 py-2 rounded-full whitespace-nowrap text-sm font-bold transition-colors ${
-                  selectedDay === day.key
-                    ? "bg-[#e43a3a] text-white"
-                    : "bg-white border border-neutral-200 text-neutral-600 hover:border-[#e43a3a] hover:text-[#e43a3a]"
-                }`}
-              >
-                {day.label}
-              </button>
-            ))}
-          </div>
-
-          <div className="p-4 space-y-3">
-            {scheduleData.filter(row => row[selectedDay]).length > 0 ? (
-              scheduleData.filter(row => row[selectedDay]).map((row, idx) => {
-                const session = row[selectedDay]!;
-                return (
-                  <div key={idx} className="flex items-stretch rounded-xl overflow-hidden border border-neutral-200 shadow-sm">
-                    <div className="bg-[#e43a3a] text-black font-bold p-3 flex items-center justify-center min-w-[80px]">
-                      {row.time}
-                    </div>
-                    <div className={`flex-1 p-3 flex flex-col justify-center ${session.bg}`}>
-                      <span className="font-bold text-sm">{session.name}</span>
-                      {session.desc && <span className="text-xs opacity-90 mt-0.5">{session.desc}</span>}
-                    </div>
-                  </div>
-                );
-              })
-            ) : (
-              <div className="text-center text-neutral-500 py-8">Nenhuma aula programada para este dia.</div>
-            )}
-          </div>
-        </div>
-
-        {/* Desktop View */}
-        <div className="hidden md:block overflow-x-auto">
+        <div className="overflow-x-auto">
           <table className="w-full border-collapse min-w-[800px]">
             <thead>
               <tr>
-                <th className="bg-[#e43a3a] text-black font-bold border border-[#333333] p-3 w-20 sticky left-0 z-10">HORÁRIO</th>
+                <th className="bg-[#e43a3a] text-black font-bold border border-[#333333] p-3 w-20 sticky left-0 z-20 shadow-[1px_0_0_#333333]">HORÁRIO</th>
                 <th className="bg-[#e43a3a] text-black font-bold border border-[#333333] p-3">SEGUNDA</th>
                 <th className="bg-[#e43a3a] text-black font-bold border border-[#333333] p-3">TERÇA</th>
                 <th className="bg-[#e43a3a] text-black font-bold border border-[#333333] p-3">QUARTA</th>
@@ -218,7 +177,7 @@ export function Schedule() {
             <tbody>
               {scheduleData.map((row, idx) => (
                 <tr key={idx}>
-                  <td className="bg-[#e43a3a] text-black font-bold border border-[#333333] p-3 text-center sticky left-0 z-10">{row.time}</td>
+                  <td className="bg-[#e43a3a] text-black font-bold border border-[#333333] p-3 text-center sticky left-0 z-10 shadow-[1px_0_0_#333333]">{row.time}</td>
                   <ClassCell session={row.mon} />
                   <ClassCell session={row.tue} />
                   <ClassCell session={row.wed} />
