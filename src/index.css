@@ -21,6 +21,22 @@ body {
   .pb-safe {
     padding-bottom: env(safe-area-inset-bottom);
   }
+  
+  .scrollbar-custom::-webkit-scrollbar {
+    height: 10px;
+  }
+  .scrollbar-custom::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+  .scrollbar-custom::-webkit-scrollbar-thumb {
+    background: #BC002D;
+    border-radius: 4px;
+  }
+  .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+    background: #990024;
+  }
+
   .animate-in {
     animation-fill-mode: both;
   }

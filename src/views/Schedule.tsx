@@ -160,24 +160,24 @@ export function Schedule() {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse min-w-[800px]">
+      <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden flex flex-col">
+        <div className="w-full overflow-x-auto scrollbar-custom pb-2">
+          <table className="w-full border-collapse min-w-[1000px]">
             <thead>
               <tr>
-                <th className="bg-[#e43a3a] text-black font-bold border border-[#333333] p-3 w-20 sticky left-0 z-20 shadow-[1px_0_0_#333333]">HORÁRIO</th>
-                <th className="bg-[#e43a3a] text-black font-bold border border-[#333333] p-3">SEGUNDA</th>
-                <th className="bg-[#e43a3a] text-black font-bold border border-[#333333] p-3">TERÇA</th>
-                <th className="bg-[#e43a3a] text-black font-bold border border-[#333333] p-3">QUARTA</th>
-                <th className="bg-[#e43a3a] text-black font-bold border border-[#333333] p-3">QUINTA</th>
-                <th className="bg-[#e43a3a] text-black font-bold border border-[#333333] p-3">SEXTA</th>
-                <th className="bg-[#e43a3a] text-black font-bold border border-[#333333] p-3">SÁBADO</th>
+                <th className="bg-[#e43a3a] text-black font-bold border border-[#333333] p-3 w-20 sticky left-0 z-20 shadow-[2px_0_4px_-1px_rgba(0,0,0,0.2)]">HORÁRIO</th>
+                <th className="bg-[#e43a3a] text-black font-bold border border-[#333333] p-3 min-w-[140px]">SEGUNDA</th>
+                <th className="bg-[#e43a3a] text-black font-bold border border-[#333333] p-3 min-w-[140px]">TERÇA</th>
+                <th className="bg-[#e43a3a] text-black font-bold border border-[#333333] p-3 min-w-[140px]">QUARTA</th>
+                <th className="bg-[#e43a3a] text-black font-bold border border-[#333333] p-3 min-w-[140px]">QUINTA</th>
+                <th className="bg-[#e43a3a] text-black font-bold border border-[#333333] p-3 min-w-[140px]">SEXTA</th>
+                <th className="bg-[#e43a3a] text-black font-bold border border-[#333333] p-3 min-w-[140px]">SÁBADO</th>
               </tr>
             </thead>
             <tbody>
               {scheduleData.map((row, idx) => (
                 <tr key={idx}>
-                  <td className="bg-[#e43a3a] text-black font-bold border border-[#333333] p-3 text-center sticky left-0 z-10 shadow-[1px_0_0_#333333]">{row.time}</td>
+                  <td className="bg-[#e43a3a] text-black font-bold border border-[#333333] p-3 text-center sticky left-0 z-10 shadow-[2px_0_4px_-1px_rgba(0,0,0,0.2)]">{row.time}</td>
                   <ClassCell session={row.mon} />
                   <ClassCell session={row.tue} />
                   <ClassCell session={row.wed} />
