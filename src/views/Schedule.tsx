@@ -160,11 +160,51 @@ export function Schedule() {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 flex flex-col relative w-full overflow-hidden max-w-full">
-        <div className="md:hidden flex items-center justify-center gap-2 p-3 bg-neutral-50/80 border-b border-neutral-100 text-sm text-neutral-600 font-medium">
-          <MoveHorizontal className="w-4 h-4 animate-pulse" />
-          <span>Deslize a tabela para o lado para ver mais dias</span>
+      {/* Mobile View - Lista Vertical por Dia */}
+      <div className="md:hidden flex flex-col gap-6">
+        {days.map((day) => {
+          const dayClasses = scheduleData.filter((row) => row[day.key]);
+          if (dayClasses.length === 0) return null;
+          return (
+            <div key={day.key} className="bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden">
+              <div className="bg-[#e43a3a] text-white p-3 text-center font-bold text-lg uppercase tracking-wide">
+                {day.label}
+              </div>
+              <div className="divide-y divide-neutral-200/60">
+                {dayClasses.map((row, idx) => {
+                  const session = row[day.key]!;
+                  return (
+                    <div key={idx} className="flex items-stretch min-h-[76px]">
+                      <div className="w-20 bg-neutral-50 text-neutral-800 font-bold p-3 flex items-center justify-center shrink-0 border-r border-neutral-200/60">
+                        {row.time}
+                      </div>
+                      <div className={`flex-1 p-3 flex flex-col justify-center ${session.bg}`}>
+                        <span className="font-bold text-sm leading-tight">{session.name}</span>
+                        {session.desc && <span className="text-[11px] mt-0.5 opacity-90">{session.desc}</span>}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+        
+        <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 p-6 flex flex-col items-center justify-center gap-4 text-center">
+          <img src="https://i.imgur.com/FFeA342.png" alt="Madeira Artes Marciais Logo" className="w-16 h-16 object-contain" />
+          <div>
+            <p className="font-bold text-lg">Madeira Artes Marciais</p>
+            <p className="text-sm text-neutral-600">INFORMAÇÕES: 21 97368-1109</p>
+            <p className="text-sm text-neutral-600">@madeiraartesmarciais</p>
+          </div>
+          <div className="text-xs text-neutral-500 italic mt-2">
+            * PLANOS NA RECEPÇÃO.
+          </div>
         </div>
+      </div>
+
+      {/* Desktop View - Tabela Horizontal */}
+      <div className="hidden md:flex bg-white rounded-2xl shadow-sm border border-neutral-100 flex-col relative w-full overflow-hidden max-w-full">
         <div className="schedule-wrapper scrollbar-custom">
           <table className="w-full border-collapse min-w-[1000px]">
             <thead>
@@ -194,7 +234,7 @@ export function Schedule() {
           </table>
         </div>
         
-        <div className="p-6 bg-neutral-50 border-t border-neutral-100 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="p-6 bg-neutral-50 border-t border-neutral-100 flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <img src="https://i.imgur.com/FFeA342.png" alt="Madeira Artes Marciais Logo" className="w-16 h-16 object-contain" />
             <div>
