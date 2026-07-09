@@ -37,8 +37,8 @@ export function Layout({ children }: { children: ReactNode }) {
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-4 md:p-10 pb-20 md:pb-10">
-          <div className="max-w-6xl mx-auto relative">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-10 pb-[120px] md:pb-10">
+          <div className="max-w-6xl mx-auto relative w-full">
             {children}
           </div>
         </main>
@@ -54,7 +54,7 @@ export function Layout({ children }: { children: ReactNode }) {
         href={whatsappUrl} 
         target="_blank" 
         rel="noopener noreferrer"
-        className="fixed bottom-20 md:bottom-16 right-4 md:right-8 bg-[#25D366] text-white p-4 rounded-full shadow-lg hover:scale-105 hover:bg-[#20bd5a] transition-all z-50 flex items-center justify-center group"
+        className="fixed bottom-[90px] md:bottom-8 right-4 md:right-8 bg-[#25D366] text-white p-4 rounded-full shadow-lg hover:scale-105 hover:bg-[#20bd5a] transition-all z-50 flex items-center justify-center group"
         title="Fale conosco no WhatsApp"
       >
         <MessageCircle className="w-6 h-6" />

@@ -143,7 +143,7 @@ export function Schedule() {
   ] as const;
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500 max-w-6xl mx-auto">
+    <div className="space-y-8 animate-in fade-in duration-500 max-w-6xl mx-auto w-full">
       <button 
         onClick={() => navigate(-1)}
         className="flex items-center gap-2 text-sm text-neutral-500 hover:text-karate-red font-medium transition-colors"
@@ -160,15 +160,12 @@ export function Schedule() {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 flex flex-col relative">
+      <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 flex flex-col relative w-full overflow-hidden max-w-full">
         <div className="md:hidden flex items-center justify-center gap-2 p-3 bg-neutral-50/80 border-b border-neutral-100 text-sm text-neutral-600 font-medium">
           <MoveHorizontal className="w-4 h-4 animate-pulse" />
           <span>Deslize a tabela para o lado para ver mais dias</span>
         </div>
-        <div 
-          className="w-full overflow-x-auto scrollbar-custom pb-2"
-          style={{ WebkitOverflowScrolling: 'touch' }}
-        >
+        <div className="schedule-wrapper scrollbar-custom">
           <table className="w-full border-collapse min-w-[1000px]">
             <thead>
               <tr>

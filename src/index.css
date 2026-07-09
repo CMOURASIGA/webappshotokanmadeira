@@ -37,6 +37,14 @@ body {
     background: #990024;
   }
 
+  .schedule-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 16px;
+  }
+  
   .animate-in {
     animation-fill-mode: both;
   }
