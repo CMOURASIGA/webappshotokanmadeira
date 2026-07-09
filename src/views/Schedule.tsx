@@ -1,4 +1,4 @@
-import { ArrowLeft, Calendar } from "lucide-react";
+import { ArrowLeft, Calendar, MoveHorizontal } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
@@ -160,8 +160,15 @@ export function Schedule() {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden flex flex-col">
-        <div className="w-full overflow-x-auto scrollbar-custom pb-2">
+      <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 flex flex-col relative">
+        <div className="md:hidden flex items-center justify-center gap-2 p-3 bg-neutral-50/80 border-b border-neutral-100 text-sm text-neutral-600 font-medium">
+          <MoveHorizontal className="w-4 h-4 animate-pulse" />
+          <span>Deslize a tabela para o lado para ver mais dias</span>
+        </div>
+        <div 
+          className="w-full overflow-x-auto scrollbar-custom pb-2"
+          style={{ WebkitOverflowScrolling: 'touch' }}
+        >
           <table className="w-full border-collapse min-w-[1000px]">
             <thead>
               <tr>
