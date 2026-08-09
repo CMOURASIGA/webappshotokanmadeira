@@ -195,7 +195,7 @@ export function Schedule() {
           <div>
             <p className="font-bold text-lg">Madeira Artes Marciais</p>
             <p className="text-sm text-neutral-600">INFORMAÇÕES: 21 97368-1109</p>
-            <p className="text-sm text-neutral-600">@madeiraartesmarciais</p>
+            <p className="text-sm text-neutral-600">@madeirakarateshotokan</p>
           </div>
           <div className="text-xs text-neutral-500 italic mt-2">
             * PLANOS NA RECEPÇÃO.
@@ -240,7 +240,7 @@ export function Schedule() {
             <div>
               <p className="font-bold text-lg">Madeira Artes Marciais</p>
               <p className="text-sm text-neutral-600">INFORMAÇÕES: 21 97368-1109</p>
-              <p className="text-sm text-neutral-600">@madeiraartesmarciais</p>
+              <p className="text-sm text-neutral-600">@madeirakarateshotokan</p>
             </div>
           </div>
           <div className="text-xs text-neutral-500 italic">

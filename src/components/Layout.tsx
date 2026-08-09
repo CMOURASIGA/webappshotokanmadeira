@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { Sidebar } from "./Sidebar";
 import { MobileNav } from "./MobileNav";
-import { Search, MessageCircle } from "lucide-react";
+import { Search, MessageCircle, Instagram } from "lucide-react";
 
 export function Layout({ children }: { children: ReactNode }) {
   const whatsappUrl = "https://wa.me/5521968384077?text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20a%20academia.";
@@ -49,19 +49,33 @@ export function Layout({ children }: { children: ReactNode }) {
       </div>
       <MobileNav />
 
-      {/* WhatsApp Floating Button */}
-      <a 
-        href={whatsappUrl} 
-        target="_blank" 
-        rel="noopener noreferrer"
-        className="fixed bottom-[90px] md:bottom-8 right-4 md:right-8 bg-[#25D366] text-white p-4 rounded-full shadow-lg hover:scale-105 hover:bg-[#20bd5a] transition-all z-50 flex items-center justify-center group"
-        title="Fale conosco no WhatsApp"
-      >
-        <MessageCircle className="w-6 h-6" />
-        <span className="max-w-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs transition-all duration-300 ease-in-out font-medium text-sm group-hover:ml-2">
-          Saiba mais
-        </span>
-      </a>
+      {/* Floating Action Buttons */}
+      <div className="fixed bottom-[90px] md:bottom-8 right-4 md:right-8 flex flex-col gap-3 z-50">
+        <a 
+          href="https://instagram.com/madeirakarateshotokan" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] text-white p-4 rounded-full shadow-lg hover:scale-105 transition-all flex items-center justify-center group"
+          title="Siga nosso Instagram"
+        >
+          <Instagram className="w-6 h-6" />
+          <span className="max-w-0 overflow-hidden whitespace-nowrap group-hover:max-w-[200px] transition-all duration-300 ease-in-out font-medium text-sm group-hover:ml-2">
+            @madeirakarateshotokan
+          </span>
+        </a>
+        <a 
+          href={whatsappUrl} 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="bg-[#25D366] text-white p-4 rounded-full shadow-lg hover:scale-105 hover:bg-[#20bd5a] transition-all flex items-center justify-center group"
+          title="Fale conosco no WhatsApp"
+        >
+          <MessageCircle className="w-6 h-6" />
+          <span className="max-w-0 overflow-hidden whitespace-nowrap group-hover:max-w-[200px] transition-all duration-300 ease-in-out font-medium text-sm group-hover:ml-2">
+            Saiba mais
+          </span>
+        </a>
+      </div>
     </div>
   );
 }
