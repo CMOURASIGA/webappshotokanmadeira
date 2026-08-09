@@ -8,6 +8,7 @@ import { useState } from "react";
 import { Layout } from "./components/Layout";
 import { SplashScreen } from "./components/SplashScreen";
 import { Home } from "./views/Home";
+import { Store } from "./views/Store";
 import { KatasList } from "./views/KatasList";
 import { KataDetail } from "./views/KataDetail";
 import { TechniquesList } from "./views/TechniquesList";
@@ -31,6 +32,7 @@ export default function App() {
         <Layout>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/store" element={<Store />} />
             <Route path="/schedule" element={<Schedule />} />
             <Route path="/katas" element={<KatasList />} />
             <Route path="/katas/:id" element={<KataDetail />} />
