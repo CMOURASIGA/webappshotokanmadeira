@@ -4,7 +4,7 @@ import { MobileNav } from "./MobileNav";
 import { Search, MessageCircle, Instagram } from "lucide-react";
 
 export function Layout({ children }: { children: ReactNode }) {
-  const whatsappUrl = "https://wa.me/5521968384077?text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20a%20academia.";
+  const whatsappUrl = "https://wa.me/5521973681109?text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20a%20academia.";
 
   return (
     <div className="min-h-screen bg-[#F4F4F4] text-[#111111] flex font-sans overflow-hidden h-screen relative">
@@ -18,7 +18,7 @@ export function Layout({ children }: { children: ReactNode }) {
             
             <div className="md:hidden flex items-center gap-2">
               <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 overflow-hidden bg-white">
-                <img src="https://i.imgur.com/FFeA342.png" alt="Madeira Karate Logo" className="w-full h-full object-cover" />
+                <img src="https://i.imgur.com/fECU6ud.png" alt="Madeira Karate Logo" className="w-full h-full object-cover" />
               </div>
               <h1 className="font-jp font-bold tracking-wide uppercase text-karate-black text-sm">Madeira Karate</h1>
             </div>

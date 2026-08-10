@@ -191,7 +191,7 @@ export function Schedule() {
         })}
         
         <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 p-6 flex flex-col items-center justify-center gap-4 text-center">
-          <img src="https://i.imgur.com/FFeA342.png" alt="Madeira Artes Marciais Logo" className="w-16 h-16 object-contain" />
+          <img src="https://i.imgur.com/fECU6ud.png" alt="Madeira Artes Marciais Logo" className="w-16 h-16 object-contain" />
           <div>
             <p className="font-bold text-lg">Madeira Artes Marciais</p>
             <p className="text-sm text-neutral-600">INFORMAÇÕES: 21 97368-1109</p>
@@ -236,7 +236,7 @@ export function Schedule() {
         
         <div className="p-6 bg-neutral-50 border-t border-neutral-100 flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <img src="https://i.imgur.com/FFeA342.png" alt="Madeira Artes Marciais Logo" className="w-16 h-16 object-contain" />
+            <img src="https://i.imgur.com/fECU6ud.png" alt="Madeira Artes Marciais Logo" className="w-16 h-16 object-contain" />
             <div>
               <p className="font-bold text-lg">Madeira Artes Marciais</p>
               <p className="text-sm text-neutral-600">INFORMAÇÕES: 21 97368-1109</p>

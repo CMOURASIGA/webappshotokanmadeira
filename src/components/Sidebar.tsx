@@ -23,7 +23,7 @@ export function Sidebar() {
     <aside className="hidden md:flex flex-col w-64 bg-[#111111] h-screen fixed top-0 left-0 border-r border-[#2B2B2B]">
       <div className="p-8 flex flex-col items-center border-b border-[#2B2B2B]">
         <div className="w-24 h-24 rounded-full flex items-center justify-center mb-4 overflow-hidden bg-white">
-          <img src="https://i.imgur.com/FFeA342.png" alt="Madeira Karate Logo" className="w-full h-full object-cover" />
+          <img src="https://i.imgur.com/fECU6ud.png" alt="Madeira Karate Logo" className="w-full h-full object-cover" />
         </div>
         <h1 className="text-white text-base font-bold tracking-widest uppercase text-center leading-tight">
           Madeira<br/><span className="text-karate-gold text-[10px]">Karate Shotokan &<br/>Artes Marciais</span>
