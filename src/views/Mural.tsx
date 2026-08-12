@@ -36,12 +36,12 @@ export function Mural() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
           {notices.map((notice, index) => (
             <div 
               key={notice.id} 
               onClick={() => setSelectedNoticeIndex(index)}
-              className="bg-white rounded-2xl overflow-hidden shadow-sm border border-neutral-100 hover:shadow-md transition-shadow group flex flex-col cursor-pointer"
+              className="bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm border border-neutral-100 hover:shadow-md transition-shadow group flex flex-col cursor-pointer"
             >
               <div className="w-full aspect-[4/5] bg-neutral-100 overflow-hidden relative">
                 {notice.image ? (
@@ -57,15 +57,15 @@ export function Mural() {
                   </div>
                 )}
                 {notice.showPopup && (
-                  <div className="absolute top-4 right-4 bg-karate-red text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest shadow-lg">
+                  <div className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-karate-red text-white text-[9px] sm:text-[10px] font-bold px-2 py-1 sm:px-3 rounded-full uppercase tracking-widest shadow-lg">
                     Destaque
                   </div>
                 )}
               </div>
               
               {notice.title && (
-                <div className="p-5 flex-1 flex flex-col justify-between">
-                  <h3 className="font-bold text-lg text-[#111111] leading-tight group-hover:text-karate-red transition-colors">
+                <div className="p-3 sm:p-4 flex-1 flex flex-col justify-between">
+                  <h3 className="font-bold text-sm sm:text-base text-[#111111] leading-tight group-hover:text-karate-red transition-colors line-clamp-2">
                     {notice.title}
                   </h3>
                 </div>
