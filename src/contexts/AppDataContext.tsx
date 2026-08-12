@@ -139,6 +139,15 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
           notices: noticesList,
           loading: false
         });
+
+        // Dynamically update the app icon (favicon) based on the loaded logo
+        if (configObj.logo) {
+          const iconLink = document.querySelector("link[rel='icon']") as HTMLLinkElement;
+          if (iconLink) iconLink.href = configObj.logo;
+
+          const appleIconLink = document.querySelector("link[rel='apple-touch-icon']") as HTMLLinkElement;
+          if (appleIconLink) appleIconLink.href = configObj.logo;
+        }
       } catch (error) {
         console.error("Failed to fetch data from sheets:", error);
         setData(prev => ({ ...prev, loading: false }));
