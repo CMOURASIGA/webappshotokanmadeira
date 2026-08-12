@@ -1,52 +1,24 @@
 import { useState } from "react";
 import { ArrowLeft, Check, Copy, ShoppingBag } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
-interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  images: string[];
-}
-
-const products: Product[] = [
-  {
-    id: "camisa-branca",
-    name: "Camisa Branca Oficial",
-    description: "Camisa oficial da Madeira Karate Shotokan. Confortável para os treinos e para o uso diário, mostrando o orgulho da nossa equipe.",
-    price: 80.0,
-    images: [
-      "https://i.imgur.com/GFRZ065.jpeg",
-      "https://i.imgur.com/cfyICW6.jpeg",
-      "https://i.imgur.com/mBWr9l9.jpeg",
-    ],
-  },
-  {
-    id: "camisa-preta",
-    name: "Camisa Preta Oficial",
-    description: "Camisa preta oficial com design exclusivo. Leve a marca da Madeira Karate Shotokan com você aonde for.",
-    price: 80.0,
-    images: [
-      "https://i.imgur.com/AXNFsun.jpeg",
-      "https://i.imgur.com/NVidHd8.jpeg",
-      "https://i.imgur.com/IhPpba8.jpeg",
-    ],
-  },
-];
+import { useAppData, Product } from "../contexts/AppDataContext";
 
 export function Store() {
   const navigate = useNavigate();
   const [copiedKey, setCopiedKey] = useState(false);
   
-  // Use a fallback key for presentation if the environment variable is not yet set by the user
-  const pixKey = import.meta.env.VITE_PIX_KEY || "21973681109";
+  const { products, config, loading } = useAppData();
+  const pixKey = config.pix;
 
   const copyPixKey = () => {
     navigator.clipboard.writeText(pixKey);
     setCopiedKey(true);
     setTimeout(() => setCopiedKey(false), 2000);
   };
+
+  if (loading) {
+    return <div className="p-8 text-center text-neutral-500">Carregando loja...</div>;
+  }
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 max-w-6xl mx-auto w-full">
@@ -107,21 +79,21 @@ export function Store() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {products.map((product) => (
-          <ProductCard key={product.id} product={product} />
+          <ProductCard key={product.id} product={product} whatsapp={config.whatsapp} />
         ))}
       </div>
     </div>
   );
 }
 
-function ProductCard({ product }: { product: Product }) {
+function ProductCard({ product, whatsapp }: { product: Product, whatsapp: string }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden group flex flex-col">
       <div className="aspect-[4/5] bg-neutral-100 relative overflow-hidden">
         <img 
-          src={product.images[currentImageIndex]} 
+          src={product.images[currentImageIndex] || undefined} 
           alt={product.name} 
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
@@ -150,7 +122,7 @@ function ProductCard({ product }: { product: Product }) {
         <p className="text-sm text-neutral-600 flex-1">{product.description}</p>
         
         <a 
-          href={`https://wa.me/5521973681109?text=Olá!%20Gostaria%20de%20comprar%20a%20${encodeURIComponent(product.name)}.%20Segue%20meu%20comprovante%20PIX.`}
+          href={`https://wa.me/${whatsapp}?text=Olá!%20Gostaria%20de%20comprar%20a%20${encodeURIComponent(product.name)}.%20Segue%20meu%20comprovante%20PIX.`}
           target="_blank"
           rel="noopener noreferrer"
           className="mt-6 block w-full py-3 px-4 bg-neutral-900 hover:bg-black text-white text-center font-bold rounded-xl transition-colors"

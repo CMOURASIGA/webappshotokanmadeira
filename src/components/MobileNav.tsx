@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "../lib/utils";
-import { BookOpen, Home, List, Shield, Menu, X, ChevronRight, Calendar, ShoppingBag } from "lucide-react";
+import { BookOpen, Home, List, Shield, Menu, X, ChevronRight, Calendar, ShoppingBag, Megaphone } from "lucide-react";
 import { useState } from "react";
 
 export function MobileNav() {
@@ -9,12 +9,13 @@ export function MobileNav() {
 
   const mainLinks = [
     { name: "Início", path: "/", icon: Home },
+    { name: "Mural", path: "/mural", icon: Megaphone },
     { name: "Loja", path: "/store", icon: ShoppingBag },
     { name: "Katas", path: "/katas", icon: BookOpen },
-    { name: "Técnicas", path: "/techniques", icon: Shield },
   ];
 
   const moreLinks = [
+    { name: "Técnicas", path: "/techniques", icon: Shield },
     { name: "Grade de Horários", path: "/schedule", icon: Calendar },
     { name: "Faixas", path: "/belts", icon: List },
     { name: "Série de Katas", path: "/kata-series", icon: BookOpen },

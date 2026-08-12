@@ -21,17 +21,22 @@ import { History } from "./views/History";
 import { KataSeries } from "./views/KataSeries";
 import { Schedule } from "./views/Schedule";
 import { Maintenance } from "./views/Maintenance";
+import { Mural } from "./views/Mural";
+import { AppDataProvider } from "./contexts/AppDataContext";
+import { NoticePopup } from "./components/NoticePopup";
 
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
 
   return (
-    <>
+    <AppDataProvider>
       {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
+      <NoticePopup canShow={!showSplash} />
       <HashRouter>
         <Layout>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/mural" element={<Mural />} />
             <Route path="/store" element={<Store />} />
             <Route path="/schedule" element={<Schedule />} />
             <Route path="/katas" element={<KatasList />} />
@@ -48,6 +53,6 @@ export default function App() {
           </Routes>
         </Layout>
       </HashRouter>
-    </>
+    </AppDataProvider>
   );
 }
