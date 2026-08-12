@@ -25,6 +25,7 @@ import { Mural } from "./views/Mural";
 import { Events } from "./views/Events";
 import { AppDataProvider } from "./contexts/AppDataContext";
 import { NoticePopup } from "./components/NoticePopup";
+import { Analytics } from "./components/Analytics";
 
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
@@ -34,6 +35,7 @@ export default function App() {
       {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
       <NoticePopup canShow={!showSplash} />
       <HashRouter>
+        <Analytics />
         <Layout>
           <Routes>
             <Route path="/" element={<Home />} />

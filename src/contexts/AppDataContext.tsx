@@ -5,6 +5,7 @@ type AppConfig = {
   whatsapp: string;
   pix: string;
   logo: string;
+  googleAnalyticsId?: string;
 };
 
 export type Product = {
@@ -96,6 +97,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
           if (key === "whatsapp") configObj.whatsapp = value;
           if (key === "pix") configObj.pix = value;
           if (key === "logo" && value) configObj.logo = extractCleanUrl(value);
+          if (key === "google_analytics_id" && value) configObj.googleAnalyticsId = value;
         });
 
         // Fetch Products
