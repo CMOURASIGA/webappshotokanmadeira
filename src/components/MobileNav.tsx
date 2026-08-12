@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "../lib/utils";
-import { BookOpen, Home, List, Shield, Menu, X, ChevronRight, Calendar, ShoppingBag, Megaphone } from "lucide-react";
+import { BookOpen, Home, List, Shield, Menu, X, ChevronRight, Calendar, ShoppingBag, Megaphone, Camera } from "lucide-react";
 import { useState } from "react";
 
 export function MobileNav() {
@@ -15,6 +15,7 @@ export function MobileNav() {
   ];
 
   const moreLinks = [
+    { name: "Eventos & Fotos", path: "/events", icon: Camera },
     { name: "Técnicas", path: "/techniques", icon: Shield },
     { name: "Grade de Horários", path: "/schedule", icon: Calendar },
     { name: "Faixas", path: "/belts", icon: List },

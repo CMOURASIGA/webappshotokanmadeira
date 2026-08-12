@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "../lib/utils";
-import { BookOpen, Home, List, Shield, User, Calendar, ShoppingBag, Megaphone } from "lucide-react";
+import { BookOpen, Home, List, Shield, User, Calendar, ShoppingBag, Megaphone, Camera } from "lucide-react";
 import { useAppData } from "../contexts/AppDataContext";
 
 export function Sidebar() {
@@ -11,6 +11,7 @@ export function Sidebar() {
     { name: "Início", path: "/", icon: Home },
     { name: "Mural", path: "/mural", icon: Megaphone },
     { name: "Loja", path: "/store", icon: ShoppingBag },
+    { name: "Eventos & Fotos", path: "/events", icon: Camera },
     { name: "Grade de Horários", path: "/schedule", icon: Calendar },
     { name: "Série de Katas", path: "/kata-series", icon: BookOpen },
     { name: "Lista de Katas", path: "/katas", icon: BookOpen },

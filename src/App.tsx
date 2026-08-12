@@ -22,6 +22,7 @@ import { KataSeries } from "./views/KataSeries";
 import { Schedule } from "./views/Schedule";
 import { Maintenance } from "./views/Maintenance";
 import { Mural } from "./views/Mural";
+import { Events } from "./views/Events";
 import { AppDataProvider } from "./contexts/AppDataContext";
 import { NoticePopup } from "./components/NoticePopup";
 
@@ -37,6 +38,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/mural" element={<Mural />} />
+            <Route path="/events" element={<Events />} />
             <Route path="/store" element={<Store />} />
             <Route path="/schedule" element={<Schedule />} />
             <Route path="/katas" element={<KatasList />} />

@@ -73,9 +73,22 @@ export function NoticeModal({ notices, currentIndex, isOpen, onClose, onNavigate
           )}
         </div>
         
-        {currentNotice.title && (
-          <div className="p-4 text-center">
-            <h3 className="text-white font-bold text-lg">{currentNotice.title}</h3>
+        {(currentNotice.title || currentNotice.link) && (
+          <div className="p-4 flex flex-col items-center gap-3">
+            {currentNotice.title && (
+              <h3 className="text-white font-bold text-lg text-center">{currentNotice.title}</h3>
+            )}
+            
+            {currentNotice.link && (
+              <a 
+                href={currentNotice.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full bg-karate-red hover:bg-red-700 text-white font-bold py-3 px-4 rounded-xl transition-colors text-center shadow-md flex items-center justify-center gap-2"
+              >
+                Ver Álbum Completo
+              </a>
+            )}
           </div>
         )}
       </div>

@@ -20,12 +20,15 @@ export type Notice = {
   title: string;
   image: string;
   showPopup: boolean;
+  link?: string;
+  type: 'aviso' | 'evento';
 };
 
 type AppData = {
   config: AppConfig;
   products: Product[];
   notices: Notice[];
+  events: Notice[];
   loading: boolean;
 };
 
@@ -67,6 +70,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     },
     products: [],
     notices: [],
+    events: [],
     loading: true
   });
 
@@ -126,17 +130,42 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
                 id: row.id,
                 title: row.titulo || row.title || "",
                 image: extractCleanUrl((row.imagem || row.image || "").trim()),
-                showPopup: (row.mostrar_popup || "").toLowerCase().trim() === "sim"
+                showPopup: (row.mostrar_popup || "").toLowerCase().trim() === "sim",
+                type: 'aviso'
               })).reverse(); // Reverse so the newest (bottom of sheet) comes first
           }
         } catch (err) {
           console.warn("Could not fetch Avisos sheet. It might not exist yet.", err);
         }
 
+        // Fetch Events (Eventos)
+        let eventsList: Notice[] = [];
+        try {
+          const eventsUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Eventos`;
+          const eventsRes = await fetch(eventsUrl);
+          if (eventsRes.ok) {
+            const eventsCsv = await eventsRes.text();
+            const parsedEvents = Papa.parse(eventsCsv, { header: true }).data as any[];
+            eventsList = parsedEvents
+              .filter(row => row.id)
+              .map(row => ({
+                id: row.id,
+                title: row.titulo || row.title || "",
+                image: extractCleanUrl((row.imagem || row.image || "").trim()),
+                showPopup: (row.mostrar_popup || "").toLowerCase().trim() === "sim",
+                link: (row.link_album || row.link || "").trim(),
+                type: 'evento'
+              })).reverse();
+          }
+        } catch (err) {
+          console.warn("Could not fetch Eventos sheet. It might not exist yet.", err);
+        }
+
         setData({
           config: configObj,
           products: productsList,
           notices: noticesList,
+          events: eventsList,
           loading: false
         });
 
