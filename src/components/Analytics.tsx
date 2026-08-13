@@ -29,16 +29,13 @@ export function Analytics() {
     script1.src = `https://www.googletagmanager.com/gtag/js?id=${trackingId}`;
     document.head.appendChild(script1);
 
-    // 2. Add initialization script
-    const script2 = document.createElement("script");
-    script2.id = "ga-init-script";
-    script2.innerHTML = `
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', '${trackingId}', { send_page_view: false });
-    `;
-    document.head.appendChild(script2);
+    // 2. Initialize directly in window to avoid inline script execution issues
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function () {
+      window.dataLayer.push(arguments);
+    };
+    window.gtag("js", new Date());
+    window.gtag("config", trackingId, { send_page_view: false });
   }, [config.googleAnalyticsId]);
 
   // Track page views on route changes
