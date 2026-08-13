@@ -6,6 +6,7 @@ type AppConfig = {
   pix: string;
   logo: string;
   googleAnalyticsId?: string;
+  beltVideoUrl?: string;
 };
 
 export type Product = {
@@ -102,6 +103,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
           if (key === "pix") configObj.pix = value;
           if (key === "logo" && value) configObj.logo = extractCleanUrl(value);
           if (key === "google_analytics_id" && value) configObj.googleAnalyticsId = value;
+          if (key === "video_faixa" && value) configObj.beltVideoUrl = value;
         });
 
         // Fetch Products

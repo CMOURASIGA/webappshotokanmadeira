@@ -1,9 +1,11 @@
 import { Shield, ArrowLeft, Book, ScrollText, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useAppData } from "../contexts/AppDataContext";
 
 export function DojoKun() {
   const navigate = useNavigate();
+  const { config } = useAppData();
   const [activeTab, setActiveTab] = useState<"dojokun" | "nijukun" | "reigi">("dojokun");
 
   const dojoKun = [
@@ -170,7 +172,7 @@ export function DojoKun() {
                   <iframe 
                     width="100%" 
                     height="100%" 
-                    src="https://www.youtube.com/embed/DE1YlRfdOSg" 
+                    src={config.beltVideoUrl || "https://www.youtube.com/embed/DE1YlRfdOSg"}
                     title="Como amarrar a faixa de Karate"
                     frameBorder="0" 
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
