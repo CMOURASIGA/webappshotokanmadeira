@@ -6,7 +6,7 @@ import { useAppData } from "../contexts/AppDataContext";
 export function TechniqueDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { techniqueVideos } = useAppData();
+  const { techniqueVideos, techniqueImages } = useAppData();
   
   const tech = techniques.find(t => t.id === id);
 
@@ -15,6 +15,7 @@ export function TechniqueDetail() {
   }
 
   const videoUrl = techniqueVideos[tech.id] || tech.videoUrl;
+  const imageUrl = techniqueImages[tech.id] || tech.imageUrl;
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300 pb-8">
@@ -41,6 +42,13 @@ export function TechniqueDetail() {
 
         <div className="p-6 md:p-8 grid md:grid-cols-3 gap-8">
           <div className="md:col-span-2 space-y-8">
+            {imageUrl && (
+              <section className="mb-8">
+                <div className="w-full rounded-2xl overflow-hidden shadow-sm border border-neutral-100 bg-neutral-50 flex items-center justify-center relative group">
+                  <img src={imageUrl} alt={tech.nameJp} className="w-full h-auto object-cover max-h-[500px]" />
+                </div>
+              </section>
+            )}
             {videoUrl && (
               <section className="mb-8">
                 <div className="aspect-video w-full rounded-2xl overflow-hidden shadow-sm border border-neutral-100 bg-karate-black flex items-center justify-center relative group">

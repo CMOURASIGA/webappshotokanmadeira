@@ -33,6 +33,7 @@ type AppData = {
   events: Notice[];
   kataVideos: Record<string, string>;
   techniqueVideos: Record<string, string>;
+  techniqueImages: Record<string, string>;
   loading: boolean;
 };
 
@@ -77,6 +78,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     events: [],
     kataVideos: {},
     techniqueVideos: {},
+    techniqueImages: {},
     loading: true
   });
 
@@ -187,8 +189,9 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
           console.warn("Could not fetch Katas sheet. It might not exist yet.", err);
         }
 
-        // Fetch Tecnicas Videos
+        // Fetch Tecnicas Videos e Imagens
         let techniqueVideosMap: Record<string, string> = {};
+        let techniqueImagesMap: Record<string, string> = {};
         try {
           const tecUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Tecnicas`;
           const tecRes = await fetch(tecUrl);
@@ -196,8 +199,13 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
             const tecCsv = await tecRes.text();
             const parsedTec = Papa.parse(tecCsv, { header: true }).data as any[];
             parsedTec.forEach(row => {
-              if (row.id && row.video_url) {
-                techniqueVideosMap[row.id.trim()] = row.video_url.trim();
+              if (row.id) {
+                if (row.video_url) {
+                  techniqueVideosMap[row.id.trim()] = row.video_url.trim();
+                }
+                if (row.imagem || row.image_url) {
+                  techniqueImagesMap[row.id.trim()] = (row.imagem || row.image_url).trim();
+                }
               }
             });
           }
@@ -212,6 +220,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
           events: eventsList,
           kataVideos: kataVideosMap,
           techniqueVideos: techniqueVideosMap,
+          techniqueImages: techniqueImagesMap,
           loading: false
         });
 

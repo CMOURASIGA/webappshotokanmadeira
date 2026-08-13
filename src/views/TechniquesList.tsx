@@ -2,9 +2,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { techniques } from "../data/mockData";
 import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
+import { useAppData } from "../contexts/AppDataContext";
 
 export function TechniquesList() {
   const navigate = useNavigate();
+  const { techniqueImages } = useAppData();
   const [selectedCategory, setSelectedCategory] = useState<string>("Todas");
   
   const categories = Array.from(new Set(techniques.map(t => t.category)));
@@ -56,13 +58,19 @@ export function TechniquesList() {
       </div>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {filteredTechniques.map(tech => (
+        {filteredTechniques.map(tech => {
+          const imgUrl = techniqueImages[tech.id] || tech.imageUrl;
+          return (
           <Link key={tech.id} to={`/techniques/${tech.id}`} className="bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden hover:shadow-md hover:border-karate-red/50 transition-all group flex flex-col">
-            <div className="bg-[#111111] h-32 p-4 flex items-center justify-center border-b border-neutral-100 relative overflow-hidden">
-               <div className="text-6xl font-serif italic text-white/10 absolute -left-2 -top-2 pointer-events-none group-hover:text-karate-red/20 transition-colors">
-                技
-              </div>
-              <h3 className="text-white text-xl font-black tracking-widest uppercase z-10 text-center">{tech.nameJp}</h3>
+            <div className={`h-32 p-4 flex items-center justify-center border-b border-neutral-100 relative overflow-hidden ${imgUrl ? 'bg-black' : 'bg-[#111111]'}`}> 
+              {imgUrl ? (
+                <img src={imgUrl} alt={tech.nameJp} className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity" />
+              ) : (
+                <div className="text-6xl font-serif italic text-white/10 absolute -left-2 -top-2 pointer-events-none group-hover:text-karate-red/20 transition-colors">
+                  技
+                </div>
+              )}
+              <h3 className="text-white text-xl font-black tracking-widest uppercase z-10 text-center drop-shadow-md">{tech.nameJp}</h3>
             </div>
             <div className="p-5 flex-1 flex flex-col">
               <span className="text-xs font-bold text-karate-red uppercase tracking-wider mb-1 block">{tech.category}</span>
@@ -76,7 +84,7 @@ export function TechniquesList() {
               </div>
             </div>
           </Link>
-        ))}
+        )})}
       </div>
     </div>
   );
