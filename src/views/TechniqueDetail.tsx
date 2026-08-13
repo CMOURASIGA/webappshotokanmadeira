@@ -1,15 +1,20 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { techniques } from "../data/mockData";
 import { ArrowLeft, CheckCircle2, XCircle, Info } from "lucide-react";
+import { useAppData } from "../contexts/AppDataContext";
 
 export function TechniqueDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { techniqueVideos } = useAppData();
+  
   const tech = techniques.find(t => t.id === id);
 
   if (!tech) {
     return <div className="p-8 text-center">Técnica não encontrada.</div>;
   }
+
+  const videoUrl = techniqueVideos[tech.id] || tech.videoUrl;
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300 pb-8">
@@ -36,6 +41,22 @@ export function TechniqueDetail() {
 
         <div className="p-6 md:p-8 grid md:grid-cols-3 gap-8">
           <div className="md:col-span-2 space-y-8">
+            {videoUrl && (
+              <section className="mb-8">
+                <div className="aspect-video w-full rounded-2xl overflow-hidden shadow-sm border border-neutral-100 bg-karate-black flex items-center justify-center relative group">
+                  <iframe 
+                    width="100%" 
+                    height="100%" 
+                    src={videoUrl} 
+                    title={`Vídeo da Técnica ${tech.nameJp}`}
+                    frameBorder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowFullScreen
+                    className="absolute inset-0 w-full h-full"
+                  ></iframe>
+                </div>
+              </section>
+            )}
             <section>
               <h2 className="text-2xl font-bold mb-4 font-jp border-b border-neutral-100 pb-2">Descrição</h2>
               <p className="text-neutral-700 leading-relaxed text-lg">{tech.description}</p>

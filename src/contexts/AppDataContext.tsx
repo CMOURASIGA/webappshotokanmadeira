@@ -30,6 +30,8 @@ type AppData = {
   products: Product[];
   notices: Notice[];
   events: Notice[];
+  kataVideos: Record<string, string>;
+  techniqueVideos: Record<string, string>;
   loading: boolean;
 };
 
@@ -72,6 +74,8 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     products: [],
     notices: [],
     events: [],
+    kataVideos: {},
+    techniqueVideos: {},
     loading: true
   });
 
@@ -163,11 +167,49 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
           console.warn("Could not fetch Eventos sheet. It might not exist yet.", err);
         }
 
+        // Fetch Katas Videos
+        let kataVideosMap: Record<string, string> = {};
+        try {
+          const katasUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Katas`;
+          const katasRes = await fetch(katasUrl);
+          if (katasRes.ok) {
+            const katasCsv = await katasRes.text();
+            const parsedKatas = Papa.parse(katasCsv, { header: true }).data as any[];
+            parsedKatas.forEach(row => {
+              if (row.id && row.video_url) {
+                kataVideosMap[row.id.trim()] = row.video_url.trim();
+              }
+            });
+          }
+        } catch (err) {
+          console.warn("Could not fetch Katas sheet. It might not exist yet.", err);
+        }
+
+        // Fetch Tecnicas Videos
+        let techniqueVideosMap: Record<string, string> = {};
+        try {
+          const tecUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Tecnicas`;
+          const tecRes = await fetch(tecUrl);
+          if (tecRes.ok) {
+            const tecCsv = await tecRes.text();
+            const parsedTec = Papa.parse(tecCsv, { header: true }).data as any[];
+            parsedTec.forEach(row => {
+              if (row.id && row.video_url) {
+                techniqueVideosMap[row.id.trim()] = row.video_url.trim();
+              }
+            });
+          }
+        } catch (err) {
+          console.warn("Could not fetch Tecnicas sheet. It might not exist yet.", err);
+        }
+
         setData({
           config: configObj,
           products: productsList,
           notices: noticesList,
           events: eventsList,
+          kataVideos: kataVideosMap,
+          techniqueVideos: techniqueVideosMap,
           loading: false
         });
 
