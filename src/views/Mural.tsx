@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useAppData } from "../contexts/AppDataContext";
 import { Megaphone, Calendar } from "lucide-react";
 import { NoticeModal } from "../components/NoticeModal";
+import { InstagramEmbed } from "../components/InstagramEmbed";
 
 export function Mural() {
   const { notices, loading } = useAppData();
@@ -44,7 +45,13 @@ export function Mural() {
               className="bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm border border-neutral-100 hover:shadow-md transition-shadow group flex flex-col cursor-pointer"
             >
               <div className="w-full aspect-[4/5] bg-neutral-100 overflow-hidden relative">
-                {notice.image ? (
+                {notice.instagramUrl ? (
+                  <InstagramEmbed
+                    url={notice.instagramUrl}
+                    title={notice.title}
+                    compact
+                  />
+                ) : notice.image ? (
                   <img 
                     src={notice.image} 
                     alt={notice.title} 
