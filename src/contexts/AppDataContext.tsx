@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import Papa from "papaparse";
+import { isInstagramPublicationUrl } from "../components/InstagramEmbed";
 
 type AppConfig = {
   whatsapp: string;
@@ -21,6 +22,7 @@ export type Notice = {
   id: string;
   title: string;
   image: string;
+  instagramUrl?: string;
   showPopup: boolean;
   link?: string;
   type: 'aviso' | 'evento';
@@ -136,13 +138,24 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
             const parsedNotices = Papa.parse(noticesCsv, { header: true }).data as any[];
             noticesList = parsedNotices
               .filter(row => row.id)
-              .map(row => ({
-                id: row.id,
-                title: row.titulo || row.title || "",
-                image: extractCleanUrl((row.imagem || row.image || "").trim()),
-                showPopup: (row.mostrar_popup || "").toLowerCase().trim() === "sim",
-                type: 'aviso'
-              })).reverse(); // Reverse so the newest (bottom of sheet) comes first
+              .map(row => {
+                const rawImage = (row.imagem || row.image || "").trim();
+                const explicitInstagramUrl = (
+                  row.instagram || row.instagram_url || row.link_instagram || ""
+                ).trim();
+                const instagramUrl = explicitInstagramUrl || (
+                  isInstagramPublicationUrl(rawImage) ? rawImage : ""
+                );
+
+                return {
+                  id: row.id,
+                  title: row.titulo || row.title || "",
+                  image: instagramUrl ? "" : extractCleanUrl(rawImage),
+                  instagramUrl: isInstagramPublicationUrl(instagramUrl) ? instagramUrl : undefined,
+                  showPopup: (row.mostrar_popup || "").toLowerCase().trim() === "sim",
+                  type: 'aviso' as const
+                };
+              }).reverse(); // Reverse so the newest (bottom of sheet) comes first
           }
         } catch (err) {
           console.warn("Could not fetch Avisos sheet. It might not exist yet.", err);
@@ -164,7 +177,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
                 image: extractCleanUrl((row.imagem || row.image || "").trim()),
                 showPopup: (row.mostrar_popup || "").toLowerCase().trim() === "sim",
                 link: (row.link_album || row.link || "").trim(),
-                type: 'evento'
+                type: 'evento' as const
               })).reverse();
           }
         } catch (err) {

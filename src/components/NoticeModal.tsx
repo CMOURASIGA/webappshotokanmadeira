@@ -1,5 +1,6 @@
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { Notice } from "../contexts/AppDataContext";
+import { InstagramEmbed } from "./InstagramEmbed";
 
 interface NoticeModalProps {
   notices: Notice[];
@@ -24,7 +25,7 @@ export function NoticeModal({ notices, currentIndex, isOpen, onClose, onNavigate
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="relative w-full max-w-md bg-neutral-900 rounded-2xl overflow-hidden shadow-2xl">
+      <div className="relative w-full max-w-md max-h-[92vh] bg-neutral-900 rounded-2xl overflow-hidden shadow-2xl flex flex-col">
         <button 
           onClick={onClose}
           className="absolute top-4 right-4 z-10 w-10 h-10 bg-black/50 hover:bg-black text-white rounded-full flex items-center justify-center transition-colors"
@@ -32,8 +33,13 @@ export function NoticeModal({ notices, currentIndex, isOpen, onClose, onNavigate
           <X size={20} />
         </button>
 
-        <div className="w-full aspect-[4/5] bg-neutral-800 relative">
-          {currentNotice.image ? (
+        <div className={`${currentNotice.instagramUrl ? 'min-h-0 flex-1 overflow-y-auto bg-white' : 'aspect-[4/5]'} w-full bg-neutral-800 relative`}>
+          {currentNotice.instagramUrl ? (
+            <InstagramEmbed
+              url={currentNotice.instagramUrl}
+              title={currentNotice.title}
+            />
+          ) : currentNotice.image ? (
             <img 
               src={currentNotice.image} 
               alt={currentNotice.title}
