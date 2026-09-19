@@ -1,5 +1,7 @@
 # SPEC 01 — Responsive Foundation, Navigation & Global Search
 
+> **Status:** APROVADA EM HUMAN VALIDATION EM 19/09/2026.
+
 ## 1. Objetivo
 Estabelecer a fundação responsiva universal, a estrutura ergonômica de navegação e o mecanismo de busca global em tempo real do Dojo Digital Madeira Karate Shotokan & Artes Marciais.
 
