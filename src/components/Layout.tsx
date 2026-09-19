@@ -1,67 +1,138 @@
-import { ReactNode } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import { Sidebar } from "./Sidebar";
 import { MobileNav } from "./MobileNav";
+import { GlobalSearchModal } from "./GlobalSearchModal";
 import { Search, MessageCircle, Instagram } from "lucide-react";
 import { useAppData } from "../contexts/AppDataContext";
+import { Link } from "react-router-dom";
 
 export function Layout({ children }: { children: ReactNode }) {
   const { config } = useAppData();
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchInitialQuery, setSearchInitialQuery] = useState("");
+
   const whatsappUrl = `https://wa.me/${config.whatsapp}?text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20a%20academia.`;
 
+  // Atalho de teclado global: Cmd+K / Ctrl+K
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setIsSearchOpen(prev => !prev);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  const openSearch = (query = "") => {
+    setSearchInitialQuery(query);
+    setIsSearchOpen(true);
+  };
+
   return (
-    <div className="min-h-screen bg-[#F4F4F4] text-[#111111] flex font-sans overflow-hidden h-screen relative">
+    <div className="min-h-screen bg-[#F4F4F4] text-[#111111] flex font-sans overflow-x-hidden relative">
+      {/* Sidebar Desktop (exibida em telas >= 1024px) */}
       <Sidebar />
-      <div className="flex-1 md:ml-64 flex flex-col h-full relative">
-        <header className="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-4 md:px-10 shrink-0">
-          <div className="flex items-center gap-4">
-            <span className="text-[#BC002D] font-bold text-sm tracking-[0.2em] uppercase italic hidden md:block">Dojo Digital</span>
-            <div className="hidden md:block h-4 w-[1px] bg-gray-300"></div>
-            <span className="text-gray-400 text-xs hidden md:block">Estudo e Disciplina</span>
+
+      {/* Conteúdo Principal */}
+      <div className="flex-1 lg:ml-64 flex flex-col min-h-screen w-full min-w-0 relative">
+        {/* Header Superior Responsivo */}
+        <header className="h-16 sm:h-20 bg-white border-b border-gray-200 flex items-center justify-between px-3 sm:px-6 md:px-8 lg:px-10 shrink-0 sticky top-0 z-30">
+          <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+            {/* Tag Dojo Digital para Desktop */}
+            <span className="text-[#BC002D] font-bold text-xs sm:text-sm tracking-[0.2em] uppercase italic hidden lg:block shrink-0">
+              Dojo Digital
+            </span>
+            <div className="hidden lg:block h-4 w-[1px] bg-gray-300"></div>
+            <span className="text-gray-400 text-xs hidden lg:block truncate">
+              Estudo e Disciplina
+            </span>
             
-            <div className="md:hidden flex items-center gap-2">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 overflow-hidden bg-white">
-                <img src={config.logo || undefined} alt="Madeira Karate Logo" className="w-full h-full object-cover" />
+            {/* Marca Madeira Karate para Mobile e Tablet */}
+            <Link to="/" className="lg:hidden flex items-center gap-2.5 min-w-0 group">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shrink-0 overflow-hidden bg-neutral-900 border border-neutral-700">
+                <img 
+                  src={config.logo || undefined} 
+                  alt="Madeira Karate Logo" 
+                  className="w-full h-full object-contain" 
+                />
               </div>
-              <h1 className="font-jp font-bold tracking-wide uppercase text-karate-black text-sm">Madeira Karate</h1>
-            </div>
+              <div className="min-w-0">
+                <h1 className="font-jp font-bold tracking-wide uppercase text-karate-black text-xs sm:text-sm truncate">
+                  Madeira Karate
+                </h1>
+                <span className="text-[10px] text-karate-gold font-medium tracking-wider hidden sm:block leading-none">
+                  Shotokan JKA
+                </span>
+              </div>
+            </Link>
           </div>
 
-          <div className="flex items-center gap-6">
-            <div className="relative">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input 
-                type="text" 
-                placeholder="Buscar técnica ou kata..." 
-                className="bg-[#F4F4F4] border-none text-xs py-2 pl-9 pr-4 w-48 md:w-64 rounded-full focus:ring-1 focus:ring-[#BC002D] outline-none transition-all"
-              />
+          {/* Área de Busca e Ações */}
+          <div className="flex items-center gap-2 sm:gap-4">
+            {/* Campo de Busca Interativo no Header */}
+            <button
+              onClick={() => openSearch()}
+              aria-label="Abrir busca"
+              className="group flex items-center gap-2 bg-[#F4F4F4] hover:bg-gray-200/80 text-gray-500 py-1.5 sm:py-2 px-3 sm:px-4 rounded-full transition-all text-xs border border-transparent hover:border-gray-300 cursor-pointer"
+            >
+              <Search className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400 group-hover:text-karate-red transition-colors shrink-0" />
+              <span className="hidden sm:inline-block text-gray-400 group-hover:text-gray-600 truncate max-w-[140px] md:max-w-[200px]">
+                Buscar técnica ou kata...
+              </span>
+              <span className="sm:hidden text-xs text-gray-400">Buscar</span>
+              <kbd className="hidden md:inline-flex items-center gap-0.5 text-[10px] bg-white border border-gray-300 px-1.5 py-0.5 rounded text-gray-400 font-mono">
+                ⌘K
+              </kbd>
+            </button>
+
+            {/* Badge de Estilo / Status */}
+            <div className="hidden sm:flex items-center gap-2 pl-2 border-l border-gray-200 text-[11px] text-gray-500 font-medium">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span className="hidden md:inline">JKA Shotokan</span>
             </div>
-            <div className="hidden md:block w-8 h-8 rounded-full bg-gray-200 border border-gray-300"></div>
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-10 pb-[120px] md:pb-10">
+        {/* Viewport Principal com Scroll Suave e Margens Seguras */}
+        <main className="flex-1 p-3 sm:p-6 md:p-8 lg:p-10 pb-[90px] lg:pb-12 w-full max-w-full overflow-x-hidden">
           <div className="max-w-6xl mx-auto relative w-full">
             {children}
           </div>
         </main>
 
-        <footer className="h-12 bg-[#111111] items-center justify-center shrink-0 hidden md:flex">
-          <p className="text-[10px] text-gray-500 tracking-[0.3em] uppercase">O conteúdo educativo não substitui a orientação presencial de um sensei qualificado.</p>
+        {/* Footer Institucional Desktop */}
+        <footer className="h-12 bg-[#111111] items-center justify-center shrink-0 hidden lg:flex px-4 border-t border-neutral-800">
+          <p className="text-[10px] text-neutral-400 tracking-[0.25em] uppercase text-center">
+            O conteúdo educativo não substitui a orientação presencial de um sensei qualificado.
+          </p>
         </footer>
       </div>
-      <MobileNav />
 
-      {/* Floating Action Buttons */}
-      <div className="fixed bottom-[90px] md:bottom-8 right-4 md:right-8 flex flex-col gap-3 z-50">
+      {/* Navegação Mobile Inferior & Drawer */}
+      <MobileNav onOpenSearch={() => openSearch()} />
+
+      {/* Modal de Busca Global Indexada */}
+      <GlobalSearchModal 
+        isOpen={isSearchOpen} 
+        onClose={() => setIsSearchOpen(false)} 
+        initialQuery={searchInitialQuery}
+      />
+
+      {/* Botões Flutuantes de Ação Rápida (WhatsApp & Instagram) */}
+      <div className="fixed bottom-[74px] lg:bottom-8 right-3 sm:right-6 lg:right-8 flex flex-col gap-2.5 z-30">
         <a 
           href="https://instagram.com/madeirakarateshotokan" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] text-white p-4 rounded-full shadow-lg hover:scale-105 transition-all flex items-center justify-center group"
+          className="bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] text-white p-3 sm:p-3.5 rounded-full shadow-lg hover:scale-105 active:scale-95 transition-all flex items-center justify-center group focus:outline-none focus:ring-2 focus:ring-pink-500"
           title="Siga nosso Instagram"
+          aria-label="Instagram Madeira Karate"
         >
-          <Instagram className="w-6 h-6" />
-          <span className="max-w-0 overflow-hidden whitespace-nowrap group-hover:max-w-[200px] transition-all duration-300 ease-in-out font-medium text-sm group-hover:ml-2">
+          <Instagram className="w-5 h-5 sm:w-5 sm:h-5" />
+          <span className="max-w-0 overflow-hidden whitespace-nowrap group-hover:max-w-[200px] transition-all duration-300 ease-in-out font-medium text-xs group-hover:ml-2">
             @madeirakarateshotokan
           </span>
         </a>
@@ -69,11 +140,12 @@ export function Layout({ children }: { children: ReactNode }) {
           href={whatsappUrl} 
           target="_blank" 
           rel="noopener noreferrer"
-          className="bg-[#25D366] text-white p-4 rounded-full shadow-lg hover:scale-105 hover:bg-[#20bd5a] transition-all flex items-center justify-center group"
+          className="bg-[#25D366] text-white p-3 sm:p-3.5 rounded-full shadow-lg hover:scale-105 hover:bg-[#20bd5a] active:scale-95 transition-all flex items-center justify-center group focus:outline-none focus:ring-2 focus:ring-emerald-500"
           title="Fale conosco no WhatsApp"
+          aria-label="WhatsApp Madeira Karate"
         >
-          <MessageCircle className="w-6 h-6" />
-          <span className="max-w-0 overflow-hidden whitespace-nowrap group-hover:max-w-[200px] transition-all duration-300 ease-in-out font-medium text-sm group-hover:ml-2">
+          <MessageCircle className="w-5 h-5 sm:w-5 sm:h-5" />
+          <span className="max-w-0 overflow-hidden whitespace-nowrap group-hover:max-w-[200px] transition-all duration-300 ease-in-out font-medium text-xs group-hover:ml-2">
             Saiba mais
           </span>
         </a>

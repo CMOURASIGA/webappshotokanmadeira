@@ -7,13 +7,13 @@ export function SplashScreen({ onComplete }: { onComplete: () => void }) {
 
   useEffect(() => {
     // Transição de entrada suave
-    const timer1 = setTimeout(() => setStage(1), 80);
-    // Pausa prolongada para contemplação da marca (início da saída suave aos 4.5s)
-    const timer2 = setTimeout(() => setStage(2), 4500);
-    // Finalização e liberação completa aos 5.2s
+    const timer1 = setTimeout(() => setStage(1), 60);
+    // Início da saída suave aos 2.4s (tempo total de ~3 segundos)
+    const timer2 = setTimeout(() => setStage(2), 2400);
+    // Finalização e liberação completa aos 3.0s
     const timer3 = setTimeout(() => {
       onComplete();
-    }, 5200);
+    }, 3000);
 
     return () => {
       clearTimeout(timer1);
@@ -26,7 +26,7 @@ export function SplashScreen({ onComplete }: { onComplete: () => void }) {
     setStage(2);
     setTimeout(() => {
       onComplete();
-    }, 400);
+    }, 200);
   };
 
   return (

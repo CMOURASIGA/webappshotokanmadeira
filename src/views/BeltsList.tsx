@@ -20,16 +20,16 @@ export function BeltsList() {
 
       <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden">
         {belts.map((belt) => (
-          <div key={belt.id} className="flex flex-col md:flex-row md:items-start gap-6 p-8 border-b border-neutral-100 last:border-0 hover:bg-neutral-50 transition-colors">
-            <div className="flex items-center gap-6">
-              <div className="w-16 h-16 shrink-0 rounded-full flex items-center justify-center border-4 border-neutral-100 shadow-inner" style={{ backgroundColor: belt.color }}>
+          <div key={belt.id} className="flex flex-col md:flex-row md:items-start gap-4 sm:gap-6 p-4 sm:p-6 md:p-8 border-b border-neutral-100 last:border-0 hover:bg-neutral-50 transition-colors">
+            <div className="flex items-center gap-4 sm:gap-6">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 shrink-0 rounded-full flex items-center justify-center border-4 border-neutral-100 shadow-inner" style={{ backgroundColor: belt.color }}>
                 {belt.id === "black" && <span className="text-white text-xs font-bold font-jp tracking-widest">初段</span>}
                 {belt.id === "white" && <span className="text-karate-dark text-xs font-bold font-jp">無級</span>}
               </div>
               
-              <div className="w-48">
-                <h3 className="text-2xl font-bold font-jp">{belt.name}</h3>
-                <p className="text-sm font-bold text-karate-red uppercase tracking-wider">{belt.level}</p>
+              <div className="w-auto sm:w-48">
+                <h3 className="text-xl sm:text-2xl font-bold font-jp">{belt.name}</h3>
+                <p className="text-xs sm:text-sm font-bold text-karate-red uppercase tracking-wider">{belt.level}</p>
               </div>
             </div>
 

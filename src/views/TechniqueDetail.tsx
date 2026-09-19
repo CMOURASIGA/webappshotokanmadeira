@@ -44,8 +44,22 @@ export function TechniqueDetail() {
           <div className="md:col-span-2 space-y-8">
             {imageUrl && (
               <section className="mb-8">
-                <div className="w-full rounded-2xl overflow-hidden shadow-sm border border-neutral-100 bg-neutral-50 flex items-center justify-center relative group">
-                  <img src={imageUrl} alt={tech.nameJp} className="w-full h-auto object-cover max-h-[500px]" />
+                <div className="w-full rounded-2xl overflow-hidden shadow-sm border border-neutral-100 bg-neutral-950 flex items-center justify-center relative p-2">
+                  <img 
+                    src={imageUrl} 
+                    alt={tech.nameJp} 
+                    className="w-auto h-auto max-w-full object-contain max-h-[480px] rounded-xl"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                      const parent = e.currentTarget.parentElement;
+                      if (parent) {
+                        const fallback = document.createElement('div');
+                        fallback.className = 'py-12 text-center text-neutral-400 text-sm';
+                        fallback.innerText = 'Imagem temporariamente indisponível';
+                        parent.appendChild(fallback);
+                      }
+                    }} 
+                  />
                 </div>
               </section>
             )}
