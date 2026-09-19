@@ -3,11 +3,18 @@ import { ArrowRight, BookOpen, Megaphone, Shield, Award, Sparkles } from "lucide
 import { useAppData } from "../../contexts/AppDataContext";
 
 interface HomeHeroProps {
+  totalKatas?: number;
+  totalBelts?: number;
   onScrollToBelts: () => void;
   onScrollToAnnouncements: () => void;
 }
 
-export function HomeHero({ onScrollToBelts, onScrollToAnnouncements }: HomeHeroProps) {
+export function HomeHero({
+  totalKatas = 26,
+  totalBelts = 8,
+  onScrollToBelts,
+  onScrollToAnnouncements
+}: HomeHeroProps) {
   const { notices, events } = useAppData();
   const totalAnnouncements = notices.length + events.length;
 
@@ -88,11 +95,11 @@ export function HomeHero({ onScrollToBelts, onScrollToAnnouncements }: HomeHeroP
         {/* Bottom Metrics Bar */}
         <div className="mt-8 sm:mt-10 pt-6 border-t border-neutral-800/80 grid grid-cols-2 sm:grid-cols-4 gap-4 text-left">
           <div className="space-y-0.5">
-            <p className="text-xl sm:text-2xl font-black text-white font-mono">26 Katas</p>
+            <p className="text-xl sm:text-2xl font-black text-white font-mono">{totalKatas} Katas</p>
             <p className="text-xs text-neutral-400 font-medium">Heian, Tekki & Superiores</p>
           </div>
           <div className="space-y-0.5">
-            <p className="text-xl sm:text-2xl font-black text-karate-gold font-mono">8 Níveis</p>
+            <p className="text-xl sm:text-2xl font-black text-karate-gold font-mono">{totalBelts} Níveis</p>
             <p className="text-xs text-neutral-400 font-medium">Da Branca ao Dan</p>
           </div>
           <div className="space-y-0.5">

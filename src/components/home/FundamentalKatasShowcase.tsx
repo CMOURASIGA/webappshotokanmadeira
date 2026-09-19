@@ -1,12 +1,13 @@
 import { Link } from "react-router-dom";
-import { BookOpen, ArrowRight, Play, Layers, Compass } from "lucide-react";
+import { BookOpen, ArrowRight, Play, Layers, Compass, Clock } from "lucide-react";
 import { Kata } from "../../types";
 
 interface FundamentalKatasShowcaseProps {
   katas: Kata[];
+  totalKatas?: number;
 }
 
-export function FundamentalKatasShowcase({ katas }: FundamentalKatasShowcaseProps) {
+export function FundamentalKatasShowcase({ katas, totalKatas }: FundamentalKatasShowcaseProps) {
   // Fundamental katas for foundational study: Heian 1-5 + Tekki Shodan
   const fundamentalIds = [
     "heian-shodan",
@@ -20,6 +21,8 @@ export function FundamentalKatasShowcase({ katas }: FundamentalKatasShowcaseProp
   const fundamentalKatas = fundamentalIds
     .map(id => katas.find(k => k.id === id))
     .filter((k): k is Kata => k !== undefined);
+
+  const displayedTotalKatas = totalKatas ?? katas.length;
 
   return (
     <section className="space-y-6">
@@ -50,7 +53,7 @@ export function FundamentalKatasShowcase({ katas }: FundamentalKatasShowcaseProp
             to="/katas"
             className="inline-flex items-center gap-1.5 text-sm font-bold text-karate-red hover:text-red-700 transition-colors group"
           >
-            <span>Ver todos os 26 Katas</span>
+            <span>Ver todos os {displayedTotalKatas} Katas</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
           </Link>
         </div>
@@ -65,16 +68,23 @@ export function FundamentalKatasShowcase({ katas }: FundamentalKatasShowcaseProp
             className="group bg-white rounded-2xl p-5 sm:p-6 border border-neutral-200 shadow-sm hover:shadow-md hover:border-karate-red/30 transition-all flex flex-col justify-between"
           >
             <div>
-              {/* Top Meta */}
+              {/* Top Meta: Group, Movements & Estimated Duration */}
               <div className="flex items-center justify-between gap-2 mb-3">
                 <span className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-neutral-100 text-neutral-700 border border-neutral-200/80 group-hover:border-karate-red/30 group-hover:text-karate-red transition-colors">
                   {kata.group}
                 </span>
 
-                <span className="text-xs font-mono text-neutral-400 font-medium flex items-center gap-1">
-                  <Layers className="w-3.5 h-3.5" />
-                  {kata.movementsCount} movimentos
-                </span>
+                <div className="flex items-center gap-2.5 text-xs font-mono text-neutral-500 font-medium">
+                  <span className="flex items-center gap-1" title="Número de movimentos">
+                    <Layers className="w-3.5 h-3.5 text-neutral-400" />
+                    {kata.movementsCount} mov.
+                  </span>
+                  <span className="text-neutral-300">•</span>
+                  <span className="flex items-center gap-1" title="Tempo médio de execução">
+                    <Clock className="w-3.5 h-3.5 text-karate-gold" />
+                    {kata.estimatedDuration || "Tempo pendente"}
+                  </span>
+                </div>
               </div>
 
               {/* Title & Meaning */}

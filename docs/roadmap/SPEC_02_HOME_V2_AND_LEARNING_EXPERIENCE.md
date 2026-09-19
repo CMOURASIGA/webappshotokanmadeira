@@ -42,3 +42,4 @@ Reformular a página inicial (`/`) do Dojo Digital Madeira Karate Shotokan, tran
 - Implementar esta SPEC em branch própria, com PR e preview antes de qualquer merge na `main`.
 - Não iniciar SPEC 03 antes da Human Validation explícita desta SPEC.
 - Todas as alterações devem seguir a arquitetura estabelecida no `Layout.tsx` e no sistema de rotas já unificado.
+- **Regra Fundamental de Dados**: Nunca utilizar dados mockados como fallback de conteúdo institucional em produção. Se a planilha estiver vazia, exibir o EmptyState apropriado. Lista vazia ≠ erro de carregamento.

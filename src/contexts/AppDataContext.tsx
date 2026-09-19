@@ -26,6 +26,8 @@ export type Notice = {
   showPopup: boolean;
   link?: string;
   type: 'aviso' | 'evento';
+  date?: string; // Data ISO (YYYY-MM-DD) ou DD/MM/YYYY
+  formattedDate?: string;
 };
 
 type AppData = {
@@ -37,6 +39,7 @@ type AppData = {
   techniqueVideos: Record<string, string>;
   techniqueImages: Record<string, string>;
   loading: boolean;
+  eventsError: boolean;
 };
 
 const AppDataContext = createContext<AppData | undefined>(undefined);
@@ -81,7 +84,8 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     kataVideos: {},
     techniqueVideos: {},
     techniqueImages: {},
-    loading: true
+    loading: true,
+    eventsError: false
   });
 
   useEffect(() => {
@@ -163,6 +167,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
 
         // Fetch Events (Eventos)
         let eventsList: Notice[] = [];
+        let hasEventsError = false;
         try {
           const eventsUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Eventos`;
           const eventsRes = await fetch(eventsUrl);
@@ -170,18 +175,23 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
             const eventsCsv = await eventsRes.text();
             const parsedEvents = Papa.parse(eventsCsv, { header: true }).data as any[];
             eventsList = parsedEvents
-              .filter(row => row.id)
+              .filter(row => row && row.id && String(row.id).trim() !== "")
               .map(row => ({
-                id: row.id,
+                id: String(row.id).trim(),
                 title: row.titulo || row.title || "",
                 image: extractCleanUrl((row.imagem || row.image || "").trim()),
                 showPopup: (row.mostrar_popup || "").toLowerCase().trim() === "sim",
                 link: (row.link_album || row.link || "").trim(),
-                type: 'evento' as const
+                type: 'evento' as const,
+                date: (row.data || row.date || row.data_evento || row.event_date || "").trim()
               })).reverse();
+          } else {
+            console.warn(`Could not fetch Eventos sheet. Status: ${eventsRes.status}`);
+            hasEventsError = true;
           }
         } catch (err) {
-          console.warn("Could not fetch Eventos sheet. It might not exist yet.", err);
+          console.warn("Could not fetch Eventos sheet due to network/parsing error.", err);
+          hasEventsError = true;
         }
 
         // Fetch Katas Videos
@@ -234,7 +244,8 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
           kataVideos: kataVideosMap,
           techniqueVideos: techniqueVideosMap,
           techniqueImages: techniqueImagesMap,
-          loading: false
+          loading: false,
+          eventsError: hasEventsError
         });
 
         // Dynamically update the app icon (favicon) based on the loaded logo

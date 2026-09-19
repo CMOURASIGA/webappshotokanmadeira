@@ -9,7 +9,7 @@ import { DojoKunSection } from "../components/home/DojoKunSection";
 import { NoticeModal } from "../components/NoticeModal";
 
 export function Home() {
-  const { notices, events, loading } = useAppData();
+  const { notices, events, loading, eventsError } = useAppData();
 
   // State for opening NoticeModal directly from Home
   const [modalNotices, setModalNotices] = useState<Notice[]>([]);
@@ -39,6 +39,8 @@ export function Home() {
     <div className="space-y-12 sm:space-y-16 animate-in fade-in duration-500 max-w-7xl mx-auto w-full pb-16">
       {/* 1. Hero Editorial de Alta Fidelidade */}
       <HomeHero
+        totalKatas={katas.length}
+        totalBelts={belts.length}
         onScrollToBelts={() => scrollToSection("trilha-graduacao")}
         onScrollToAnnouncements={() => scrollToSection("mural-e-eventos")}
       />
@@ -47,13 +49,14 @@ export function Home() {
       <BeltProgressionTrack belts={belts} />
 
       {/* 3. Vitrine de Katas Fundamentais */}
-      <FundamentalKatasShowcase katas={katas} />
+      <FundamentalKatasShowcase katas={katas} totalKatas={katas.length} />
 
       {/* 4. Painel de Comunicação Viva do Dojo (Avisos e Eventos) */}
       <DojoAnnouncementsSection
         notices={notices}
         events={events}
         loading={loading}
+        eventsError={eventsError}
         onOpenNoticeModal={handleOpenNoticeModal}
       />
 

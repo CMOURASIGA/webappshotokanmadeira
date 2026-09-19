@@ -430,6 +430,7 @@ export const katas: Kata[] = [
     level: "Iniciante",
     recommendedBeltId: "yellow",
     movementsCount: 21,
+    estimatedDuration: "Aprox. 40s",
     videoUrl: "https://www.youtube.com/embed/9B4jM80-P7E",
     description: "O primeiro kata da série Heian, foca em bases sólidas (Zenkutsu e Kokutsu Dachi), defesas básicas e socos no nível Chudan e Jodan.",
     movements: [
@@ -476,6 +477,7 @@ export const katas: Kata[] = [
     level: "Iniciante",
     recommendedBeltId: "red",
     movementsCount: 26,
+    estimatedDuration: "Aprox. 45s",
     videoUrl: "https://www.youtube.com/embed/eXb-lZq9TCE",
     description: "Segundo kata da série Heian. Introduz chutes (Yoko Geri e Mae Geri) e combinações mais elaboradas como a defesa dupla no início.",
     movements: [
@@ -505,6 +507,7 @@ export const katas: Kata[] = [
     level: "Iniciante",
     recommendedBeltId: "orange",
     movementsCount: 20,
+    estimatedDuration: "Aprox. 40s",
     description: "Terceiro kata da série. Introduz a base Kiba Dachi (Base do Cavaleiro) de forma mais predominante.",
     movements: ["(Abreviado para o mock)"],
     mainTechniques: ["Kiba Dachi", "Uchi Uke", "Nukite"],
@@ -520,6 +523,7 @@ export const katas: Kata[] = [
     level: "Iniciante",
     recommendedBeltId: "green",
     movementsCount: 27,
+    estimatedDuration: "Aprox. 50s",
     description: "Quarto kata da série. Foco em movimentos abertos, duplos e introduz técnicas de chute com as mãos (Kakiwake Uke).",
     movements: ["(Abreviado para o mock)"],
     mainTechniques: ["Kakiwake Uke", "Mae Geri", "Shuto Uke"],
@@ -535,6 +539,7 @@ export const katas: Kata[] = [
     level: "Iniciante",
     recommendedBeltId: "purple",
     movementsCount: 23,
+    estimatedDuration: "Aprox. 50s",
     description: "Último kata da série Heian. Introduz salto (tobi) e várias bases e posições corporais avançadas.",
     movements: ["(Abreviado para o mock)"],
     mainTechniques: ["Mizu Nagare Kamae", "Tobi", "Mikazuki Geri"],
@@ -550,6 +555,7 @@ export const katas: Kata[] = [
     level: "Intermediário",
     recommendedBeltId: "brown",
     movementsCount: 29,
+    estimatedDuration: "Aprox. 50s",
     description: "Kata executado linearmente e focado em combates laterais e à curta distância em Kiba Dachi.",
     movements: ["(Abreviado para o mock)"],
     mainTechniques: ["Kiba Dachi", "Nami Gaeshi"],
@@ -565,6 +571,7 @@ export const katas: Kata[] = [
     level: "Avançado",
     recommendedBeltId: "black",
     movementsCount: 42,
+    estimatedDuration: "Aprox. 60s",
     description: "Representa a superação de obstáculos, executado com forte espírito de quebra (penetração de defesas).",
     movements: ["(Abreviado para o mock)"],
     mainTechniques: ["Sochin Dachi", "Soto Uke", "Yama Zuki"],
@@ -876,3 +883,4 @@ export const katas: Kata[] = [
     commonErrors: ["Falta de entendimento das aplicações (Bunkai)."]
   }
 ];
+

@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { X, ChevronLeft, ChevronRight, ExternalLink, ImageOff } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, ExternalLink, ImageOff, Calendar } from "lucide-react";
 import { Notice } from "../contexts/AppDataContext";
 import { InstagramEmbed } from "./InstagramEmbed";
 
@@ -244,7 +244,13 @@ export function NoticeModal({
         
         {/* Rodapé com Título e Botão quando existentes */}
         {hasFooter && (
-          <div className="p-3.5 sm:p-4 bg-neutral-900 border-t border-neutral-800 shrink-0 flex flex-col items-center gap-2.5 z-10">
+          <div className="p-3.5 sm:p-4 bg-neutral-900 border-t border-neutral-800 shrink-0 flex flex-col items-center gap-2 z-10">
+            {currentNotice.date && (
+              <div className="flex items-center gap-1.5 text-xs text-karate-gold font-bold">
+                <Calendar className="w-3.5 h-3.5" />
+                <span>{currentNotice.formattedDate || currentNotice.date}</span>
+              </div>
+            )}
             {currentNotice.title && (
               <h3 className="text-white font-bold text-base sm:text-lg text-center leading-snug max-w-2xl px-2">
                 {currentNotice.title}

@@ -34,6 +34,7 @@ export type Kata = {
   level: string;
   recommendedBeltId: string;
   movementsCount: number;
+  estimatedDuration?: string; // Tempo médio estimado de execução oficial JKA Shotokan
   description: string;
   embusenImageUrl?: string;
   movements: string[];
