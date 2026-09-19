@@ -1,6 +1,6 @@
 # SPEC 02 — Home V2 & Experiência de Aprendizado
 
-> **Status:** BLOQUEADA ATÉ APROVAÇÃO EXPLÍCITA DA HUMAN VALIDATION DA SPEC 01.
+> **Status:** LIBERADA PARA DESENVOLVIMENTO APÓS APROVAÇÃO DA SPEC 01 EM HUMAN VALIDATION EM 19/09/2026.
 
 ---
 
@@ -37,6 +37,8 @@ Reformular a página inicial (`/`) do Dojo Digital Madeira Karate Shotokan, tran
 
 ---
 
-## 3. Critérios de Não-Início (Governança)
-- Nenhum código desta SPEC deve ser mesclado ou ativado antes da assinatura e validação da SPEC 01.
+## 3. Governança de Implementação
+- SPEC 01 aprovada em Human Validation em 19/09/2026.
+- Implementar esta SPEC em branch própria, com PR e preview antes de qualquer merge na `main`.
+- Não iniciar SPEC 03 antes da Human Validation explícita desta SPEC.
 - Todas as alterações devem seguir a arquitetura estabelecida no `Layout.tsx` e no sistema de rotas já unificado.
