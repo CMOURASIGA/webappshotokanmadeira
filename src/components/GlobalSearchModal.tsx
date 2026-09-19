@@ -43,6 +43,22 @@ export function GlobalSearchModal({ isOpen, onClose, initialQuery = "" }: Global
   const navigate = useNavigate();
   const { notices, events } = useAppData();
 
+  // Todos os resultados indexados em tempo real
+  const allResults = useMemo(() => {
+    return searchAllData(query, notices, events);
+  }, [query, notices, events]);
+
+  // Filtragem pela aba ativa
+  const filteredResults = useMemo(() => {
+    if (selectedCategory === "all") return allResults;
+    return allResults.filter(item => item.category === selectedCategory);
+  }, [allResults, selectedCategory]);
+
+  const handleSelect = (item: SearchResultItem) => {
+    onClose();
+    navigate(item.path);
+  };
+
   useEffect(() => {
     if (isOpen) {
       setQuery(initialQuery);
@@ -59,29 +75,50 @@ export function GlobalSearchModal({ isOpen, onClose, initialQuery = "" }: Global
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
+        e.preventDefault();
         onClose();
+        return;
+      }
+
+      // Se não houver resultados filtrados, teclas de navegação e seleção não agem
+      if (filteredResults.length === 0) return;
+
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setSelectedIndex(prev => Math.min(prev + 1, filteredResults.length - 1));
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setSelectedIndex(prev => Math.max(prev - 1, 0));
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        const currentSelected = filteredResults[selectedIndex];
+        if (currentSelected) {
+          handleSelect(currentSelected);
+        }
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, filteredResults, selectedIndex]);
 
-  // Todos os resultados indexados em tempo real
-  const allResults = useMemo(() => {
-    return searchAllData(query, notices, events);
-  }, [query, notices, events]);
+  // Garante que selectedIndex nunca ultrapasse o total de itens ao mudar filtros/query
+  useEffect(() => {
+    if (filteredResults.length === 0) {
+      setSelectedIndex(0);
+    } else if (selectedIndex >= filteredResults.length) {
+      setSelectedIndex(filteredResults.length - 1);
+    }
+  }, [filteredResults.length, selectedIndex]);
 
-  // Filtragem pela aba ativa
-  const filteredResults = useMemo(() => {
-    if (selectedCategory === "all") return allResults;
-    return allResults.filter(item => item.category === selectedCategory);
-  }, [allResults, selectedCategory]);
-
-  const handleSelect = (item: SearchResultItem) => {
-    onClose();
-    navigate(item.path);
-  };
+  // Rola o item ativo para visualização ao navegar com o teclado
+  useEffect(() => {
+    if (!isOpen || filteredResults.length === 0) return;
+    const activeEl = document.getElementById(`search-result-item-${selectedIndex}`);
+    if (activeEl) {
+      activeEl.scrollIntoView({ block: "nearest" });
+    }
+  }, [selectedIndex, isOpen, filteredResults.length]);
 
   const getCategoryIcon = (category: SearchCategory) => {
     switch (category) {
@@ -117,6 +154,11 @@ export function GlobalSearchModal({ isOpen, onClose, initialQuery = "" }: Global
           <input 
             ref={inputRef}
             type="text"
+            role="combobox"
+            aria-expanded={filteredResults.length > 0}
+            aria-controls="search-results-list"
+            aria-autocomplete="list"
+            aria-activedescendant={filteredResults.length > 0 ? `search-result-item-${selectedIndex}` : undefined}
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
@@ -127,7 +169,11 @@ export function GlobalSearchModal({ isOpen, onClose, initialQuery = "" }: Global
           />
           {query && (
             <button 
-              onClick={() => setQuery("")}
+              onClick={() => {
+                setQuery("");
+                setSelectedIndex(0);
+                inputRef.current?.focus();
+              }}
               className="p-1.5 text-neutral-400 hover:text-white rounded-full hover:bg-neutral-800 transition-colors"
               aria-label="Limpar busca"
             >
@@ -156,7 +202,10 @@ export function GlobalSearchModal({ isOpen, onClose, initialQuery = "" }: Global
               return (
                 <button
                   key={tab.key}
-                  onClick={() => setSelectedCategory(tab.key)}
+                  onClick={() => {
+                    setSelectedCategory(tab.key);
+                    setSelectedIndex(0);
+                  }}
                   className={`text-xs px-2.5 py-1 rounded-full whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 ${
                     isSelected
                       ? "bg-karate-red text-white font-bold shadow-sm"
@@ -223,48 +272,92 @@ export function GlobalSearchModal({ isOpen, onClose, initialQuery = "" }: Global
             </div>
           ) : (
             /* Lista de Resultados */
-            filteredResults.map((item, index) => (
-              <div
-                key={item.id}
-                onClick={() => handleSelect(item)}
-                className="group p-3 sm:p-3.5 rounded-xl hover:bg-neutral-800/80 cursor-pointer transition-all flex items-start justify-between gap-3"
-              >
-                <div className="flex items-start gap-3 min-w-0">
-                  <div className="p-2 rounded-lg bg-neutral-800 border border-neutral-700/60 shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
-                    {getCategoryIcon(item.category)}
-                  </div>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-white font-bold text-sm sm:text-base group-hover:text-karate-gold transition-colors truncate">
-                        {item.title}
-                      </span>
-                      <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full border ${item.badgeClass}`}>
-                        {item.categoryLabel}
-                      </span>
+            <div id="search-results-list" role="listbox" className="space-y-1">
+              {filteredResults.map((item, index) => {
+                const isSelected = index === selectedIndex;
+                return (
+                  <div
+                    key={item.id}
+                    id={`search-result-item-${index}`}
+                    role="option"
+                    aria-selected={isSelected}
+                    onClick={() => handleSelect(item)}
+                    onMouseEnter={() => setSelectedIndex(index)}
+                    className={`group p-3 sm:p-3.5 rounded-xl cursor-pointer transition-all flex items-start justify-between gap-3 border ${
+                      isSelected
+                        ? "bg-neutral-800/95 border-karate-gold/70 ring-1 ring-karate-gold/60 shadow-lg"
+                        : "border-transparent hover:bg-neutral-800/50"
+                    }`}
+                  >
+                    <div className="flex items-start gap-3 min-w-0">
+                      <div className={`p-2 rounded-lg border shrink-0 mt-0.5 transition-all ${
+                        isSelected 
+                          ? "bg-neutral-700/80 border-karate-gold/60 scale-105" 
+                          : "bg-neutral-800 border-neutral-700/60 group-hover:scale-105"
+                      }`}>
+                        {getCategoryIcon(item.category)}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className={`font-bold text-sm sm:text-base transition-colors truncate ${
+                            isSelected ? "text-karate-gold" : "text-white group-hover:text-karate-gold"
+                          }`}>
+                            {item.title}
+                          </span>
+                          <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full border ${item.badgeClass}`}>
+                            {item.categoryLabel}
+                          </span>
+                        </div>
+                        {item.subtitle && (
+                          <p className="text-xs text-neutral-400 font-medium mt-0.5 truncate">
+                            {item.subtitle}
+                          </p>
+                        )}
+                        <p className="text-xs text-neutral-500 mt-1 line-clamp-2 leading-relaxed">
+                          {item.description}
+                        </p>
+                      </div>
                     </div>
-                    {item.subtitle && (
-                      <p className="text-xs text-neutral-400 font-medium mt-0.5 truncate">
-                        {item.subtitle}
-                      </p>
-                    )}
-                    <p className="text-xs text-neutral-500 mt-1 line-clamp-2 leading-relaxed">
-                      {item.description}
-                    </p>
-                  </div>
-                </div>
 
-                <ArrowRight className="w-4 h-4 text-neutral-600 group-hover:text-white group-hover:translate-x-0.5 transition-all shrink-0 mt-2" />
-              </div>
-            ))
+                    <div className="flex items-center gap-2 shrink-0 mt-2">
+                      {isSelected && (
+                        <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded bg-karate-gold/20 text-karate-gold border border-karate-gold/40">
+                          ENTER ↵
+                        </span>
+                      )}
+                      <ArrowRight className={`w-4 h-4 transition-all shrink-0 ${
+                        isSelected 
+                          ? "text-karate-gold translate-x-1" 
+                          : "text-neutral-600 group-hover:text-white group-hover:translate-x-0.5"
+                      }`} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           )}
         </div>
 
         {/* Rodapé de Ajuda */}
-        <div className="p-3 bg-neutral-950 border-t border-neutral-800 text-[11px] text-neutral-500 flex items-center justify-between px-4">
-          <div className="flex items-center gap-3">
-            <span>Pressione <kbd className="bg-neutral-800 px-1 py-0.5 rounded text-neutral-400">ESC</kbd> para fechar</span>
+        <div className="p-3 bg-neutral-950 border-t border-neutral-800 text-[11px] text-neutral-400 flex flex-wrap items-center justify-between gap-2 px-4">
+          <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
+            <span className="flex items-center gap-1">
+              <kbd className="bg-neutral-800 px-1.5 py-0.5 rounded text-neutral-300 text-[10px] font-mono">↑</kbd>
+              <kbd className="bg-neutral-800 px-1.5 py-0.5 rounded text-neutral-300 text-[10px] font-mono">↓</kbd>
+              <span className="text-neutral-500">Navegar</span>
+            </span>
+            <span className="flex items-center gap-1">
+              <kbd className="bg-neutral-800 px-1.5 py-0.5 rounded text-neutral-300 text-[10px] font-mono">↵ Enter</kbd>
+              <span className="text-neutral-500">Abrir</span>
+            </span>
+            <span className="flex items-center gap-1">
+              <kbd className="bg-neutral-800 px-1.5 py-0.5 rounded text-neutral-300 text-[10px] font-mono">ESC</kbd>
+              <span className="text-neutral-500">Fechar</span>
+            </span>
           </div>
-          <span>{allResults.length} resultados indexados</span>
+          <span className="text-neutral-500">
+            {filteredResults.length} {filteredResults.length === 1 ? "resultado" : "resultados"}
+          </span>
         </div>
       </div>
     </div>
