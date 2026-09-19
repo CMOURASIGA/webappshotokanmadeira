@@ -25,7 +25,7 @@ Reformular a página inicial (`/`) do Dojo Digital Madeira Karate Shotokan, tran
 
 ### 2.3. Vitrine dos Katas Fundamentais
 - **Série Heian & Tekki**: Destaque visual dos primeiros katas (Heian Shodan, Nidan, Sandan, Yondan, Godan e Tekki Shodan).
-- **Cards Informativos**: Número de movimentos, tempo médio de execução e significado conceitual.
+- **Cards Informativos**: Nome, significado conceitual, grupo, número de movimentos, descrição concisa e acesso direto à ficha técnica (duração/tempo médio reservado e omitido até validação oficial pedagógica da Madeira Karate).
 - **Acesso em 1 Clique**: Navegação direta para a ficha técnica e vídeo oficial de cada kata em `/katas/:id`.
 
 ### 2.4. Painel de Comunicação Viva do Dojo
