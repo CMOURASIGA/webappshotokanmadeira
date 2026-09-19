@@ -26,8 +26,8 @@ A iniciativa **UX Evolution V2** visa transformar a plataforma em uma referênci
 | SPEC | Nome do Módulo | Status | Descrição Resumida |
 | :--- | :--- | :---: | :--- |
 | **SPEC 01** | **Responsive Foundation, Navigation & Global Search** | **Aprovada** | Fundação responsiva (320px a 1920px), Splash V2 de 3s, Modal adaptativo de mídia, reorganização de menus (Desktop e Mobile) e Busca Global em tempo real com suporte a teclado. |
-| **SPEC 02** | **Home V2 & Experiência de Aprendizado** | **Liberada para desenvolvimento** | Reformulação da página inicial: Hero institucional, trilha visual de graduação, atalhos de katas fundamentais, feed do mural e próximos eventos. |
-| **SPEC 03** | **Área do Aluno, Continuar Estudando & Favoritos** | **Planejada** | Persistência local de progresso, histórico do último kata estudado, marcação de favoritos e checklist de requisitos para exame de faixa. |
+| **SPEC 02** | **Home V2 & Experiência de Aprendizado** | **Aprovada** | Reformulação da página inicial: Hero institucional, trilha visual de graduação, atalhos de katas fundamentais, feed do mural e próximos eventos. |
+| **SPEC 03** | **Área do Aluno, Continuar Estudando & Favoritos** | **Liberada para desenvolvimento** | Persistência local de progresso, histórico do último kata estudado, marcação de favoritos e checklist de requisitos para exame de faixa. |
 | **SPEC 04** | **Loja V2 & Catálogo Integrado** | **Planejada** | Catálogo interativo de kimonos/dogis, faixas, proteções e acessórios do dojo, com carrinho de compras e fechamento direto via WhatsApp oficial. |
 | **SPEC 05** | **SEO, PWA & Otimização de Performance** | **Planejada** | Progressive Web App instalável com cache offline de conteúdos teóricos, dados estruturados Schema.org, metadados sociais e pontuação Lighthouse > 90. |
 
@@ -43,14 +43,14 @@ A iniciativa **UX Evolution V2** visa transformar a plataforma em uma referênci
 - **Navegação Mobile**: Barra inferior com 4 rotas prioritárias + Drawer completo contendo todas as páginas da academia.
 - **Busca Global**: Indexação em tempo real de Katas, Técnicas, Faixas, Vocabulário, Dojo Kun, História, Avisos e Eventos. Navegação completa por teclado (`ArrowDown`, `ArrowUp`, `Enter`, `Escape`) com limite de índice e retorno visual.
 
-### SPEC 02: Home V2 & Experiência de Aprendizado *(Liberada)*
+### SPEC 02: Home V2 & Experiência de Aprendizado *(Aprovada)*
 - **Hero Editorial**: Proposta de valor clara ("Do Branco ao Preto: Disciplina, Tradição e Excelência Técnica").
 - **Trilha de Graduação**: Visualização dinâmica da escala de faixas Shotokan com direcionamento para os requisitos de exame.
 - **Vitrine de Katas Fundamentais**: Destaque para a série Heian (Shodan a Godan) e Tekki Shodan com contagem de movimentos e embusen.
 - **Dojo Kun em Destaque**: Cartão interativo com os 5 princípios éticos do Karateca.
 - **Integração Viva**: Cards dinâmicos com os comunicados mais recentes do Mural e avisos de exames/seminários.
 
-### SPEC 03: Área do Aluno, Continuar Estudando & Favoritos *(Futura)*
+### SPEC 03: Área do Aluno, Continuar Estudando & Favoritos *(Liberada)*
 - **Registro Local de Progresso**: Armazenamento seguro de katas e técnicas marcados como praticados.
 - **Seção "Continuar Estudando"**: Retomada imediata do último conteúdo visualizado pelo aluno na sessão anterior.
 - **Favoritos do Karateca**: Coleção rápida de katas e técnicas para revisão pré-treino.
