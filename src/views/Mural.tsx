@@ -52,11 +52,18 @@ export function Mural() {
                     compact
                   />
                 ) : notice.image ? (
-                  <img 
-                    src={notice.image} 
-                    alt={notice.title} 
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
+                  <div className="w-full h-full bg-neutral-950 relative flex items-center justify-center">
+                    <div 
+                      className="absolute inset-0 bg-cover bg-center filter blur-md opacity-25 scale-110 pointer-events-none" 
+                      style={{ backgroundImage: `url(${notice.image})` }} 
+                    />
+                    <img 
+                      src={notice.image} 
+                      alt={notice.title} 
+                      className="w-full h-full object-contain relative z-10 p-1 group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
+                    />
+                  </div>
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center text-neutral-400 p-6 text-center">
                     <Calendar className="w-12 h-12 mb-2 opacity-50" />

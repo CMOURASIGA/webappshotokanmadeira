@@ -86,7 +86,13 @@ export function Store() {
   );
 }
 
-function ProductCard({ product, whatsapp }: { product: Product, whatsapp: string }) {
+interface ProductCardProps {
+  key?: string | number;
+  product: Product;
+  whatsapp: string;
+}
+
+function ProductCard({ product, whatsapp }: ProductCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   return (

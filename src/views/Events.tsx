@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAppData } from "../contexts/AppDataContext";
-import { Image as ImageIcon, Camera } from "lucide-react";
+import { Image as ImageIcon, Camera, Instagram } from "lucide-react";
 import { NoticeModal } from "../components/NoticeModal";
 
 export function Events() {
@@ -37,41 +37,62 @@ export function Events() {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-          {events.map((eventItem, index) => (
-            <div 
-              key={eventItem.id} 
-              onClick={() => setSelectedEventIndex(index)}
-              className="bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm border border-neutral-100 hover:shadow-md transition-shadow group flex flex-col cursor-pointer"
-            >
-              <div className="w-full aspect-[4/5] bg-neutral-100 overflow-hidden relative">
-                {eventItem.image ? (
-                  <img 
-                    src={eventItem.image} 
-                    alt={eventItem.title} 
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center text-neutral-400 p-6 text-center">
-                    <Camera className="w-12 h-12 mb-2 opacity-50" />
-                    <span className="text-sm">Sem imagem</span>
-                  </div>
-                )}
-                {eventItem.showPopup && (
-                  <div className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-karate-red text-white text-[9px] sm:text-[10px] font-bold px-2 py-1 sm:px-3 rounded-full uppercase tracking-widest shadow-lg">
-                    Destaque
+          {events.map((eventItem, index) => {
+            const isInstagram = Boolean(
+              eventItem.instagramUrl ||
+              (eventItem.image && eventItem.image.includes("instagram.com"))
+            );
+
+            return (
+              <div 
+                key={eventItem.id} 
+                onClick={() => setSelectedEventIndex(index)}
+                className="bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm border border-neutral-100 hover:shadow-md transition-shadow group flex flex-col cursor-pointer"
+              >
+                <div className="w-full aspect-[4/5] bg-neutral-950 overflow-hidden relative flex items-center justify-center">
+                  {isInstagram ? (
+                    <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-gradient-to-b from-neutral-900 to-neutral-950 text-white gap-3">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 flex items-center justify-center text-white shadow-md">
+                        <Instagram className="w-6 h-6" />
+                      </div>
+                      <span className="text-xs font-semibold text-neutral-300">Publicação Instagram</span>
+                    </div>
+                  ) : eventItem.image ? (
+                    <>
+                      <div 
+                        className="absolute inset-0 bg-cover bg-center filter blur-md opacity-25 scale-110 pointer-events-none" 
+                        style={{ backgroundImage: `url(${eventItem.image})` }} 
+                      />
+                      <img 
+                        src={eventItem.image} 
+                        alt={eventItem.title} 
+                        className="w-full h-full object-contain relative z-10 p-1 group-hover:scale-105 transition-transform duration-500"
+                        loading="lazy"
+                      />
+                    </>
+                  ) : (
+                    <div className="w-full h-full flex flex-col items-center justify-center text-neutral-400 p-6 text-center">
+                      <Camera className="w-12 h-12 mb-2 opacity-50" />
+                      <span className="text-sm">Sem imagem</span>
+                    </div>
+                  )}
+                  {eventItem.showPopup && (
+                    <div className="absolute top-2 right-2 sm:top-4 sm:right-4 z-20 bg-karate-red text-white text-[9px] sm:text-[10px] font-bold px-2 py-1 sm:px-3 rounded-full uppercase tracking-widest shadow-lg">
+                      Destaque
+                    </div>
+                  )}
+                </div>
+                
+                {eventItem.title && (
+                  <div className="p-3 sm:p-4 flex-1 flex flex-col justify-between">
+                    <h3 className="font-bold text-sm sm:text-base text-[#111111] leading-tight group-hover:text-karate-red transition-colors line-clamp-2">
+                      {eventItem.title}
+                    </h3>
                   </div>
                 )}
               </div>
-              
-              {eventItem.title && (
-                <div className="p-3 sm:p-4 flex-1 flex flex-col justify-between">
-                  <h3 className="font-bold text-sm sm:text-base text-[#111111] leading-tight group-hover:text-karate-red transition-colors line-clamp-2">
-                    {eventItem.title}
-                  </h3>
-                </div>
-              )}
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
