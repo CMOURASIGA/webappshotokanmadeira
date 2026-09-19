@@ -1,6 +1,6 @@
 # SPEC 03 — Área do Aluno, Continuar Estudando & Favoritos
 
-> **Status:** PLANEJADA (Depende das SPECs 01 e 02).
+> **Status:** LIBERADA PARA DESENVOLVIMENTO APÓS APROVAÇÃO DA SPEC 02 EM HUMAN VALIDATION EM 19/09/2026.
 
 ---
 
@@ -30,6 +30,13 @@ Proporcionar ao praticante de Karate uma experiência personalizada de estudo au
 
 ---
 
-## 3. Diretrizes de Implementação
+## 3. Governança e Diretrizes de Implementação
 - Totalmente funcional no cliente, sem requisições fantasmas ou quebra de privacidade do aluno.
 - Interface responsiva e acessível com feedback visual imediato.
+
+
+## 4. Governança
+- SPEC 01 aprovada em Human Validation.
+- SPEC 02 aprovada em Human Validation em 19/09/2026.
+- Não iniciar SPEC 04 antes da Human Validation explícita desta SPEC.
+- A política institucional de zero mock em produção permanece obrigatória.
