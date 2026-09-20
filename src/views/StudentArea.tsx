@@ -675,7 +675,7 @@ export function StudentArea() {
             {/* Lista Interativa de Requisitos do Exame */}
             <div className="space-y-3">
               <h4 className="text-sm font-bold uppercase tracking-wider text-neutral-500">
-                Itens Exigidos no Exame Oficial JKA:
+                Requisitos de estudo para esta graduação:
               </h4>
 
               {examRequirements.length === 0 ? (
