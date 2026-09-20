@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useAppData } from "../contexts/AppDataContext";
 import { useCart } from "../contexts/CartContext";
+import { PWAInstallButton } from "./pwa/PWAInstallButton";
 
 interface NavItem {
   name: string;
@@ -132,6 +133,11 @@ export function Sidebar() {
           </div>
         ))}
       </nav>
+
+      {/* Botão de Instalação PWA na Sidebar */}
+      <div className="px-3 pb-2 pt-1 shrink-0">
+        <PWAInstallButton variant="sidebar" />
+      </div>
 
       {/* Rodapé da Sidebar */}
       <div className="p-3 border-t border-[#2B2B2B] shrink-0 text-center">

@@ -6,6 +6,7 @@ import { Search, MessageCircle, Instagram, GraduationCap, ShoppingBag } from "lu
 import { useAppData } from "../contexts/AppDataContext";
 import { useCart } from "../contexts/CartContext";
 import { Link } from "react-router-dom";
+import { PWAInstallButton } from "./pwa/PWAInstallButton";
 
 export function Layout({ children }: { children: ReactNode }) {
   const { config } = useAppData();
@@ -100,6 +101,9 @@ export function Layout({ children }: { children: ReactNode }) {
               <GraduationCap className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-karate-gold" />
               <span className="hidden sm:inline">Área do Aluno</span>
             </Link>
+
+            {/* Botão de Instalação PWA Header */}
+            <PWAInstallButton variant="header" />
 
             {/* Campo de Busca Interativo no Header */}
             <button
