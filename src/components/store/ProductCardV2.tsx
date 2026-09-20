@@ -8,7 +8,8 @@ import {
   Sparkles, 
   Plus, 
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  ImageOff
 } from "lucide-react";
 import { Product } from "../../contexts/AppDataContext";
 import { useCart } from "../../contexts/CartContext";
@@ -20,6 +21,7 @@ interface ProductCardV2Props {
 
 export function ProductCardV2({ product, onQuickView }: ProductCardV2Props) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [imageError, setImageError] = useState<Record<number, boolean>>({});
   const [selectedSize, setSelectedSize] = useState<string | undefined>(
     product.sizes && product.sizes.length > 0 ? product.sizes[0] : undefined
   );
@@ -51,23 +53,36 @@ export function ProductCardV2({ product, onQuickView }: ProductCardV2Props) {
     }
   };
 
-  const images = product.images.length > 0 
-    ? product.images 
-    : ["https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=800&auto=format&fit=crop"];
+  const images = product.images;
+  const hasImages = images.length > 0;
+  const currentImageHasError = !hasImages || imageError[currentImageIndex];
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-neutral-200/80 overflow-hidden flex flex-col hover:border-neutral-300 hover:shadow-md transition-all">
       {/* Visual Header / Carousel */}
       <div className="aspect-[4/5] bg-neutral-100 relative overflow-hidden group">
-        <img
-          src={images[currentImageIndex]}
-          alt={product.name}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-          onError={(e) => {
-            // Fallback de imagem caso a URL falhe
-            (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=800&auto=format&fit=crop";
-          }}
-        />
+        {!currentImageHasError ? (
+          <img
+            src={images[currentImageIndex]}
+            alt={product.name}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            onError={() => {
+              setImageError((prev) => ({ ...prev, [currentImageIndex]: true }));
+            }}
+          />
+        ) : (
+          <div className="w-full h-full flex flex-col items-center justify-center p-4 text-center bg-neutral-100 text-neutral-400 select-none">
+            <div className="w-12 h-12 rounded-xl bg-neutral-200/70 flex items-center justify-center mb-2">
+              <ImageOff className="w-6 h-6 text-neutral-400 stroke-[1.5]" />
+            </div>
+            <span className="text-xs font-medium text-neutral-500">
+              Imagem do produto indisponível
+            </span>
+            <span className="text-[10px] text-neutral-400 mt-0.5">
+              Consulte a secretaria para mais detalhes
+            </span>
+          </div>
+        )}
 
         {/* Tags superiores */}
         <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2 pointer-events-none">

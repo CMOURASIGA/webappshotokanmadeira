@@ -201,33 +201,39 @@ export function Store() {
               </span>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-neutral-900 p-3.5 rounded-lg border border-neutral-700">
-              <div className="space-y-0.5 text-left w-full sm:w-auto">
-                <span className="text-[11px] text-neutral-400 block font-mono uppercase">
-                  Chave PIX Oficial (Telefone)
-                </span>
-                <span className="text-sm sm:text-base font-bold text-white font-mono select-all">
-                  {config.pix || "21973681109"}
-                </span>
-              </div>
+            {config.pix && config.pix.trim() !== "" ? (
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-neutral-900 p-3.5 rounded-lg border border-neutral-700">
+                <div className="space-y-0.5 text-left w-full sm:w-auto">
+                  <span className="text-[11px] text-neutral-400 block font-mono uppercase">
+                    Chave PIX Oficial
+                  </span>
+                  <span className="text-sm sm:text-base font-bold text-white font-mono select-all">
+                    {config.pix}
+                  </span>
+                </div>
 
-              <button
-                onClick={copyPixKey}
-                className="w-full sm:w-auto px-4 py-2 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-bold flex items-center justify-center gap-2 transition-colors shrink-0"
-              >
-                {copiedPix ? (
-                  <>
-                    <Check className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>Copiada!</span>
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-3.5 h-3.5 text-neutral-300" />
-                    <span>Copiar Chave</span>
-                  </>
-                )}
-              </button>
-            </div>
+                <button
+                  onClick={copyPixKey}
+                  className="w-full sm:w-auto px-4 py-2 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-bold flex items-center justify-center gap-2 transition-colors shrink-0"
+                >
+                  {copiedPix ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 text-emerald-400" />
+                      <span>Copiada!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5 text-neutral-300" />
+                      <span>Copiar Chave</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            ) : (
+              <div className="bg-neutral-900 p-3.5 rounded-lg border border-neutral-700 text-xs text-neutral-300">
+                Os dados de pagamento serão fornecidos pela secretaria após a confirmação do pedido e disponibilidade dos itens.
+              </div>
+            )}
           </div>
         )}
       </div>
