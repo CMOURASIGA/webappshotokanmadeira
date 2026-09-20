@@ -17,6 +17,7 @@ import {
   GraduationCap
 } from "lucide-react";
 import { useAppData } from "../contexts/AppDataContext";
+import { useCart } from "../contexts/CartContext";
 
 interface NavItem {
   name: string;
@@ -32,6 +33,7 @@ interface NavSection {
 export function Sidebar() {
   const location = useLocation();
   const { config } = useAppData();
+  const { totalItems } = useCart();
 
   const sections: NavSection[] = [
     {
@@ -116,7 +118,12 @@ export function Sidebar() {
                       )}
                     >
                       <Icon className={cn("w-4 h-4 shrink-0", isActive ? "text-white" : "text-neutral-400")} />
-                      <span className="truncate">{item.name}</span>
+                      <span className="truncate flex-1">{item.name}</span>
+                      {item.path === "/store" && totalItems > 0 && (
+                        <span className="bg-karate-gold text-neutral-950 text-[10px] font-black px-1.5 py-0.2 rounded-full">
+                          {totalItems}
+                        </span>
+                      )}
                     </Link>
                   </li>
                 );

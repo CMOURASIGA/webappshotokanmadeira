@@ -2,12 +2,14 @@ import { ReactNode, useState, useEffect } from "react";
 import { Sidebar } from "./Sidebar";
 import { MobileNav } from "./MobileNav";
 import { GlobalSearchModal } from "./GlobalSearchModal";
-import { Search, MessageCircle, Instagram, GraduationCap } from "lucide-react";
+import { Search, MessageCircle, Instagram, GraduationCap, ShoppingBag } from "lucide-react";
 import { useAppData } from "../contexts/AppDataContext";
+import { useCart } from "../contexts/CartContext";
 import { Link } from "react-router-dom";
 
 export function Layout({ children }: { children: ReactNode }) {
   const { config } = useAppData();
+  const { totalItems, setIsCartOpen } = useCart();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchInitialQuery, setSearchInitialQuery] = useState("");
 
@@ -72,6 +74,22 @@ export function Layout({ children }: { children: ReactNode }) {
 
           {/* Área de Busca e Ações */}
           <div className="flex items-center gap-2 sm:gap-3">
+            {/* Botão de Carrinho */}
+            <button
+              onClick={() => setIsCartOpen(true)}
+              aria-label="Abrir carrinho de compras"
+              title="Carrinho de Compras do Dojo"
+              className="flex items-center gap-1.5 text-xs font-bold text-neutral-700 hover:text-karate-red bg-[#F4F4F4] hover:bg-gray-200/80 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-full border border-transparent hover:border-gray-300 transition-all shrink-0 relative"
+            >
+              <ShoppingBag className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-neutral-700" />
+              <span className="hidden sm:inline">Carrinho</span>
+              {totalItems > 0 && (
+                <span className="bg-karate-red text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center -ml-0.5">
+                  {totalItems}
+                </span>
+              )}
+            </button>
+
             {/* Atalho para Área do Aluno */}
             <Link
               to="/student-area"

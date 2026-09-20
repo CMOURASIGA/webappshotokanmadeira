@@ -16,6 +16,14 @@ export type Product = {
   description: string;
   price: number;
   images: string[];
+  category?: string;
+  sizes?: string[];
+  colors?: string[];
+  variations?: string[];
+  customizable?: boolean;
+  available?: boolean;
+  order?: number;
+  active?: boolean;
 };
 
 export type Notice = {
@@ -40,6 +48,7 @@ type AppData = {
   techniqueImages: Record<string, string>;
   loading: boolean;
   eventsError: boolean;
+  productsError: boolean;
 };
 
 const AppDataContext = createContext<AppData | undefined>(undefined);
@@ -85,7 +94,8 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     techniqueVideos: {},
     techniqueImages: {},
     loading: true,
-    eventsError: false
+    eventsError: false,
+    productsError: false
   });
 
   useEffect(() => {
@@ -114,23 +124,83 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
           if (key === "video_faixa" && value) configObj.beltVideoUrl = value;
         });
 
+        // Helper to split comma-separated or semicolon-separated lists
+        const parseList = (val?: string): string[] | undefined => {
+          if (!val) return undefined;
+          const items = val
+            .split(/[,;\n]/)
+            .map(s => s.trim())
+            .filter(Boolean);
+          return items.length > 0 ? items : undefined;
+        };
+
+        // Helper to parse boolean
+        const parseBool = (val?: string): boolean | undefined => {
+          if (!val) return undefined;
+          const clean = val.toLowerCase().trim();
+          if (["sim", "true", "1", "ativo", "disponivel", "disponível", "yes"].includes(clean)) return true;
+          if (["nao", "não", "false", "0", "inativo", "indisponivel", "indisponível", "no"].includes(clean)) return false;
+          return undefined;
+        };
+
         // Fetch Products
-        const productsUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Produtos`;
-        const productsRes = await fetch(productsUrl);
-        const productsCsv = await productsRes.text();
-        
-        const parsedProducts = Papa.parse(productsCsv, { header: true }).data as any[];
-        const productsList: Product[] = parsedProducts
-          .filter(row => row.id) // Ensure valid row
-          .map(row => ({
-            id: row.id,
-            name: row.nome || row.name || "",
-            description: row.descricao || row.description || "",
-            price: parseFloat(row.preco || row.price || "0"),
-            images: [row.imagem1, row.imagem2, row.imagem3]
-              .filter(img => img && img.trim() !== "")
-              .map(img => extractCleanUrl(img.trim()))
-          }));
+        let productsList: Product[] = [];
+        let hasProductsError = false;
+        try {
+          const productsUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Produtos`;
+          const productsRes = await fetch(productsUrl);
+          if (productsRes.ok) {
+            const productsCsv = await productsRes.text();
+            const parsedProducts = Papa.parse(productsCsv, { header: true }).data as any[];
+            
+            productsList = parsedProducts
+              .filter(row => row && row.id && String(row.id).trim() !== "")
+              .map(row => {
+                const isActive = parseBool(row.ativo ?? row.active);
+                // If explicitly marked as inactive (false), respect it; if omitted, default to true
+                const active = isActive !== false;
+
+                const isAvailable = parseBool(row.disponibilidade ?? row.disponivel ?? row.available);
+                const available = isAvailable !== false;
+
+                const rawOrder = row.ordem ?? row.order;
+                const order = rawOrder ? parseInt(String(rawOrder), 10) : undefined;
+
+                return {
+                  id: String(row.id).trim(),
+                  name: (row.nome || row.name || "").trim(),
+                  description: (row.descricao || row.description || "").trim(),
+                  price: parseFloat(row.preco || row.price || "0"),
+                  images: [row.imagem1, row.imagem2, row.imagem3]
+                    .filter(img => img && String(img).trim() !== "")
+                    .map(img => extractCleanUrl(String(img).trim())),
+                  category: (row.categoria || row.category || "").trim() || undefined,
+                  sizes: parseList(row.tamanhos || row.sizes || row.tamanho),
+                  colors: parseList(row.cores || row.colors || row.cor),
+                  variations: parseList(row.variacoes || row.variations || row.variacao),
+                  customizable: parseBool(row.personalizado || row.personalizavel || row.customizable),
+                  available,
+                  order: isNaN(Number(order)) ? undefined : order,
+                  active
+                };
+              })
+              .filter(product => product.active); // Only active products displayed in store
+
+            // Sort by order if provided, otherwise preserve sheet order
+            productsList.sort((a, b) => {
+              if (a.order !== undefined && b.order !== undefined) return a.order - b.order;
+              if (a.order !== undefined) return -1;
+              if (b.order !== undefined) return 1;
+              return 0;
+            });
+          } else {
+            console.warn(`Could not fetch Produtos sheet. Status: ${productsRes.status}`);
+            hasProductsError = true;
+          }
+        } catch (pErr) {
+          console.error("Could not fetch Produtos sheet due to network error", pErr);
+          hasProductsError = true;
+        }
 
         // Fetch Notices (Avisos)
         let noticesList: Notice[] = [];
@@ -245,7 +315,8 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
           techniqueVideos: techniqueVideosMap,
           techniqueImages: techniqueImagesMap,
           loading: false,
-          eventsError: hasEventsError
+          eventsError: hasEventsError,
+          productsError: hasProductsError
         });
 
         // Dynamically update the app icon (favicon) based on the loaded logo

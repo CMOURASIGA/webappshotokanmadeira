@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAppData } from "../contexts/AppDataContext";
+import { useCart } from "../contexts/CartContext";
 
 interface NavItem {
   name: string;
@@ -38,6 +39,7 @@ export function MobileNav({ onOpenSearch }: { onOpenSearch?: () => void }) {
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const { config } = useAppData();
+  const { totalItems } = useCart();
 
   // Fecha o drawer sempre que a rota mudar
   useEffect(() => {
@@ -123,7 +125,14 @@ export function MobileNav({ onOpenSearch }: { onOpenSearch?: () => void }) {
                   : "text-neutral-400 hover:text-white"
               )}
             >
-              <Icon className="w-5 h-5" />
+              <div className="relative">
+                <Icon className="w-5 h-5" />
+                {link.path === "/store" && totalItems > 0 && (
+                  <span className="absolute -top-1 -right-2 bg-karate-gold text-neutral-950 text-[9px] font-black w-3.5 h-3.5 rounded-full flex items-center justify-center">
+                    {totalItems}
+                  </span>
+                )}
+              </div>
               <span className="text-[10px] font-medium leading-none">{link.name}</span>
             </Link>
           );
@@ -223,6 +232,11 @@ export function MobileNav({ onOpenSearch }: { onOpenSearch?: () => void }) {
                         <div className="flex items-center gap-3">
                           <Icon className={cn("w-4 h-4", isActive ? "text-white" : "text-neutral-400")} />
                           <span>{item.name}</span>
+                          {item.path === "/store" && totalItems > 0 && (
+                            <span className="bg-karate-gold text-neutral-950 text-[10px] font-black px-1.5 py-0.5 rounded-full">
+                              {totalItems}
+                            </span>
+                          )}
                         </div>
                         <ChevronRight className="w-3.5 h-3.5 opacity-40" />
                       </Link>
