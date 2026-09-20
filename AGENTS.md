@@ -10,5 +10,6 @@
 - **SPEC 01**: Responsive Foundation, Navigation & Global Search (*Aprovada em Human Validation*).
 - **SPEC 02**: Home V2 & Experiência de Aprendizado (*Aprovada em Human Validation*).
 - **SPEC 03**: Área do Aluno, Continuar Estudando & Favoritos (*Aprovada em Human Validation*).
-- **SPEC 04**: Loja V2 & Catálogo Integrado (*Liberada para desenvolvimento*).
-- **SPECs Subsequentes**: Não iniciar SPEC 05 antes da aprovação explícita em Human Validation da SPEC 04.
+- **SPEC 04**: Loja V2 & Catálogo Integrado (*Aprovada em Human Validation*).
+- **SPEC 05**: SEO, PWA & Otimização de Performance (*Liberada para desenvolvimento*).
+- **Encerramento**: UX Evolution V2 somente pode ser considerada concluída após Human Validation explícita da SPEC 05.
