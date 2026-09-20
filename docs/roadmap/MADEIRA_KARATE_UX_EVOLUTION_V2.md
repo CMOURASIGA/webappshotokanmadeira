@@ -27,8 +27,8 @@ A iniciativa **UX Evolution V2** visa transformar a plataforma em uma referênci
 | :--- | :--- | :---: | :--- |
 | **SPEC 01** | **Responsive Foundation, Navigation & Global Search** | **Aprovada** | Fundação responsiva (320px a 1920px), Splash V2 de 3s, Modal adaptativo de mídia, reorganização de menus (Desktop e Mobile) e Busca Global em tempo real com suporte a teclado. |
 | **SPEC 02** | **Home V2 & Experiência de Aprendizado** | **Aprovada** | Reformulação da página inicial: Hero institucional, trilha visual de graduação, atalhos de katas fundamentais, feed do mural e próximos eventos. |
-| **SPEC 03** | **Área do Aluno, Continuar Estudando & Favoritos** | **Liberada para desenvolvimento** | Persistência local de progresso, histórico do último kata estudado, marcação de favoritos e checklist de requisitos para exame de faixa. |
-| **SPEC 04** | **Loja V2 & Catálogo Integrado** | **Planejada** | Catálogo interativo de kimonos/dogis, faixas, proteções e acessórios do dojo, com carrinho de compras e fechamento direto via WhatsApp oficial. |
+| **SPEC 03** | **Área do Aluno, Continuar Estudando & Favoritos** | **Aprovada** | Persistência local de progresso, histórico do último kata estudado, marcação de favoritos e checklist de requisitos para exame de faixa. |
+| **SPEC 04** | **Loja V2 & Catálogo Integrado** | **Liberada para desenvolvimento** | Catálogo interativo de kimonos/dogis, faixas, proteções e acessórios do dojo, com carrinho de compras e fechamento direto via WhatsApp oficial. |
 | **SPEC 05** | **SEO, PWA & Otimização de Performance** | **Planejada** | Progressive Web App instalável com cache offline de conteúdos teóricos, dados estruturados Schema.org, metadados sociais e pontuação Lighthouse > 90. |
 
 ---
@@ -50,13 +50,13 @@ A iniciativa **UX Evolution V2** visa transformar a plataforma em uma referênci
 - **Dojo Kun em Destaque**: Cartão interativo com os 5 princípios éticos do Karateca.
 - **Integração Viva**: Cards dinâmicos com os comunicados mais recentes do Mural e avisos de exames/seminários.
 
-### SPEC 03: Área do Aluno, Continuar Estudando & Favoritos *(Liberada)*
+### SPEC 03: Área do Aluno, Continuar Estudando & Favoritos *(Aprovada)*
 - **Registro Local de Progresso**: Armazenamento seguro de katas e técnicas marcados como praticados.
 - **Seção "Continuar Estudando"**: Retomada imediata do último conteúdo visualizado pelo aluno na sessão anterior.
 - **Favoritos do Karateca**: Coleção rápida de katas e técnicas para revisão pré-treino.
 - **Checklist de Exame**: Relação de kihon, kata e kumite exigidos para a graduação seguinte do aluno.
 
-### SPEC 04: Loja V2 & Catálogo Integrado *(Futura)*
+### SPEC 04: Loja V2 & Catálogo Integrado *(Liberada)*
 - **Catálogo Organizado**: Divisão em Uniformes (Dogis/Kimonos), Faixas Oficiais, Proteções (Protetores bucais, caneleiras, luvas) e Acessórios (Squeezes, Mochilas).
 - **Filtros e Detalhes**: Seleção por tamanho (A1 a A4, infantil), cor e tecido.
 - **Carrinho e Checkout WhatsApp**: Geração automática de mensagem estruturada para o WhatsApp da secretaria da academia com itens selecionados, tamanhos e valor total.
