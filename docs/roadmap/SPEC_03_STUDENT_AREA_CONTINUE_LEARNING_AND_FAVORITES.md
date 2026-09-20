@@ -1,6 +1,6 @@
 # SPEC 03 — Área do Aluno, Continuar Estudando & Favoritos
 
-> **Status:** LIBERADA PARA DESENVOLVIMENTO APÓS APROVAÇÃO DA SPEC 02 EM HUMAN VALIDATION EM 19/09/2026.
+> **Status:** APROVADA EM HUMAN VALIDATION EM 19/09/2026.
 
 ---
 
