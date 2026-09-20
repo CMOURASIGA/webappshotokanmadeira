@@ -96,19 +96,19 @@ export function HomeHero({
         <div className="mt-8 sm:mt-10 pt-6 border-t border-neutral-800/80 grid grid-cols-2 sm:grid-cols-4 gap-4 text-left">
           <div className="space-y-0.5">
             <p className="text-xl sm:text-2xl font-black text-white font-mono">{totalKatas} Katas</p>
-            <p className="text-xs text-neutral-400 font-medium">Heian, Tekki & Superiores</p>
+            <p className="text-xs text-neutral-300 font-medium">Heian, Tekki & Superiores</p>
           </div>
           <div className="space-y-0.5">
             <p className="text-xl sm:text-2xl font-black text-karate-gold font-mono">{totalBelts} Níveis</p>
-            <p className="text-xs text-neutral-400 font-medium">Da Branca ao Dan</p>
+            <p className="text-xs text-neutral-300 font-medium">Da Branca ao Dan</p>
           </div>
           <div className="space-y-0.5">
             <p className="text-xl sm:text-2xl font-black text-white font-mono">JKA</p>
-            <p className="text-xs text-neutral-400 font-medium">Linhagem Tradicional</p>
+            <p className="text-xs text-neutral-300 font-medium">Linhagem Tradicional</p>
           </div>
           <div className="space-y-0.5">
             <p className="text-xl sm:text-2xl font-black text-karate-red font-mono">5 Princípios</p>
-            <p className="text-xs text-neutral-400 font-medium">Dojo Kun Fundamental</p>
+            <p className="text-xs text-neutral-300 font-medium">Dojo Kun Fundamental</p>
           </div>
         </div>
       </div>

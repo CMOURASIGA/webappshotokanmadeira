@@ -5,12 +5,13 @@ import { GlobalSearchModal } from "./GlobalSearchModal";
 import { Search, MessageCircle, Instagram, GraduationCap, ShoppingBag } from "lucide-react";
 import { useAppData } from "../contexts/AppDataContext";
 import { useCart } from "../contexts/CartContext";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { PWAInstallButton } from "./pwa/PWAInstallButton";
 
 export function Layout({ children }: { children: ReactNode }) {
   const { config } = useAppData();
   const { totalItems, setIsCartOpen } = useCart();
+  const location = useLocation();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchInitialQuery, setSearchInitialQuery] = useState("");
 
@@ -75,11 +76,17 @@ export function Layout({ children }: { children: ReactNode }) {
 
           {/* Área de Busca e Ações */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Botão de Carrinho */}
-            <button
-              onClick={() => setIsCartOpen(true)}
-              aria-label="Abrir carrinho de compras"
-              title="Carrinho de Compras do Dojo"
+            {/* Botão de Carrinho / Loja */}
+            <Link
+              to="/store"
+              onClick={() => {
+                // Se já estiver na página da loja ou tiver itens selecionados, abre o drawer
+                if (location.pathname === "/store" || totalItems > 0) {
+                  setIsCartOpen(true);
+                }
+              }}
+              aria-label="Acessar a loja e carrinho de compras"
+              title="Loja Oficial e Carrinho do Dojo"
               className="flex items-center gap-1.5 text-xs font-bold text-neutral-700 hover:text-karate-red bg-[#F4F4F4] hover:bg-gray-200/80 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-full border border-transparent hover:border-gray-300 transition-all shrink-0 relative"
             >
               <ShoppingBag className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-neutral-700" />
@@ -89,7 +96,7 @@ export function Layout({ children }: { children: ReactNode }) {
                   {totalItems}
                 </span>
               )}
-            </button>
+            </Link>
 
             {/* Atalho para Área do Aluno */}
             <Link
@@ -108,15 +115,15 @@ export function Layout({ children }: { children: ReactNode }) {
             {/* Campo de Busca Interativo no Header */}
             <button
               onClick={() => openSearch()}
-              aria-label="Abrir busca"
-              className="group flex items-center gap-2 bg-[#F4F4F4] hover:bg-gray-200/80 text-gray-500 py-1.5 sm:py-2 px-3 sm:px-4 rounded-full transition-all text-xs border border-transparent hover:border-gray-300 cursor-pointer"
+              aria-label="Buscar técnica ou kata"
+              className="group flex items-center gap-2 bg-[#F4F4F4] hover:bg-gray-200/80 text-gray-600 py-1.5 sm:py-2 px-3 sm:px-4 rounded-full transition-all text-xs border border-transparent hover:border-gray-300 cursor-pointer"
             >
-              <Search className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-400 group-hover:text-karate-red transition-colors shrink-0" />
-              <span className="hidden sm:inline-block text-gray-400 group-hover:text-gray-600 truncate max-w-[140px] md:max-w-[200px]">
+              <Search className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-500 group-hover:text-karate-red transition-colors shrink-0" />
+              <span className="hidden sm:inline-block text-gray-600 group-hover:text-gray-900 truncate max-w-[140px] md:max-w-[200px]">
                 Buscar técnica ou kata...
               </span>
-              <span className="sm:hidden text-xs text-gray-400">Buscar</span>
-              <kbd className="hidden md:inline-flex items-center gap-0.5 text-[10px] bg-white border border-gray-300 px-1.5 py-0.5 rounded text-gray-400 font-mono">
+              <span className="sm:hidden text-xs text-gray-600">Buscar</span>
+              <kbd className="hidden md:inline-flex items-center gap-0.5 text-[10px] bg-white border border-gray-300 px-1.5 py-0.5 rounded text-gray-600 font-mono">
                 ⌘K
               </kbd>
             </button>

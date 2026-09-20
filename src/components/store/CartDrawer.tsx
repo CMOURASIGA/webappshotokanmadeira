@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { 
   X, 
   Trash2, 
@@ -29,6 +30,7 @@ export function CartDrawer() {
   } = useCart();
   
   const { config } = useAppData();
+  const navigate = useNavigate();
   const [confirmClear, setConfirmClear] = useState(false);
   const [thumbnailErrors, setThumbnailErrors] = useState<Record<string, boolean>>({});
 
@@ -97,8 +99,11 @@ export function CartDrawer() {
                 </p>
               </div>
               <button
-                onClick={() => setIsCartOpen(false)}
-                className="mt-2 text-xs font-bold text-karate-red hover:underline"
+                onClick={() => {
+                  setIsCartOpen(false);
+                  navigate("/store");
+                }}
+                className="mt-2 text-xs font-bold text-karate-red hover:underline cursor-pointer"
               >
                 Voltar à Loja
               </button>
