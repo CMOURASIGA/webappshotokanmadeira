@@ -8,5 +8,6 @@
 
 ## Governança de Roadmap (UX Evolution V2)
 - **SPEC 01**: Responsive Foundation, Navigation & Global Search (*Aprovada em Human Validation*).
-- **SPEC 02**: Home V2 & Experiência de Aprendizado (*Em validação*).
-- **SPECs Subsequentes**: Não iniciar SPEC 03 antes da aprovação explícita em Human Validation da SPEC 02.
+- **SPEC 02**: Home V2 & Experiência de Aprendizado (*Aprovada em Human Validation*).
+- **SPEC 03**: Área do Aluno, Continuar Estudando & Favoritos (*Implementada — Em validação*).
+- **SPECs Subsequentes**: Não iniciar SPEC 04 antes da aprovação explícita em Human Validation da SPEC 03.

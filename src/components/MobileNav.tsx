@@ -17,7 +17,8 @@ import {
   Menu, 
   X, 
   ChevronRight,
-  Search
+  Search,
+  GraduationCap
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAppData } from "../contexts/AppDataContext";
@@ -78,6 +79,7 @@ export function MobileNav({ onOpenSearch }: { onOpenSearch?: () => void }) {
     {
       title: "TREINAMENTO",
       items: [
+        { name: "Área do Aluno", path: "/student-area", icon: GraduationCap },
         { name: "Katas", path: "/katas", icon: BookOpen },
         { name: "Técnicas", path: "/techniques", icon: Shield },
         { name: "Faixas", path: "/belts", icon: List },

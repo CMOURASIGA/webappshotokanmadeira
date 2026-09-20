@@ -1,14 +1,29 @@
+import { useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { techniques } from "../data/mockData";
-import { ArrowLeft, CheckCircle2, XCircle, Info } from "lucide-react";
+import { ArrowLeft, CheckCircle2, XCircle, Info, Star, GraduationCap } from "lucide-react";
 import { useAppData } from "../contexts/AppDataContext";
+import { useStudent } from "../contexts/StudentContext";
 
 export function TechniqueDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { techniqueVideos, techniqueImages } = useAppData();
+  const { recordStudy, isFavorite, toggleFavorite } = useStudent();
   
   const tech = techniques.find(t => t.id === id);
+
+  useEffect(() => {
+    if (tech) {
+      recordStudy({
+        id: tech.id,
+        type: "technique",
+        title: tech.nameJp,
+        subtitle: tech.namePt,
+        categoryOrGroup: tech.category
+      });
+    }
+  }, [tech?.id, recordStudy]);
 
   if (!tech) {
     return <div className="p-8 text-center">Técnica não encontrada.</div>;
@@ -16,15 +31,26 @@ export function TechniqueDetail() {
 
   const videoUrl = techniqueVideos[tech.id] || tech.videoUrl;
   const imageUrl = techniqueImages[tech.id] || tech.imageUrl;
+  const isFav = isFavorite(tech.id);
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300 pb-8">
-      <button 
-        onClick={() => navigate(-1)}
-        className="flex items-center gap-2 text-sm text-neutral-500 hover:text-karate-red font-medium transition-colors"
-      >
-        <ArrowLeft className="w-4 h-4" /> Voltar
-      </button>
+      <div className="flex items-center justify-between gap-4">
+        <button 
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-2 text-sm text-neutral-500 hover:text-karate-red font-medium transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" /> Voltar
+        </button>
+
+        <Link
+          to="/student-area"
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-neutral-600 hover:text-neutral-900 bg-white border border-neutral-200 px-3 py-1.5 rounded-lg transition-colors"
+        >
+          <GraduationCap className="w-3.5 h-3.5 text-karate-gold" />
+          <span>Ver na Área do Aluno</span>
+        </Link>
+      </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden">
         <div className="bg-karate-dark text-white p-8 md:p-12 flex flex-col md:flex-row gap-8 items-center justify-between relative overflow-hidden">
@@ -32,9 +58,32 @@ export function TechniqueDetail() {
             技
           </div>
           <div className="relative z-10 flex-1">
-            <span className="inline-block bg-karate-red px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-4">
-              {tech.category}
-            </span>
+            <div className="flex items-center justify-between gap-4 mb-4">
+              <span className="inline-block bg-karate-red px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                {tech.category}
+              </span>
+
+              {/* Botão de Favoritar Técnica */}
+              <button
+                onClick={() => toggleFavorite({
+                  id: tech.id,
+                  type: "technique",
+                  title: tech.nameJp,
+                  subtitle: tech.namePt,
+                  categoryOrGroup: tech.category
+                })}
+                className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
+                  isFav
+                    ? "bg-karate-gold text-neutral-950 shadow-md"
+                    : "bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm border border-white/20"
+                }`}
+                title={isFav ? "Remover dos Favoritos" : "Adicionar aos Favoritos"}
+              >
+                <Star className={`w-3.5 h-3.5 ${isFav ? "fill-neutral-950 text-neutral-950" : "text-white"}`} />
+                <span>{isFav ? "Favoritado" : "Favoritar"}</span>
+              </button>
+            </div>
+
             <h1 className="text-4xl md:text-5xl font-bold font-jp mb-2">{tech.nameJp}</h1>
             <p className="text-xl text-neutral-300">{tech.namePt}</p>
           </div>

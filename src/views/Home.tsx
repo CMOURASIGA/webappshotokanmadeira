@@ -2,6 +2,7 @@ import { useState } from "react";
 import { katas, belts } from "../data/mockData";
 import { useAppData, Notice } from "../contexts/AppDataContext";
 import { HomeHero } from "../components/home/HomeHero";
+import { StudentQuickResumeSection } from "../components/home/StudentQuickResumeSection";
 import { BeltProgressionTrack } from "../components/home/BeltProgressionTrack";
 import { FundamentalKatasShowcase } from "../components/home/FundamentalKatasShowcase";
 import { DojoAnnouncementsSection } from "../components/home/DojoAnnouncementsSection";
@@ -45,7 +46,10 @@ export function Home() {
         onScrollToAnnouncements={() => scrollToSection("mural-e-eventos")}
       />
 
-      {/* 2. Trilha Visual de Graduação (Escala de Faixas) */}
+      {/* 2. Área do Aluno & Continuar Estudando */}
+      <StudentQuickResumeSection />
+
+      {/* 3. Trilha Visual de Graduação (Escala de Faixas) */}
       <BeltProgressionTrack belts={belts} />
 
       {/* 3. Vitrine de Katas Fundamentais */}

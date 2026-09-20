@@ -9,7 +9,8 @@ export type SearchCategory =
   | "dojokun" 
   | "history" 
   | "notice" 
-  | "event";
+  | "event"
+  | "student";
 
 export interface SearchResultItem {
   id: string;
@@ -276,6 +277,58 @@ export function searchAllData(
         description: "Evento e fotos da academia Madeira Karate.",
         path: `/events`,
         badgeClass: "bg-teal-50 text-teal-700 border-teal-200"
+      });
+    }
+  }
+
+  // 9. ÁREA DO ALUNO E FERRAMENTAS DE APRENDIZADO
+  const studentPages = [
+    {
+      id: "student-main",
+      title: "Área do Aluno",
+      subtitle: "Treinamento individual, histórico e metas",
+      desc: "Área do aluno com retomada de estudos, checklist de exame de graduação, favoritos e anotações técnicas do Sensei.",
+      path: "/student-area",
+      keywords: "aluno area do aluno continuar estudando treino progresso meu dojo monkasei"
+    },
+    {
+      id: "student-favorites",
+      title: "Favoritos do Aluno",
+      subtitle: "Katas e técnicas marcados",
+      desc: "Coleção de katas e técnicas salvas para revisão rápida antes dos treinos presenciais.",
+      path: "/student-area?tab=favorites",
+      keywords: "favoritos estrela salvar revisao katas tecnicas"
+    },
+    {
+      id: "student-exam",
+      title: "Checklist de Exame de Faixa",
+      subtitle: "Autoavaliação e requisitos JKA",
+      desc: "Lista interativa de requisitos pedagógicos (Kihon, Kata e Kumite) para a próxima graduação.",
+      path: "/student-area?tab=exam",
+      keywords: "exame faixa checklist graduacao requisitos kyu dan teste avaliacao"
+    },
+    {
+      id: "student-notes",
+      title: "Caderno de Anotações Técnicas",
+      subtitle: "Observações do Sensei",
+      desc: "Registro pessoal de dicas, correções de postura e orientações do Sensei no dojo.",
+      path: "/student-area?tab=notes",
+      keywords: "anotacoes notas caderno correcao sensei dicas postura observacoes"
+    }
+  ];
+
+  for (const sp of studentPages) {
+    const hay = normalizeText(`${sp.title} ${sp.subtitle} ${sp.desc} ${sp.keywords}`);
+    if (hay.includes(q)) {
+      results.push({
+        id: sp.id,
+        category: "student",
+        categoryLabel: "Área do Aluno",
+        title: sp.title,
+        subtitle: sp.subtitle,
+        description: sp.desc,
+        path: sp.path,
+        badgeClass: "bg-purple-50 text-purple-700 border-purple-200"
       });
     }
   }

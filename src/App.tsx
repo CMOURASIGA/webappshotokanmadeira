@@ -23,7 +23,9 @@ import { Schedule } from "./views/Schedule";
 import { Maintenance } from "./views/Maintenance";
 import { Mural } from "./views/Mural";
 import { Events } from "./views/Events";
+import { StudentArea } from "./views/StudentArea";
 import { AppDataProvider } from "./contexts/AppDataContext";
+import { StudentProvider } from "./contexts/StudentContext";
 import { NoticePopup } from "./components/NoticePopup";
 import { Analytics } from "./components/Analytics";
 
@@ -32,31 +34,35 @@ export default function App() {
 
   return (
     <AppDataProvider>
-      {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
-      <NoticePopup canShow={!showSplash} />
-      <HashRouter>
-        <Analytics />
-        <Layout>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/mural" element={<Mural />} />
-            <Route path="/events" element={<Events />} />
-            <Route path="/store" element={<Store />} />
-            <Route path="/schedule" element={<Schedule />} />
-            <Route path="/katas" element={<KatasList />} />
-            <Route path="/katas/:id" element={<KataDetail />} />
-            <Route path="/techniques" element={<TechniquesList />} />
-            <Route path="/techniques/:id" element={<TechniqueDetail />} />
-            <Route path="/belts" element={<BeltsList />} />
-            <Route path="/dojo-kun" element={<DojoKun />} />
-            <Route path="/what-is-kata" element={<WhatIsKata />} />
-            <Route path="/vocabulary" element={<Vocabulary />} />
-            <Route path="/history" element={<History />} />
-            <Route path="/kata-series" element={<KataSeries />} />
-            <Route path="*" element={<Maintenance />} />
-          </Routes>
-        </Layout>
-      </HashRouter>
+      <StudentProvider>
+        {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
+        <NoticePopup canShow={!showSplash} />
+        <HashRouter>
+          <Analytics />
+          <Layout>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/student-area" element={<StudentArea />} />
+              <Route path="/area-do-aluno" element={<StudentArea />} />
+              <Route path="/mural" element={<Mural />} />
+              <Route path="/events" element={<Events />} />
+              <Route path="/store" element={<Store />} />
+              <Route path="/schedule" element={<Schedule />} />
+              <Route path="/katas" element={<KatasList />} />
+              <Route path="/katas/:id" element={<KataDetail />} />
+              <Route path="/techniques" element={<TechniquesList />} />
+              <Route path="/techniques/:id" element={<TechniqueDetail />} />
+              <Route path="/belts" element={<BeltsList />} />
+              <Route path="/dojo-kun" element={<DojoKun />} />
+              <Route path="/what-is-kata" element={<WhatIsKata />} />
+              <Route path="/vocabulary" element={<Vocabulary />} />
+              <Route path="/history" element={<History />} />
+              <Route path="/kata-series" element={<KataSeries />} />
+              <Route path="*" element={<Maintenance />} />
+            </Routes>
+          </Layout>
+        </HashRouter>
+      </StudentProvider>
     </AppDataProvider>
   );
 }

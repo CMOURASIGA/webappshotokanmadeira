@@ -13,7 +13,8 @@ import {
   Sparkles, 
   HelpCircle, 
   ScrollText, 
-  History 
+  History,
+  GraduationCap
 } from "lucide-react";
 import { useAppData } from "../contexts/AppDataContext";
 
@@ -46,6 +47,7 @@ export function Sidebar() {
     {
       title: "TREINAMENTO",
       items: [
+        { name: "Área do Aluno", path: "/student-area", icon: GraduationCap },
         { name: "Katas", path: "/katas", icon: BookOpen },
         { name: "Técnicas", path: "/techniques", icon: Shield },
         { name: "Faixas", path: "/belts", icon: List },

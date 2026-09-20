@@ -2,7 +2,7 @@ import { ReactNode, useState, useEffect } from "react";
 import { Sidebar } from "./Sidebar";
 import { MobileNav } from "./MobileNav";
 import { GlobalSearchModal } from "./GlobalSearchModal";
-import { Search, MessageCircle, Instagram } from "lucide-react";
+import { Search, MessageCircle, Instagram, GraduationCap } from "lucide-react";
 import { useAppData } from "../contexts/AppDataContext";
 import { Link } from "react-router-dom";
 
@@ -71,7 +71,18 @@ export function Layout({ children }: { children: ReactNode }) {
           </div>
 
           {/* Área de Busca e Ações */}
-          <div className="flex items-center gap-2 sm:gap-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Atalho para Área do Aluno */}
+            <Link
+              to="/student-area"
+              aria-label="Área do Aluno"
+              title="Área do Aluno & Treinamento Autônomo"
+              className="flex items-center gap-1.5 text-xs font-bold text-neutral-700 hover:text-karate-red bg-[#F4F4F4] hover:bg-gray-200/80 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-full border border-transparent hover:border-gray-300 transition-all shrink-0"
+            >
+              <GraduationCap className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-karate-gold" />
+              <span className="hidden sm:inline">Área do Aluno</span>
+            </Link>
+
             {/* Campo de Busca Interativo no Header */}
             <button
               onClick={() => openSearch()}

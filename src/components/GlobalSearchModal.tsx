@@ -25,6 +25,7 @@ interface GlobalSearchModalProps {
 
 const CATEGORY_TABS: { key: "all" | SearchCategory; label: string }[] = [
   { key: "all", label: "Todos" },
+  { key: "student", label: "Área do Aluno" },
   { key: "kata", label: "Katas" },
   { key: "technique", label: "Técnicas" },
   { key: "vocabulary", label: "Vocabulário" },
