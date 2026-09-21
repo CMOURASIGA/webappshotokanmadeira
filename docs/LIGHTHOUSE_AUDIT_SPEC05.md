@@ -1,6 +1,6 @@
 # Evidência de Auditoria Lighthouse — SPEC 05 (SEO, PWA & Performance)
 
-> **Status:** AUDITORIA OFICIAL REGISTRADA — AGUARDANDO HUMAN VALIDATION DA SPEC 05.
+> **Status:** AUDITORIA OFICIAL REGISTRADA — SPEC 05 APROVADA EM HUMAN VALIDATION EM 21/09/2026.
 
 ---
 
@@ -79,4 +79,4 @@
 
 ---
 
-*Documento registrado formalmente para instruir a etapa de **Human Validation da SPEC 05**.*
+*Documento registrado como evidência oficial da **SPEC 05 aprovada em Human Validation em 21/09/2026**.*
