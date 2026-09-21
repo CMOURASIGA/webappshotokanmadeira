@@ -19,7 +19,6 @@ import { useNavigate } from "react-router-dom";
 import { useAppData } from "../contexts/AppDataContext";
 import { useCart } from "../contexts/CartContext";
 import { ProductCardV2 } from "../components/store/ProductCardV2";
-import { CartDrawer } from "../components/store/CartDrawer";
 
 export function Store() {
   const navigate = useNavigate();
@@ -412,9 +411,6 @@ export function Store() {
           ))}
         </div>
       )}
-
-      {/* Componente gaveta do carrinho */}
-      <CartDrawer />
     </div>
   );
 }

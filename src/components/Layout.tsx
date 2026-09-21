@@ -2,6 +2,7 @@ import { ReactNode, useState, useEffect } from "react";
 import { Sidebar } from "./Sidebar";
 import { MobileNav } from "./MobileNav";
 import { GlobalSearchModal } from "./GlobalSearchModal";
+import { CartDrawer } from "./store/CartDrawer";
 import { Search, MessageCircle, Instagram, GraduationCap, ShoppingBag } from "lucide-react";
 import { useAppData } from "../contexts/AppDataContext";
 import { useCart } from "../contexts/CartContext";
@@ -190,6 +191,8 @@ export function Layout({ children }: { children: ReactNode }) {
           </span>
         </a>
       </div>
+      {/* Drawer Global do Carrinho de Compras */}
+      <CartDrawer />
     </div>
   );
 }
