@@ -29,7 +29,7 @@ A iniciativa **UX Evolution V2** visa transformar a plataforma em uma referênci
 | **SPEC 02** | **Home V2 & Experiência de Aprendizado** | **Aprovada** | Reformulação da página inicial: Hero institucional, trilha visual de graduação, atalhos de katas fundamentais, feed do mural e próximos eventos. |
 | **SPEC 03** | **Área do Aluno, Continuar Estudando & Favoritos** | **Aprovada** | Persistência local de progresso, histórico do último kata estudado, marcação de favoritos e checklist de requisitos para exame de faixa. |
 | **SPEC 04** | **Loja V2 & Catálogo Integrado** | **Aprovada** | Catálogo interativo de kimonos/dogis, faixas, proteções e acessórios do dojo, com carrinho de compras e fechamento direto via WhatsApp oficial. |
-| **SPEC 05** | **SEO, PWA & Otimização de Performance** | **Liberada para desenvolvimento** | Progressive Web App instalável com cache offline de conteúdos teóricos, dados estruturados Schema.org, metadados sociais e pontuação Lighthouse > 90. |
+| **SPEC 05** | **SEO, PWA & Otimização de Performance** | **Aprovada** | Progressive Web App instalável, cache offline controlado, SEO estruturado, acessibilidade validada e auditoria Lighthouse registrada. |
 
 ---
 
@@ -61,8 +61,16 @@ A iniciativa **UX Evolution V2** visa transformar a plataforma em uma referênci
 - **Filtros e Detalhes**: Seleção por tamanho (A1 a A4, infantil), cor e tecido.
 - **Carrinho e Checkout WhatsApp**: Geração automática de mensagem estruturada para o WhatsApp da secretaria da academia com itens selecionados, tamanhos e valor total.
 
-### SPEC 05: SEO, PWA & Otimização de Performance *(Liberada)*
+### SPEC 05: SEO, PWA & Otimização de Performance *(Aprovada)*
 - **PWA Completo**: Manifesto Web, ícones de alta densidade, splash screen nativa de instalação e Service Worker configurado para cache offline de conteúdos teóricos (Katas, Vocabulário e Dojo Kun).
 - **SEO & Social Share**: Configuração de metatags OpenGraph/Twitter e marcação Schema.org (`SportsClub`).
 - **Performance e Acessibilidade**: Lazy loading de imagens, divisão inteligente de bundles e conformidade com WCAG AA.
 
+
+---
+
+## 5. Encerramento da UX Evolution V2
+
+A fase **UX Evolution V2 foi concluída e aprovada em Human Validation em 21/09/2026**, com as SPECs 01 a 05 aprovadas.
+
+A auditoria Lighthouse da SPEC 05 permanece registrada em `docs/LIGHTHOUSE_AUDIT_SPEC05.md`, incluindo as limitações conhecidas de performance e oportunidades futuras de evolução.
