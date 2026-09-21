@@ -1,6 +1,6 @@
 # SPEC 05 — SEO, PWA & Otimização de Performance
 
-> **Status:** LIBERADA PARA DESENVOLVIMENTO APÓS APROVAÇÃO DA SPEC 04 EM HUMAN VALIDATION EM 19/09/2026.
+> **Status:** APROVADA EM HUMAN VALIDATION EM 21/09/2026.
 
 ---
 
@@ -341,4 +341,4 @@ Validar no mínimo:
 18. Desktop.
 19. Ausência de regressões funcionais.
 
-Após aprovação desta SPEC, a fase UX Evolution V2 pode ser considerada concluída.
+SPEC 05 aprovada em Human Validation em 21/09/2026. Com esta aprovação, a fase UX Evolution V2 está concluída.
