@@ -11,5 +11,5 @@
 - **SPEC 02**: Home V2 & Experiência de Aprendizado (*Aprovada em Human Validation*).
 - **SPEC 03**: Área do Aluno, Continuar Estudando & Favoritos (*Aprovada em Human Validation*).
 - **SPEC 04**: Loja V2 & Catálogo Integrado (*Aprovada em Human Validation*).
-- **SPEC 05**: SEO, PWA & Otimização de Performance (*Liberada para desenvolvimento*).
-- **Encerramento**: UX Evolution V2 somente pode ser considerada concluída após Human Validation explícita da SPEC 05.
+- **SPEC 05**: SEO, PWA & Otimização de Performance (*Aprovada em Human Validation*).
+- **Encerramento**: UX Evolution V2 (*Concluída e aprovada em Human Validation em 21/09/2026*).
