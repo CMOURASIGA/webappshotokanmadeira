@@ -12,6 +12,7 @@ import { StudentProvider } from "./contexts/StudentContext";
 import { CartProvider } from "./contexts/CartContext";
 import { NoticePopup } from "./components/NoticePopup";
 import { Analytics } from "./components/Analytics";
+import { Analytics as VercelAnalytics } from "@vercel/analytics/react";
 import { OfflineIndicator } from "./components/pwa/OfflineIndicator";
 
 // Lazy loading & Code-splitting das views para otimização de FCP, LCP e bundle size
@@ -49,6 +50,7 @@ export default function App() {
     <AppDataProvider>
       <StudentProvider>
         <CartProvider>
+          <VercelAnalytics />
           {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
           <NoticePopup canShow={!showSplash} />
           <OfflineIndicator />
