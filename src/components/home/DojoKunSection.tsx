@@ -57,7 +57,7 @@ export function DojoKunSection() {
           <h2 className="text-2xl sm:text-3xl font-black font-jp tracking-tight text-neutral-900">
             Dojo Kun: Os 5 Preceitos Sagrados
           </h2>
-          <p className="text-sm text-neutral-500 mt-0.5">
+          <p className="text-sm text-neutral-600 mt-0.5">
             Recitados ao final de cada treino no Madeira Karate, os princípios transmitidos por Gichin Funakoshi guiam a formação do praticante.
           </p>
         </div>
@@ -84,16 +84,16 @@ export function DojoKunSection() {
                 <span className="w-8 h-8 rounded-lg bg-neutral-900 text-karate-gold flex items-center justify-center font-jp font-bold text-sm">
                   {item.number}
                 </span>
-                <span className="text-xs font-mono font-bold text-neutral-400">
+                <span className="text-xs font-mono font-bold text-neutral-600">
                   Preceito {item.numeral}
                 </span>
               </div>
 
               {/* Japanese Kanji & Romaji */}
-              <p className="text-xs font-jp text-neutral-500 line-clamp-1 mb-1 font-semibold">
+              <p className="text-xs font-jp text-neutral-600 line-clamp-1 mb-1 font-semibold">
                 {item.jp}
               </p>
-              <p className="text-[11px] font-mono text-neutral-400 italic mb-2 line-clamp-1">
+              <p className="text-[11px] font-mono text-neutral-600 italic mb-2 line-clamp-1">
                 {item.romaji}
               </p>
 
@@ -105,7 +105,7 @@ export function DojoKunSection() {
 
             {/* Daily life insight */}
             <div className="pt-3 mt-3 border-t border-neutral-100">
-              <p className="text-[11px] text-neutral-500 leading-relaxed">
+              <p className="text-[11px] text-neutral-600 leading-relaxed">
                 {item.insight}
               </p>
             </div>

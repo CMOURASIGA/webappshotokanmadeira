@@ -50,7 +50,7 @@ export function Layout({ children }: { children: ReactNode }) {
               Dojo Digital
             </span>
             <div className="hidden lg:block h-4 w-[1px] bg-gray-300"></div>
-            <span className="text-gray-400 text-xs hidden lg:block truncate">
+            <span className="text-gray-600 text-xs hidden lg:block truncate">
               Estudo e Disciplina
             </span>
             
@@ -115,7 +115,7 @@ export function Layout({ children }: { children: ReactNode }) {
             {/* Campo de Busca Interativo no Header */}
             <button
               onClick={() => openSearch()}
-              aria-label="Buscar técnica ou kata"
+              aria-label="Buscar técnica ou kata... ⌘K"
               className="group flex items-center gap-2 bg-[#F4F4F4] hover:bg-gray-200/80 text-gray-600 py-1.5 sm:py-2 px-3 sm:px-4 rounded-full transition-all text-xs border border-transparent hover:border-gray-300 cursor-pointer"
             >
               <Search className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-500 group-hover:text-karate-red transition-colors shrink-0" />
@@ -129,7 +129,7 @@ export function Layout({ children }: { children: ReactNode }) {
             </button>
 
             {/* Badge de Estilo / Status */}
-            <div className="hidden sm:flex items-center gap-2 pl-2 border-l border-gray-200 text-[11px] text-gray-500 font-medium">
+            <div className="hidden sm:flex items-center gap-2 pl-2 border-l border-gray-200 text-[11px] text-gray-600 font-medium">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
               <span className="hidden md:inline">JKA Shotokan</span>
             </div>

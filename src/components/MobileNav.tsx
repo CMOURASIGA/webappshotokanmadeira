@@ -121,8 +121,8 @@ export function MobileNav({ onOpenSearch }: { onOpenSearch?: () => void }) {
               className={cn(
                 "flex flex-col items-center justify-center gap-1 py-1.5 px-2 flex-1 rounded-lg transition-all min-h-[44px]",
                 isActive 
-                  ? "text-karate-red font-bold" 
-                  : "text-neutral-400 hover:text-white"
+                  ? "text-red-400 font-bold" 
+                  : "text-neutral-300 hover:text-white"
               )}
             >
               <div className="relative">
@@ -144,7 +144,7 @@ export function MobileNav({ onOpenSearch }: { onOpenSearch?: () => void }) {
           aria-label="Abrir Menu Completo"
           className={cn(
             "flex flex-col items-center justify-center gap-1 py-1.5 px-2 flex-1 rounded-lg transition-all min-h-[44px]",
-            menuOpen ? "text-karate-red font-bold" : "text-neutral-400 hover:text-white"
+            menuOpen ? "text-red-400 font-bold" : "text-neutral-300 hover:text-white"
           )}
         >
           <Menu className="w-5 h-5" />

@@ -35,7 +35,7 @@ export function BeltProgressionTrack({ belts }: BeltProgressionTrackProps) {
           <h2 className="text-2xl sm:text-3xl font-black font-jp tracking-tight text-neutral-900">
             A Jornada das Faixas
           </h2>
-          <p className="text-sm text-neutral-500 mt-0.5">
+          <p className="text-sm text-neutral-600 mt-0.5">
             Do primeiro passo na faixa branca ao domínio técnico da faixa preta. Toque em uma faixa para ver os requisitos.
           </p>
         </div>
@@ -146,10 +146,10 @@ export function BeltProgressionTrack({ belts }: BeltProgressionTrackProps) {
 
           {/* Requirements Grid */}
           <div className="pt-5">
-            <h4 className="text-xs uppercase font-bold tracking-wider text-neutral-400 mb-3 flex items-center gap-1.5">
+            <h3 className="text-xs uppercase font-bold tracking-wider text-neutral-600 mb-3 flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-karate-red" />
               Requisitos Principais de Exame
-            </h4>
+            </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
               {selectedBelt.requirements.map((req, i) => (

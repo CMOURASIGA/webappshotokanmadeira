@@ -35,9 +35,9 @@ export function StudentQuickResumeSection() {
             </div>
 
             <div>
-              <h3 className="text-xl sm:text-2xl font-bold font-jp text-neutral-900">
+              <h2 className="text-xl sm:text-2xl font-bold font-jp text-neutral-900">
                 {lastStudy.title}
-              </h3>
+              </h2>
               <p className="text-xs sm:text-sm text-neutral-500 mt-0.5">
                 {lastStudy.subtitle} • {lastStudy.categoryOrGroup}
               </p>
@@ -116,9 +116,9 @@ export function StudentQuickResumeSection() {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-bold text-sm sm:text-base text-neutral-900 font-jp">
+                <h2 className="font-bold text-sm sm:text-base text-neutral-900 font-jp">
                   Área do Aluno & Treinamento Individual
-                </h3>
+                </h2>
                 <span className="text-[10px] bg-karate-gold/20 text-neutral-800 font-bold px-2 py-0.5 rounded-full uppercase">
                   Novo
                 </span>

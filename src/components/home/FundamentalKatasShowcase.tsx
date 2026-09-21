@@ -36,7 +36,7 @@ export function FundamentalKatasShowcase({ katas, totalKatas }: FundamentalKatas
           <h2 className="text-2xl sm:text-3xl font-black font-jp tracking-tight text-neutral-900">
             Katas Fundamentais
           </h2>
-          <p className="text-sm text-neutral-500 mt-0.5">
+          <p className="text-sm text-neutral-600 mt-0.5">
             A base técnica do Shotokan. Os 5 Katas da série Heian e o Tekki Shodan para fortalecimento de postura e embusen.
           </p>
         </div>
@@ -90,7 +90,7 @@ export function FundamentalKatasShowcase({ katas, totalKatas }: FundamentalKatas
                 </span>
               </h3>
 
-              <p className="text-xs text-neutral-500 italic mt-1 line-clamp-1">
+              <p className="text-xs text-neutral-600 italic mt-1 line-clamp-1">
                 "{kata.meaning}"
               </p>
 

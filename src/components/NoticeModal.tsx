@@ -159,7 +159,7 @@ export function NoticeModal({
               </div>
               <div className="space-y-1 text-center">
                 <p className="text-white font-medium text-base">Imagem temporariamente indisponível</p>
-                <p className="text-xs text-neutral-500">Não foi possível carregar a arte deste aviso</p>
+                <p className="text-xs text-neutral-300">Não foi possível carregar a arte deste aviso</p>
               </div>
             </div>
           ) : currentNotice.image ? (
@@ -173,6 +173,8 @@ export function NoticeModal({
               <img 
                 src={currentNotice.image} 
                 alt={currentNotice.title || "Aviso"}
+                width="1200"
+                height="675"
                 onLoad={(e) => {
                   const { naturalWidth, naturalHeight } = e.currentTarget;
                   if (naturalWidth && naturalHeight) {
@@ -229,12 +231,16 @@ export function NoticeModal({
                       key={idx}
                       onClick={() => onNavigate(idx)}
                       aria-label={`Ir para o aviso ${idx + 1}`}
-                      className={`h-2 rounded-full transition-all duration-300 ${
-                        idx === currentIndex 
-                          ? "w-6 bg-karate-red" 
-                          : "w-2 bg-white/50 hover:bg-white/80"
-                      }`}
-                    />
+                      className="min-w-[24px] min-h-[24px] p-1 flex items-center justify-center cursor-pointer"
+                    >
+                      <span
+                        className={`h-2 rounded-full transition-all duration-300 block ${
+                          idx === currentIndex 
+                            ? "w-6 bg-karate-red" 
+                            : "w-2 bg-white/50 hover:bg-white/80"
+                        }`}
+                      />
+                    </button>
                   ))}
                 </div>
               </div>
