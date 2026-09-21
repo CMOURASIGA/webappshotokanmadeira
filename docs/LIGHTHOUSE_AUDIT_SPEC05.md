@@ -46,7 +46,7 @@
 3. **SEO Técnico e Dados Estruturados (100/100):**
    - `index.html` com canonical, meta description e OpenGraph completos.
    - `sitemap.xml` e `robots.txt` estruturados e validados.
-   - JSON-LD estruturado cobrindo `SportsClub`, `WebSite` e `ItemList` com dados institucionais oficiais.
+   - JSON-LD estruturado cobrindo `WebApplication` e `SportsOrganization` com dados institucionais oficiais.
 
 4. **PWA Completo:**
    - Manifesto Web (`manifest.json`) com ícones, tema institucional e display standalone.

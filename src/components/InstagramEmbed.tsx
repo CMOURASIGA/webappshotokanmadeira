@@ -54,7 +54,7 @@ export function InstagramEmbed({ url, title, compact = false }: InstagramEmbedPr
           </div>
           <div className="min-w-0">
             <p className="text-xs font-semibold truncate text-neutral-100">{title || "Publicação Oficial"}</p>
-            <p className="text-[10px] text-neutral-400 font-mono">@madeirakarate</p>
+            <p className="text-[10px] text-neutral-400 font-mono">@madeirakarateshotokan</p>
           </div>
         </div>
         <ExternalLink className="w-4 h-4 text-neutral-400 group-hover:text-white transition-colors shrink-0 ml-2" />
@@ -75,7 +75,7 @@ export function InstagramEmbed({ url, title, compact = false }: InstagramEmbedPr
           <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
           <span>Instagram Oficial</span>
           <span className="text-neutral-500">•</span>
-          <span className="font-mono text-[11px] text-neutral-300">@madeirakarate</span>
+          <span className="font-mono text-[11px] text-neutral-300">@madeirakarateshotokan</span>
         </div>
 
         {/* Title */}
