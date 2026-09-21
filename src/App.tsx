@@ -13,6 +13,7 @@ import { CartProvider } from "./contexts/CartContext";
 import { NoticePopup } from "./components/NoticePopup";
 import { Analytics } from "./components/Analytics";
 import { OfflineIndicator } from "./components/pwa/OfflineIndicator";
+import { Analytics as VercelAnalytics } from '@vercel/analytics/react';
 
 // Lazy loading & Code-splitting das views para otimização de FCP, LCP e bundle size
 const Home = lazy(() => import("./views/Home").then(m => ({ default: m.Home })));
@@ -79,6 +80,7 @@ export default function App() {
               </Suspense>
             </Layout>
           </HashRouter>
+          <VercelAnalytics />
         </CartProvider>
       </StudentProvider>
     </AppDataProvider>
