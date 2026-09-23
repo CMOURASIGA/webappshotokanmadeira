@@ -51,7 +51,9 @@ export function KatasList() {
               
               <div className="mt-auto flex flex-wrap gap-2 text-xs">
                 <span className="bg-karate-light text-karate-dark px-2 py-1 rounded font-medium">{kata.group}</span>
-                <span className="bg-karate-light text-karate-dark px-2 py-1 rounded font-medium">{kata.movementsCount} mov.</span>
+                <span className="bg-karate-light text-karate-dark px-2 py-1 rounded font-medium">
+                  {kata.movementsCount > 0 ? `${kata.movementsCount} mov.` : "Em catalogação"}
+                </span>
                 <span className="bg-karate-red/10 text-karate-red px-2 py-1 rounded font-medium">{kata.level}</span>
               </div>
             </div>

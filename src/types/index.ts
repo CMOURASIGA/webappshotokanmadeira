@@ -58,3 +58,5 @@ export type Kata = {
   videoUrl?: string;
   commonErrors: string[];
 };
+
+export * from "./jka";

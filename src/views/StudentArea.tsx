@@ -22,11 +22,14 @@ import {
   Award,
   Smartphone,
   ShieldCheck,
-  Info
+  Info,
+  FileText
 } from "lucide-react";
 import { useStudent, TechnicalNote } from "../contexts/StudentContext";
 import { belts, katas, techniques } from "../data/mockData";
 import { getBeltChecklistGroups } from "../data/graduationRequirements";
+import { getDanExamAdminRule } from "../data/jkaExamRules";
+import { JKA_DISCLAIMER } from "../data/jkaReferences";
 
 export function StudentArea() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -76,6 +79,10 @@ export function StudentArea() {
   }, [currentExamBelt.id]);
 
   const examProgress = getBeltExamProgress(currentExamBelt.id, examChecklistData.totalCheckable);
+
+  const currentDanAdminRule = useMemo(() => {
+    return currentExamBelt.id.startsWith("black") ? getDanExamAdminRule(currentExamBelt.id) : undefined;
+  }, [currentExamBelt.id]);
 
   // Note Modal / Form State
   const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
@@ -690,30 +697,78 @@ export function StudentArea() {
                     </div>
                   </div>
 
-                  {currentExamBelt.danRules && (
-                    <div className="p-4 rounded-xl bg-amber-50/60 border border-amber-200/80 space-y-2 text-xs sm:text-sm">
-                      <h5 className="font-bold text-amber-900 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-                        <CheckCircle2 className="w-4 h-4 text-amber-600" />
-                        Regras Administrativas Oficiais Confirmadas (JKA Brasil 2026):
-                      </h5>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-neutral-800 pt-1">
-                        {currentExamBelt.danRules.previousGrade && (
-                          <div><strong>Graduação anterior:</strong> {currentExamBelt.danRules.previousGrade}</div>
-                        )}
-                        {currentExamBelt.danRules.minimumTime && (
-                          <div><strong>Carência mínima:</strong> {currentExamBelt.danRules.minimumTime}</div>
-                        )}
-                        {currentExamBelt.danRules.minimumAge && (
-                          <div><strong>Idade mínima:</strong> {currentExamBelt.danRules.minimumAge}</div>
-                        )}
+                  {currentDanAdminRule && (
+                    <div className="p-5 rounded-2xl bg-amber-50/70 border border-amber-200/90 space-y-3 text-xs text-neutral-800">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-amber-200/70 pb-2.5">
+                        <div className="flex items-center gap-1.5">
+                          <ShieldCheck className="w-4 h-4 text-amber-700 shrink-0" />
+                          <strong className="text-amber-950 font-bold uppercase tracking-wider text-xs">
+                            Informações Administrativas para Exame de Dan ({currentDanAdminRule.danLevel})
+                          </strong>
+                        </div>
+                        <span className="text-[11px] font-semibold text-amber-800">
+                          Referência JKA Brasil — <strong>{currentDanAdminRule.sourceYear}</strong>
+                        </span>
                       </div>
-                      {currentExamBelt.danRules.notes && currentExamBelt.danRules.notes.length > 0 && (
-                        <ul className="text-[11px] text-neutral-600 space-y-0.5 pt-1 list-disc list-inside">
-                          {currentExamBelt.danRules.notes.map((n, i) => (
-                            <li key={i}>{n}</li>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                        <div className="bg-white p-3 rounded-xl border border-amber-200/60 shadow-2xs">
+                          <span className="text-neutral-500 block text-[11px]">Graduação anterior:</span>
+                          <strong className="text-neutral-900 font-semibold">{currentDanAdminRule.previousGrade}</strong>
+                        </div>
+                        <div className="bg-white p-3 rounded-xl border border-amber-200/60 shadow-2xs">
+                          <span className="text-neutral-500 block text-[11px]">Carência mínima:</span>
+                          <strong className="text-neutral-900 font-semibold">{currentDanAdminRule.minimumTime}</strong>
+                        </div>
+                        <div className="bg-white p-3 rounded-xl border border-amber-200/60 shadow-2xs">
+                          <span className="text-neutral-500 block text-[11px]">Idade mínima:</span>
+                          <strong className="text-neutral-900 font-semibold">
+                            {currentDanAdminRule.minimumAge ? currentDanAdminRule.minimumAge : "Não informada na tabela oficial"}
+                          </strong>
+                        </div>
+                      </div>
+
+                      <div className="bg-white p-3.5 rounded-xl border border-amber-200/60 shadow-2xs space-y-1">
+                        <span className="font-bold text-amber-950 flex items-center gap-1.5">
+                          <Clock className="w-3.5 h-3.5 text-amber-700" />
+                          Cursos Oficiais ({currentDanAdminRule.courseHoursRequired}h):
+                        </span>
+                        <p className="text-neutral-700 text-[11px] leading-relaxed">
+                          {currentDanAdminRule.courseNotes}
+                        </p>
+                      </div>
+
+                      <div className="bg-white p-3.5 rounded-xl border border-amber-200/60 shadow-2xs space-y-1">
+                        <span className="font-bold text-amber-950 flex items-center gap-1.5">
+                          <FileText className="w-3.5 h-3.5 text-amber-700" />
+                          Documentação exigida:
+                        </span>
+                        <ul className="list-disc list-inside space-y-0.5 text-[11px] text-neutral-700">
+                          {currentDanAdminRule.documentationRequirements.map((d, i) => (
+                            <li key={i}>{d}</li>
                           ))}
                         </ul>
+                      </div>
+
+                      {currentDanAdminRule.crossFederationRules && (
+                        <div className="bg-amber-100/60 p-3 rounded-xl border border-amber-300/80 text-[11px] text-amber-950">
+                          <strong>Candidatos de outras federações ({currentDanAdminRule.crossFederationRules.eligibleGrades.join(", ")}):</strong> {currentDanAdminRule.crossFederationRules.description}
+                        </div>
                       )}
+
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1 border-t border-amber-200/60 text-[11px] text-neutral-600">
+                        <p className="italic">
+                          {JKA_DISCLAIMER}
+                        </p>
+                        <a
+                          href="https://jkabrasil.com.br/wp-content/uploads/2026/01/5-Exame-de-Grau-JKA-2026-MARINGA-Investimentos.pdf"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-amber-900 font-semibold hover:underline inline-flex items-center gap-1 shrink-0"
+                        >
+                          Edital oficial 2026 <ExternalLink className="w-3 h-3" />
+                        </a>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -784,22 +839,78 @@ export function StudentArea() {
                     </div>
                   )}
 
-                  {/* Regras Administrativas de Dan (ex: 1º Dan) */}
-                  {currentExamBelt.danRules && (
-                    <div className="p-4 rounded-xl bg-amber-50/60 border border-amber-200/80 space-y-1.5 text-xs text-neutral-700">
-                      <strong className="block text-amber-900 font-bold uppercase tracking-wider text-[11px]">
-                        Regras Administrativas (JKA Brasil 2026):
-                      </strong>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-0.5">
-                        {currentExamBelt.danRules.previousGrade && (
-                          <div><strong>Graduação anterior:</strong> {currentExamBelt.danRules.previousGrade}</div>
-                        )}
-                        {currentExamBelt.danRules.minimumTime && (
-                          <div><strong>Carência:</strong> {currentExamBelt.danRules.minimumTime}</div>
-                        )}
-                        {currentExamBelt.danRules.minimumAge && (
-                          <div><strong>Idade mínima:</strong> {currentExamBelt.danRules.minimumAge}</div>
-                        )}
+                  {/* Informações Administrativas para Exame de Dan (ex: 1º Dan) */}
+                  {currentDanAdminRule && (
+                    <div className="p-5 rounded-2xl bg-amber-50/70 border border-amber-200/90 space-y-3 text-xs text-neutral-800 mt-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-amber-200/70 pb-2.5">
+                        <div className="flex items-center gap-1.5">
+                          <ShieldCheck className="w-4 h-4 text-amber-700 shrink-0" />
+                          <strong className="text-amber-950 font-bold uppercase tracking-wider text-xs">
+                            Informações Administrativas para Exame de Dan ({currentDanAdminRule.danLevel})
+                          </strong>
+                        </div>
+                        <span className="text-[11px] font-semibold text-amber-800">
+                          Referência JKA Brasil — <strong>{currentDanAdminRule.sourceYear}</strong>
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                        <div className="bg-white p-3 rounded-xl border border-amber-200/60 shadow-2xs">
+                          <span className="text-neutral-500 block text-[11px]">Graduação anterior:</span>
+                          <strong className="text-neutral-900 font-semibold">{currentDanAdminRule.previousGrade}</strong>
+                        </div>
+                        <div className="bg-white p-3 rounded-xl border border-amber-200/60 shadow-2xs">
+                          <span className="text-neutral-500 block text-[11px]">Carência mínima:</span>
+                          <strong className="text-neutral-900 font-semibold">{currentDanAdminRule.minimumTime}</strong>
+                        </div>
+                        <div className="bg-white p-3 rounded-xl border border-amber-200/60 shadow-2xs">
+                          <span className="text-neutral-500 block text-[11px]">Idade mínima:</span>
+                          <strong className="text-neutral-900 font-semibold">
+                            {currentDanAdminRule.minimumAge ? currentDanAdminRule.minimumAge : "Não informada na tabela oficial"}
+                          </strong>
+                        </div>
+                      </div>
+
+                      <div className="bg-white p-3.5 rounded-xl border border-amber-200/60 shadow-2xs space-y-1">
+                        <span className="font-bold text-amber-950 flex items-center gap-1.5">
+                          <Clock className="w-3.5 h-3.5 text-amber-700" />
+                          Cursos Oficiais ({currentDanAdminRule.courseHoursRequired}h):
+                        </span>
+                        <p className="text-neutral-700 text-[11px] leading-relaxed">
+                          {currentDanAdminRule.courseNotes}
+                        </p>
+                      </div>
+
+                      <div className="bg-white p-3.5 rounded-xl border border-amber-200/60 shadow-2xs space-y-1">
+                        <span className="font-bold text-amber-950 flex items-center gap-1.5">
+                          <FileText className="w-3.5 h-3.5 text-amber-700" />
+                          Documentação exigida:
+                        </span>
+                        <ul className="list-disc list-inside space-y-0.5 text-[11px] text-neutral-700">
+                          {currentDanAdminRule.documentationRequirements.map((d, i) => (
+                            <li key={i}>{d}</li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      {currentDanAdminRule.crossFederationRules && (
+                        <div className="bg-amber-100/60 p-3 rounded-xl border border-amber-300/80 text-[11px] text-amber-950">
+                          <strong>Candidatos de outras federações ({currentDanAdminRule.crossFederationRules.eligibleGrades.join(", ")}):</strong> {currentDanAdminRule.crossFederationRules.description}
+                        </div>
+                      )}
+
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1 border-t border-amber-200/60 text-[11px] text-neutral-600">
+                        <p className="italic">
+                          {JKA_DISCLAIMER}
+                        </p>
+                        <a
+                          href="https://jkabrasil.com.br/wp-content/uploads/2026/01/5-Exame-de-Grau-JKA-2026-MARINGA-Investimentos.pdf"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-amber-900 font-semibold hover:underline inline-flex items-center gap-1 shrink-0"
+                        >
+                          Edital oficial 2026 <ExternalLink className="w-3 h-3" />
+                        </a>
                       </div>
                     </div>
                   )}

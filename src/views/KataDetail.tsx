@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { katas } from "../data/mockData";
-import { ArrowLeft, Play, Shield, AlertTriangle, Star, CheckCircle2, GraduationCap } from "lucide-react";
+import { ArrowLeft, Play, Shield, AlertTriangle, Star, CheckCircle2, GraduationCap, Info } from "lucide-react";
 import { useAppData } from "../contexts/AppDataContext";
 import { useStudent } from "../contexts/StudentContext";
 
@@ -125,56 +125,73 @@ export function KataDetail() {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-neutral-100 pb-3 mb-4">
                 <h2 className="text-2xl font-bold font-jp flex items-center gap-2">
                   <Shield className="text-karate-red w-6 h-6" />
-                  Sequência de Movimentos ({kata.movementsCount})
+                  Sequência de Movimentos {kata.movements.length > 0 ? `(${kata.movementsCount})` : ""}
                 </h2>
 
-                <div className="text-xs font-semibold text-neutral-500 flex items-center gap-2">
-                  <span>Memorização: {progress.completed}/{progress.total}</span>
-                  <span className="font-bold text-karate-red font-mono">({progress.percentage}%)</span>
+                {kata.movements.length > 0 && (
+                  <div className="text-xs font-semibold text-neutral-500 flex items-center gap-2">
+                    <span>Memorização: {progress.completed}/{progress.total}</span>
+                    <span className="font-bold text-karate-red font-mono">({progress.percentage}%)</span>
+                  </div>
+                )}
+              </div>
+
+              {kata.movements.length > 0 ? (
+                <>
+                  {/* Barra de Progresso Visual de Cobertura do Kata */}
+                  <div className="w-full h-2 bg-neutral-100 rounded-full overflow-hidden mb-5 border border-neutral-200/60">
+                    <div 
+                      className="h-full bg-karate-red rounded-full transition-all duration-300"
+                      style={{ width: `${progress.percentage}%` }}
+                    />
+                  </div>
+
+                  <div className="bg-neutral-50 rounded-xl p-4 sm:p-6 border border-neutral-200/60">
+                    <p className="text-xs text-neutral-500 mb-4 italic">
+                      Dica de estudo: Toque no checkbox de cada movimento à medida que for memorizando a sequência técnica.
+                    </p>
+                    <ul className="space-y-2.5">
+                      {kata.movements.map((mov, i) => {
+                        const done = isMovementCompleted(kata.id, i);
+
+                        return (
+                          <li 
+                            key={i} 
+                            onClick={() => toggleKataMovement(kata.id, i)}
+                            className={`flex gap-3 items-start p-2.5 rounded-lg transition-colors cursor-pointer select-none ${
+                              done ? "bg-emerald-50/70 text-neutral-900 border border-emerald-200/60" : "hover:bg-white text-neutral-700"
+                            }`}
+                          >
+                            <button
+                              type="button"
+                              className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 mt-0.5 transition-colors ${
+                                done ? "bg-emerald-600 text-white" : "border border-neutral-300 bg-white"
+                              }`}
+                            >
+                              {done && <CheckCircle2 className="w-3.5 h-3.5" />}
+                            </button>
+                            <span className="text-karate-red font-bold text-xs min-w-[20px] mt-0.5">{i+1}.</span>
+                            <span className={`leading-snug text-sm flex-1 ${done ? "line-through text-neutral-500" : ""}`}>
+                              {mov.replace(/^\d+\.\s*/, '')}
+                            </span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                </>
+              ) : (
+                <div className="p-6 rounded-2xl bg-neutral-50 border border-neutral-200/80 text-center space-y-2">
+                  <div className="w-10 h-10 rounded-full bg-neutral-200/70 text-neutral-600 flex items-center justify-center mx-auto">
+                    <Info className="w-5 h-5" />
+                  </div>
+                  <h3 className="font-bold text-neutral-800 text-base">Conteúdo técnico em catalogação</h3>
+                  <p className="text-xs sm:text-sm text-neutral-600 max-w-md mx-auto leading-relaxed">
+                    A sequência detalhada passo a passo deste Kata está em processo de catalogação e validação pedagógica oficial.
+                    Consulte seu Sensei para o treino prático e estudo das técnicas deste Kata.
+                  </p>
                 </div>
-              </div>
-
-              {/* Barra de Progresso Visual de Cobertura do Kata */}
-              <div className="w-full h-2 bg-neutral-100 rounded-full overflow-hidden mb-5 border border-neutral-200/60">
-                <div 
-                  className="h-full bg-karate-red rounded-full transition-all duration-300"
-                  style={{ width: `${progress.percentage}%` }}
-                />
-              </div>
-
-              <div className="bg-neutral-50 rounded-xl p-4 sm:p-6 border border-neutral-200/60">
-                <p className="text-xs text-neutral-500 mb-4 italic">
-                  Dica de estudo: Toque no checkbox de cada movimento à medida que for memorizando a sequência técnica.
-                </p>
-                <ul className="space-y-2.5">
-                  {kata.movements.map((mov, i) => {
-                    const done = isMovementCompleted(kata.id, i);
-
-                    return (
-                      <li 
-                        key={i} 
-                        onClick={() => toggleKataMovement(kata.id, i)}
-                        className={`flex gap-3 items-start p-2.5 rounded-lg transition-colors cursor-pointer select-none ${
-                          done ? "bg-emerald-50/70 text-neutral-900 border border-emerald-200/60" : "hover:bg-white text-neutral-700"
-                        }`}
-                      >
-                        <button
-                          type="button"
-                          className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 mt-0.5 transition-colors ${
-                            done ? "bg-emerald-600 text-white" : "border border-neutral-300 bg-white"
-                          }`}
-                        >
-                          {done && <CheckCircle2 className="w-3.5 h-3.5" />}
-                        </button>
-                        <span className="text-karate-red font-bold text-xs min-w-[20px] mt-0.5">{i+1}.</span>
-                        <span className={`leading-snug text-sm flex-1 ${done ? "line-through text-neutral-500" : ""}`}>
-                          {mov.replace(/^\d+\.\s*/, '')}
-                        </span>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
+              )}
             </section>
 
             <section>
