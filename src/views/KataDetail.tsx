@@ -125,7 +125,7 @@ export function KataDetail() {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-neutral-100 pb-3 mb-4">
                 <h2 className="text-2xl font-bold font-jp flex items-center gap-2">
                   <Shield className="text-karate-red w-6 h-6" />
-                  Sequência de Movimentos {kata.movements.length > 0 ? `(${kata.movements.length})` : ""}
+                  Sequência de Movimentos {kata.movementsCount > 0 ? `(${kata.movementsCount} movimentos — JKA)` : ""}
                 </h2>
 
                 {kata.movements.length > 0 && (
@@ -186,9 +186,22 @@ export function KataDetail() {
                     <Info className="w-5 h-5" />
                   </div>
                   <h3 className="font-bold text-neutral-800 text-base">Sequência técnica em atualização</h3>
+                  {kata.movementsCount > 0 && (
+                    <p className="text-sm font-semibold text-neutral-800">
+                      Quantidade oficial: {kata.movementsCount} movimentos
+                    </p>
+                  )}
                   <p className="text-xs sm:text-sm text-neutral-600 max-w-md mx-auto leading-relaxed">
-                    Este Kata já faz parte do catálogo do Madeira Karate. A sequência detalhada de movimentos poderá receber atualização e complementação conforme validação técnica e pedagógica. Para estudo prático, siga a orientação do seu Sensei.
+                    A quantidade de movimentos está validada pelo Manual Técnico do Instrutor da JKA Headquarters. A sequência detalhada passo a passo ainda está sendo revisada e complementada no Madeira Karate. Para estudo prático, siga a orientação do seu Sensei.
                   </p>
+                  <a
+                    href="https://www.jka.or.jp/wp/wp-content/uploads/2017/04/tech_manual_instructor.pdf"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-xs font-semibold text-karate-red hover:underline"
+                  >
+                    Fonte oficial: JKA Headquarters
+                  </a>
                 </div>
               )}
             </section>
