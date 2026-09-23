@@ -154,8 +154,8 @@ export function searchAllData(
         category: "kata",
         categoryLabel: "Kata",
         title: kata.name,
-        subtitle: kata.movements && kata.movements.length > 0
-          ? `${kata.movements.length} movimentos • ${kata.level || "Shotokan"}`
+        subtitle: kata.movementsCount > 0
+          ? `${kata.movementsCount} movimentos JKA • ${kata.movements && kata.movements.length > 0 ? "sequência disponível" : "sequência em atualização"} • ${kata.level || "Shotokan"}`
           : `Sequência em atualização • ${kata.level || "Shotokan"}`,
         description: kata.meaning || kata.description || "Kata tradicional do Karate Shotokan com embusen e técnicas fundamentais.",
         path: `/katas/${kata.id}`,
