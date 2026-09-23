@@ -1,6 +1,6 @@
 # SPEC 07 — Referências JKA, Regras Administrativas de Exame e Base de Competição
 
-> **Status:** BLOQUEADA ATÉ APROVAÇÃO DA SPEC 06 EM HUMAN VALIDATION.
+> **Status:** LIBERADA PARA DESENVOLVIMENTO.
 >
 > **Escopo:** manutenção pós-UX Evolution V2, sequencial à SPEC 06.
 >
@@ -451,13 +451,13 @@ Não implementar nesta SPEC:
 
 ## 19. Dependência e ordem de execução
 
-Esta SPEC está **BLOQUEADA** até a conclusão e Human Validation explícita da SPEC 06.
+A dependência da SPEC 06 foi atendida: a SPEC 06 foi concluída e aprovada em Human Validation em 23/09/2026. A SPEC 07 está liberada para desenvolvimento.
 
 Fluxo obrigatório:
 
-`SPEC 06 implementação → Human Validation → aprovação → liberar SPEC 07`
+`SPEC 06 aprovada → SPEC 07 liberada para desenvolvimento → implementação → Human Validation`
 
-Não iniciar desenvolvimento da SPEC 07 em paralelo com correções pendentes da SPEC 06.
+A SPEC 07 pode ser iniciada. Não reabrir a SPEC 06 sem evidência de regressão ou necessidade de correção formal.
 
 ---
 
@@ -465,7 +465,7 @@ Não iniciar desenvolvimento da SPEC 07 em paralelo com correções pendentes da
 
 A SPEC 07 somente poderá ser marcada como aprovada após:
 
-- SPEC 06 aprovada;
+- SPEC 06 aprovada em Human Validation;
 - implementação publicada;
 - fontes e anos rastreáveis;
 - auditoria do catálogo de Katas concluída;
