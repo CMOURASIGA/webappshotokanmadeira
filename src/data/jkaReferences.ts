@@ -55,6 +55,19 @@ export const jkaReferences: JkaReference[] = [
       "Modalidades de Kumite e agrupamentos de Kata específicos de torneio.",
       "Não constitui requisito de exame ou graduação."
     ]
+  },
+  {
+    id: "jka-japan-tech-manual-instructor",
+    title: "Technical Manual for the Instructor — JKA Headquarters",
+    sourceType: "graduation",
+    sourceName: "Japan Karate Association Headquarters",
+    sourceUrl: "https://www.jka.or.jp/wp/wp-content/uploads/2017/04/tech_manual_instructor.pdf",
+    sourceYear: 2017,
+    notes: [
+      "Fonte oficial JKA Headquarters para quantidade de movimentos e características dos Katas.",
+      "A quantidade oficial de movimentos pode ser exibida mesmo quando a sequência passo a passo ainda estiver em atualização no Dojo Digital.",
+      "Não utilizar o manual como substituto de uma sequência textual completa quando ela não estiver publicada no material consultado."
+    ]
   }
 ];
 
