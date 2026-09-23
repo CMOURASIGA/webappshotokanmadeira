@@ -67,9 +67,18 @@ export function KataDetail() {
           </div>
           <div className="relative z-10">
             <div className="flex items-center justify-between gap-4 mb-4">
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <span className="bg-white/20 px-3 py-1 rounded-full text-xs font-medium uppercase tracking-wider">{kata.group}</span>
                 <span className="bg-karate-red px-3 py-1 rounded-full text-xs font-medium uppercase tracking-wider">{kata.level}</span>
+                {kata.movements && kata.movements.length > 0 ? (
+                  <span className="bg-white/20 px-3 py-1 rounded-full text-xs font-medium">
+                    {kata.movements.length} movimentos
+                  </span>
+                ) : kata.movementsCount > 0 ? (
+                  <span className="bg-white/20 px-3 py-1 rounded-full text-xs font-medium" title="Fonte: Technical Manual for the Instructor — JKA Headquarters">
+                    {kata.movementsCount} movimentos — JKA
+                  </span>
+                ) : null}
               </div>
 
               {/* Botão de Favoritar Kata */}
@@ -128,12 +137,16 @@ export function KataDetail() {
                   Sequência de Movimentos {kata.movementsCount > 0 ? `(${kata.movementsCount} movimentos — JKA)` : ""}
                 </h2>
 
-                {kata.movements.length > 0 && (
+                {kata.movements.length > 0 ? (
                   <div className="text-xs font-semibold text-neutral-500 flex items-center gap-2">
                     <span>Memorização: {progress.completed}/{progress.total}</span>
                     <span className="font-bold text-karate-red font-mono">({progress.percentage}%)</span>
                   </div>
-                )}
+                ) : kata.movementsCount > 0 ? (
+                  <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-neutral-100 text-neutral-700 border border-neutral-200">
+                    {kata.movementsCount} movimentos — JKA
+                  </span>
+                ) : null}
               </div>
 
               {kata.movements.length > 0 ? (
@@ -180,6 +193,24 @@ export function KataDetail() {
                     </ul>
                   </div>
                 </>
+              ) : kata.movementsCount > 0 ? (
+                <div className="p-6 rounded-2xl bg-neutral-50 border border-neutral-200/80 text-center space-y-3">
+                  <div className="w-10 h-10 rounded-full bg-neutral-200/70 text-neutral-600 flex items-center justify-center mx-auto">
+                    <Info className="w-5 h-5" />
+                  </div>
+                  <div className="space-y-1">
+                    <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-neutral-200/80 text-neutral-800">
+                      {kata.movementsCount} movimentos — JKA
+                    </span>
+                    <h3 className="font-bold text-neutral-800 text-base">Sequência detalhada em atualização</h3>
+                  </div>
+                  <p className="text-xs sm:text-sm text-neutral-600 max-w-md mx-auto leading-relaxed">
+                    Este Kata já faz parte do catálogo do Madeira Karate. A sequência detalhada de movimentos poderá receber atualização e complementação conforme validação técnica e pedagógica. Para estudo prático, siga a orientação do seu Sensei.
+                  </p>
+                  <div className="pt-2 border-t border-neutral-200/70 max-w-sm mx-auto text-[11px] text-neutral-500">
+                    <span className="font-semibold text-neutral-700">Fonte:</span> Technical Manual for the Instructor — JKA Headquarters
+                  </div>
+                </div>
               ) : (
                 <div className="p-6 rounded-2xl bg-neutral-50 border border-neutral-200/80 text-center space-y-2">
                   <div className="w-10 h-10 rounded-full bg-neutral-200/70 text-neutral-600 flex items-center justify-center mx-auto">
