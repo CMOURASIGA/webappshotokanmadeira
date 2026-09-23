@@ -229,8 +229,10 @@ export function StudentProvider({ children }: { children: ReactNode }) {
   const getKataProgress = useCallback((kataId: string, totalMovements: number) => {
     const completedList = kataMovementsProgress[kataId] || [];
     const completed = completedList.length;
-    const total = totalMovements > 0 ? totalMovements : 1;
-    const percentage = Math.min(100, Math.round((completed / total) * 100));
+    if (!totalMovements || totalMovements <= 0) {
+      return { completed: 0, total: 0, percentage: 0 };
+    }
+    const percentage = Math.min(100, Math.round((completed / totalMovements) * 100));
     return { completed, total: totalMovements, percentage };
   }, [kataMovementsProgress]);
 

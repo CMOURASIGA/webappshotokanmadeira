@@ -154,7 +154,9 @@ export function searchAllData(
         category: "kata",
         categoryLabel: "Kata",
         title: kata.name,
-        subtitle: `${kata.movementsCount || kata.movements?.length || 0} movimentos • ${kata.level || "Shotokan"}`,
+        subtitle: kata.movements && kata.movements.length > 0
+          ? `${kata.movements.length} movimentos • ${kata.level || "Shotokan"}`
+          : `Em catalogação • ${kata.level || "Shotokan"}`,
         description: kata.meaning || kata.description || "Kata tradicional do Karate Shotokan com embusen e técnicas fundamentais.",
         path: `/katas/${kata.id}`,
         badgeClass: "bg-red-50 text-karate-red border-red-200"

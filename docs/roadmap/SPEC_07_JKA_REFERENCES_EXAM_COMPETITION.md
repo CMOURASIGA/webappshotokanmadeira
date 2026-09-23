@@ -1,6 +1,6 @@
 # SPEC 07 — Referências JKA, Regras Administrativas de Exame e Base de Competição
 
-> **Status:** LIBERADA PARA DESENVOLVIMENTO.
+> **Status:** IMPLEMENTADA — AGUARDANDO HUMAN VALIDATION.
 >
 > **Escopo:** manutenção pós-UX Evolution V2, sequencial à SPEC 06.
 >

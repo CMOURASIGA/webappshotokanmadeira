@@ -28,7 +28,7 @@ export function KataDetail() {
         title: kata.name,
         subtitle: kata.meaning,
         categoryOrGroup: kata.group,
-        totalMovements: kata.movementsCount
+        totalMovements: kata.movements && kata.movements.length > 0 ? kata.movements.length : undefined
       });
     }
   }, [kata?.id, recordStudy]);
@@ -39,7 +39,7 @@ export function KataDetail() {
   
   const videoUrl = kataVideos[kata.id] || kata.videoUrl;
   const isFav = isFavorite(kata.id);
-  const progress = getKataProgress(kata.id, kata.movementsCount);
+  const progress = getKataProgress(kata.id, kata.movements && kata.movements.length > 0 ? kata.movements.length : 0);
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300 pb-8">
@@ -125,7 +125,7 @@ export function KataDetail() {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-neutral-100 pb-3 mb-4">
                 <h2 className="text-2xl font-bold font-jp flex items-center gap-2">
                   <Shield className="text-karate-red w-6 h-6" />
-                  Sequência de Movimentos {kata.movements.length > 0 ? `(${kata.movementsCount})` : ""}
+                  Sequência de Movimentos {kata.movements.length > 0 ? `(${kata.movements.length})` : ""}
                 </h2>
 
                 {kata.movements.length > 0 && (

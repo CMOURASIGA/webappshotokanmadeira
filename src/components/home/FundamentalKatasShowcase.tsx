@@ -75,10 +75,16 @@ export function FundamentalKatasShowcase({ katas, totalKatas }: FundamentalKatas
                 </span>
 
                 <div className="flex items-center gap-1.5 text-xs font-mono text-neutral-500 font-medium">
-                  <span className="flex items-center gap-1" title="Número de movimentos">
-                    <Layers className="w-3.5 h-3.5 text-neutral-400" />
-                    {kata.movementsCount} mov.
-                  </span>
+                  {kata.movements && kata.movements.length > 0 ? (
+                    <span className="flex items-center gap-1" title="Número de movimentos">
+                      <Layers className="w-3.5 h-3.5 text-neutral-400" />
+                      {kata.movements.length} mov.
+                    </span>
+                  ) : (
+                    <span className="text-[11px] text-neutral-400 font-sans italic">
+                      Em catalogação
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -103,7 +109,7 @@ export function FundamentalKatasShowcase({ katas, totalKatas }: FundamentalKatas
             <div className="pt-5 mt-5 border-t border-neutral-100 flex items-center justify-between text-xs font-bold text-neutral-700 group-hover:text-karate-red transition-colors">
               <span className="flex items-center gap-1.5">
                 <Play className="w-3.5 h-3.5 fill-current text-karate-red" />
-                <span>Estudar Kata e Movimentos</span>
+                <span>{kata.movements && kata.movements.length > 0 ? "Estudar Kata e Movimentos" : "Ver detalhes do Kata"}</span>
               </span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </div>
