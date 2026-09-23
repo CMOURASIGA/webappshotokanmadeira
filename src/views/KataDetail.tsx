@@ -185,10 +185,9 @@ export function KataDetail() {
                   <div className="w-10 h-10 rounded-full bg-neutral-200/70 text-neutral-600 flex items-center justify-center mx-auto">
                     <Info className="w-5 h-5" />
                   </div>
-                  <h3 className="font-bold text-neutral-800 text-base">Conteúdo técnico em catalogação</h3>
+                  <h3 className="font-bold text-neutral-800 text-base">Sequência técnica em atualização</h3>
                   <p className="text-xs sm:text-sm text-neutral-600 max-w-md mx-auto leading-relaxed">
-                    A sequência detalhada passo a passo deste Kata está em processo de catalogação e validação pedagógica oficial.
-                    Consulte seu Sensei para o treino prático e estudo das técnicas deste Kata.
+                    Este Kata já faz parte do catálogo do Madeira Karate. A sequência detalhada de movimentos poderá receber atualização e complementação conforme validação técnica e pedagógica. Para estudo prático, siga a orientação do seu Sensei.
                   </p>
                 </div>
               )}

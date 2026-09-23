@@ -82,7 +82,7 @@ export function FundamentalKatasShowcase({ katas, totalKatas }: FundamentalKatas
                     </span>
                   ) : (
                     <span className="text-[11px] text-neutral-400 font-sans italic">
-                      Em catalogação
+                      Sequência em atualização
                     </span>
                   )}
                 </div>
