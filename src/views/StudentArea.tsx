@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { useStudent, TechnicalNote } from "../contexts/StudentContext";
 import { belts, katas, techniques } from "../data/mockData";
+import { getBeltChecklistGroups } from "../data/graduationRequirements";
 
 export function StudentArea() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -67,11 +68,14 @@ export function StudentArea() {
 
   // Selected Belt for Exam Checklist
   const currentExamBelt = useMemo(() => {
-    return belts.find(b => b.id === selectedExamBeltId) || belts[1]; // default yellow (6º Kyu)
+    return belts.find(b => b.id === selectedExamBeltId) || belts[1]; // default yellow (9º Kyu)
   }, [selectedExamBeltId]);
 
-  const examRequirements = currentExamBelt.requirements || [];
-  const examProgress = getBeltExamProgress(currentExamBelt.id, examRequirements.length);
+  const examChecklistData = useMemo(() => {
+    return getBeltChecklistGroups(currentExamBelt.id);
+  }, [currentExamBelt.id]);
+
+  const examProgress = getBeltExamProgress(currentExamBelt.id, examChecklistData.totalCheckable);
 
   // Note Modal / Form State
   const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
@@ -602,8 +606,8 @@ export function StudentArea() {
             <div className="flex items-center gap-2 overflow-x-auto pb-2 pt-1">
               {belts.map(belt => {
                 const isSelected = belt.id === currentExamBelt.id;
-                const reqs = belt.requirements || [];
-                const prog = getBeltExamProgress(belt.id, reqs.length);
+                const bChecklist = getBeltChecklistGroups(belt.id);
+                const prog = getBeltExamProgress(belt.id, bChecklist.totalCheckable);
 
                 return (
                   <button
@@ -626,7 +630,7 @@ export function StudentArea() {
                     <div className="w-full h-1 bg-neutral-200/50 rounded-full mt-2 overflow-hidden">
                       <div 
                         className={`h-full rounded-full transition-all duration-300 ${isSelected ? "bg-karate-gold" : "bg-neutral-600"}`}
-                        style={{ width: `${prog.percentage}%` }}
+                        style={{ width: `${bChecklist.totalCheckable > 0 ? prog.percentage : 0}%` }}
                       />
                     </div>
                   </button>
@@ -664,57 +668,141 @@ export function StudentArea() {
               <div className="bg-neutral-50 p-4 rounded-xl border border-neutral-200/80 sm:min-w-[180px] text-right">
                 <span className="text-xs text-neutral-500 block mb-0.5">Prontidão para Exame</span>
                 <span className="text-2xl font-black text-neutral-900 font-mono">
-                  {examProgress.percentage}%
+                  {examChecklistData.totalCheckable > 0 ? `${examProgress.percentage}%` : "—"}
                 </span>
                 <span className="text-[11px] text-neutral-500 block mt-0.5">
-                  {examProgress.completed} de {examProgress.total} itens dominados
+                  {examChecklistData.totalCheckable > 0
+                    ? `${examProgress.completed} de ${examChecklistData.totalCheckable} itens dominados`
+                    : "Regras administrativas aplicáveis"}
                 </span>
               </div>
             </div>
 
-            {/* Lista Interativa de Requisitos do Exame */}
-            <div className="space-y-3">
-              <h4 className="text-sm font-bold uppercase tracking-wider text-neutral-500">
-                Requisitos de estudo para esta graduação:
-              </h4>
+            {/* Lista Interativa de Requisitos do Exame Agrupados */}
+            <div className="space-y-6">
+              {examChecklistData.totalCheckable === 0 ? (
+                <div className="space-y-4">
+                  <div className="p-4 rounded-xl bg-neutral-100 border border-neutral-200 text-neutral-600 text-sm flex items-start gap-3">
+                    <Info className="w-5 h-5 text-neutral-400 shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="block text-neutral-800 font-semibold mb-0.5">Programa Técnico:</strong>
+                      <span>Conteúdo técnico não cadastrado nesta versão.</span>
+                    </div>
+                  </div>
 
-              {examRequirements.length === 0 ? (
-                <p className="text-xs text-neutral-500 italic">
-                  Requisitos desta graduação em catalogação técnica.
-                </p>
-              ) : (
-                <div className="grid gap-2.5">
-                  {examRequirements.map((req, index) => {
-                    const isCompleted = isExamRequirementCompleted(currentExamBelt.id, index);
-
-                    return (
-                      <div
-                        key={index}
-                        onClick={() => toggleExamRequirement(currentExamBelt.id, index)}
-                        className={`flex items-start gap-3 p-4 rounded-xl border transition-all cursor-pointer select-none ${
-                          isCompleted
-                            ? "bg-emerald-50/60 border-emerald-300 text-neutral-900"
-                            : "bg-neutral-50 hover:bg-neutral-100/80 border-neutral-200 text-neutral-700"
-                        }`}
-                      >
-                        <button
-                          type="button"
-                          className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 mt-0.5 transition-colors ${
-                            isCompleted
-                              ? "bg-emerald-600 text-white"
-                              : "border-2 border-neutral-300 bg-white"
-                          }`}
-                        >
-                          {isCompleted && <CheckCircle2 className="w-4 h-4" />}
-                        </button>
-                        <div className="flex-1 min-w-0">
-                          <span className={`text-sm leading-snug font-medium block ${isCompleted ? "line-through text-neutral-500" : "text-neutral-900"}`}>
-                            {req}
-                          </span>
-                        </div>
+                  {currentExamBelt.danRules && (
+                    <div className="p-4 rounded-xl bg-amber-50/60 border border-amber-200/80 space-y-2 text-xs sm:text-sm">
+                      <h5 className="font-bold text-amber-900 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                        <CheckCircle2 className="w-4 h-4 text-amber-600" />
+                        Regras Administrativas Oficiais Confirmadas (JKA Brasil 2026):
+                      </h5>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-neutral-800 pt-1">
+                        {currentExamBelt.danRules.previousGrade && (
+                          <div><strong>Graduação anterior:</strong> {currentExamBelt.danRules.previousGrade}</div>
+                        )}
+                        {currentExamBelt.danRules.minimumTime && (
+                          <div><strong>Carência mínima:</strong> {currentExamBelt.danRules.minimumTime}</div>
+                        )}
+                        {currentExamBelt.danRules.minimumAge && (
+                          <div><strong>Idade mínima:</strong> {currentExamBelt.danRules.minimumAge}</div>
+                        )}
                       </div>
-                    );
-                  })}
+                      {currentExamBelt.danRules.notes && currentExamBelt.danRules.notes.length > 0 && (
+                        <ul className="text-[11px] text-neutral-600 space-y-0.5 pt-1 list-disc list-inside">
+                          {currentExamBelt.danRules.notes.map((n, i) => (
+                            <li key={i}>{n}</li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {examChecklistData.groups.map(group => (
+                    <div key={group.category} className="space-y-2.5">
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-neutral-600 flex items-center gap-2">
+                        <span 
+                          className={`w-2 h-2 rounded-full ${
+                            group.category === "kihon" 
+                              ? "bg-karate-red" 
+                              : group.category === "kata" 
+                              ? "bg-amber-500" 
+                              : "bg-blue-600"
+                          }`} 
+                        />
+                        <span>{group.title}</span>
+                      </h4>
+
+                      <div className="grid gap-2">
+                        {group.items.map(item => {
+                          const isCompleted = isExamRequirementCompleted(item.id);
+
+                          return (
+                            <div
+                              key={item.id}
+                              onClick={() => toggleExamRequirement(item.id)}
+                              className={`flex items-start gap-3 p-3.5 sm:p-4 rounded-xl border transition-all cursor-pointer select-none ${
+                                isCompleted
+                                  ? "bg-emerald-50/70 border-emerald-300 text-neutral-900"
+                                  : "bg-neutral-50 hover:bg-neutral-100/80 border-neutral-200 text-neutral-700"
+                              }`}
+                            >
+                              <button
+                                type="button"
+                                className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 mt-0.5 transition-colors ${
+                                  isCompleted
+                                    ? "bg-emerald-600 text-white"
+                                    : "border-2 border-neutral-300 bg-white"
+                                }`}
+                              >
+                                {isCompleted && <CheckCircle2 className="w-4 h-4" />}
+                              </button>
+                              <div className="flex-1 min-w-0">
+                                <span className={`text-xs sm:text-sm leading-snug font-medium block font-mono ${isCompleted ? "line-through text-neutral-400" : "text-neutral-900"}`}>
+                                  {item.text}
+                                </span>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Observações da Banca Examinadora (Texto informativo) */}
+                  {examChecklistData.notes && examChecklistData.notes.length > 0 && (
+                    <div className="p-4 rounded-xl bg-neutral-50 border border-neutral-200 text-xs text-neutral-600 space-y-1">
+                      <strong className="block text-neutral-800 font-semibold mb-1">
+                        Observações da Banca Examinadora:
+                      </strong>
+                      <ul className="list-disc list-inside space-y-0.5">
+                        {examChecklistData.notes.map((n, i) => (
+                          <li key={i}>{n}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* Regras Administrativas de Dan (ex: 1º Dan) */}
+                  {currentExamBelt.danRules && (
+                    <div className="p-4 rounded-xl bg-amber-50/60 border border-amber-200/80 space-y-1.5 text-xs text-neutral-700">
+                      <strong className="block text-amber-900 font-bold uppercase tracking-wider text-[11px]">
+                        Regras Administrativas (JKA Brasil 2026):
+                      </strong>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-0.5">
+                        {currentExamBelt.danRules.previousGrade && (
+                          <div><strong>Graduação anterior:</strong> {currentExamBelt.danRules.previousGrade}</div>
+                        )}
+                        {currentExamBelt.danRules.minimumTime && (
+                          <div><strong>Carência:</strong> {currentExamBelt.danRules.minimumTime}</div>
+                        )}
+                        {currentExamBelt.danRules.minimumAge && (
+                          <div><strong>Idade mínima:</strong> {currentExamBelt.danRules.minimumAge}</div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

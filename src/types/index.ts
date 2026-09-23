@@ -2,9 +2,23 @@ export type Belt = {
   id: string;
   name: string;
   color: string;
-  level: string; // e.g., "8º Kyu"
+  level: string; // e.g., "10º Kyu", "1º Dan (Shodan)"
   meaning?: string;
   requirements?: string[];
+  kihon?: string[];
+  kata?: string[];
+  kumite?: string[];
+  notes?: string[];
+  source?: {
+    name: string;
+    url: string;
+  };
+  danRules?: {
+    previousGrade?: string;
+    minimumTime?: string;
+    minimumAge?: string;
+    notes?: string[];
+  };
 };
 
 export type TechniqueCategory = "Base" | "Soco" | "Defesa" | "Chute" | "Mão Aberta" | "Deslocamento" | "Combinação";

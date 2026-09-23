@@ -52,9 +52,9 @@ interface StudentContextType {
   // Graduation Exam Checklist
   selectedExamBeltId: string;
   setSelectedExamBeltId: (beltId: string) => void;
-  examChecklist: Record<string, boolean>; // key: `${beltId}_${requirementIndex}`
-  toggleExamRequirement: (beltId: string, requirementIndex: number) => void;
-  isExamRequirementCompleted: (beltId: string, requirementIndex: number) => boolean;
+  examChecklist: Record<string, boolean>;
+  toggleExamRequirement: (beltIdOrKey: string, requirementIndex?: number) => void;
+  isExamRequirementCompleted: (beltIdOrKey: string, requirementIndex?: number) => boolean;
   getBeltExamProgress: (beltId: string, requirementsLength: number) => { completed: number; total: number; percentage: number };
 
   // Technical Notes
@@ -68,9 +68,10 @@ const STORAGE_KEYS = {
   RECENT_STUDIES: "madeira_student_recent_studies_v1",
   KATA_PROGRESS: "madeira_student_kata_progress_v1",
   FAVORITES: "madeira_student_favorites_v1",
-  EXAM_BELT: "madeira_student_exam_belt_v1",
-  EXAM_CHECKLIST: "madeira_student_exam_checklist_v1",
+  EXAM_BELT: "madeira_student_exam_belt_v2",
+  EXAM_CHECKLIST: "madeira_student_exam_checklist_v2",
   TECHNICAL_NOTES: "madeira_student_technical_notes_v1",
+  MIGRATION_FLAG: "madeira_student_exam_migration_v2_applied",
 };
 
 const StudentContext = createContext<StudentContextType | undefined>(undefined);
@@ -101,14 +102,42 @@ export function StudentProvider({ children }: { children: ReactNode }) {
     safeParse<FavoriteItem[]>(STORAGE_KEYS.FAVORITES, [])
   );
 
-  // 4. Graduation Exam
+  // 4. Graduation Exam (Schema V2 JKA com migração controlada)
   const [selectedExamBeltId, setSelectedExamBeltIdState] = useState<string>(() => {
-    return localStorage.getItem(STORAGE_KEYS.EXAM_BELT) || "yellow";
+    try {
+      const v2Belt = localStorage.getItem(STORAGE_KEYS.EXAM_BELT);
+      if (v2Belt && v2Belt !== "red") {
+        if (v2Belt === "brown") return "brown-3";
+        if (v2Belt === "black") return "black-1";
+        return v2Belt;
+      }
+      const v1Belt = localStorage.getItem("madeira_student_exam_belt_v1");
+      if (v1Belt) {
+        if (v1Belt === "red") return "yellow";
+        if (v1Belt === "brown") return "brown-3";
+        if (v1Belt === "black") return "black-1";
+        if (["white", "yellow", "orange", "green", "purple"].includes(v1Belt)) return v1Belt;
+      }
+    } catch {
+      // ignore
+    }
+    return "yellow";
   });
 
-  const [examChecklist, setExamChecklist] = useState<Record<string, boolean>>(() =>
-    safeParse<Record<string, boolean>>(STORAGE_KEYS.EXAM_CHECKLIST, {})
-  );
+  const [examChecklist, setExamChecklist] = useState<Record<string, boolean>>(() => {
+    try {
+      const migrationApplied = localStorage.getItem(STORAGE_KEYS.MIGRATION_FLAG);
+      if (!migrationApplied) {
+        // Reset controlado exclusivamente do checklist antigo desatualizado
+        localStorage.removeItem("madeira_student_exam_checklist_v1");
+        localStorage.setItem(STORAGE_KEYS.MIGRATION_FLAG, "true");
+        return {};
+      }
+      return safeParse<Record<string, boolean>>(STORAGE_KEYS.EXAM_CHECKLIST, {});
+    } catch {
+      return {};
+    }
+  });
 
   // 5. Technical Notes
   const [technicalNotes, setTechnicalNotes] = useState<TechnicalNote[]>(() =>
@@ -229,29 +258,30 @@ export function StudentProvider({ children }: { children: ReactNode }) {
     setSelectedExamBeltIdState(beltId);
   }, []);
 
-  const toggleExamRequirement = useCallback((beltId: string, requirementIndex: number) => {
-    const key = `${beltId}_${requirementIndex}`;
+  const toggleExamRequirement = useCallback((beltIdOrKey: string, requirementIndex?: number) => {
+    const key = requirementIndex !== undefined ? `${beltIdOrKey}_${requirementIndex}` : beltIdOrKey;
     setExamChecklist(prev => ({
       ...prev,
       [key]: !prev[key]
     }));
   }, []);
 
-  const isExamRequirementCompleted = useCallback((beltId: string, requirementIndex: number) => {
-    const key = `${beltId}_${requirementIndex}`;
+  const isExamRequirementCompleted = useCallback((beltIdOrKey: string, requirementIndex?: number) => {
+    const key = requirementIndex !== undefined ? `${beltIdOrKey}_${requirementIndex}` : beltIdOrKey;
     return Boolean(examChecklist[key]);
   }, [examChecklist]);
 
   const getBeltExamProgress = useCallback((beltId: string, requirementsLength: number) => {
     if (requirementsLength <= 0) return { completed: 0, total: 0, percentage: 0 };
     let completed = 0;
-    for (let i = 0; i < requirementsLength; i++) {
-      if (examChecklist[`${beltId}_${i}`]) {
+    for (const [k, v] of Object.entries(examChecklist)) {
+      if (v && k.startsWith(`${beltId}_`)) {
         completed++;
       }
     }
-    const percentage = Math.round((completed / requirementsLength) * 100);
-    return { completed, total: requirementsLength, percentage };
+    const safeCompleted = Math.min(completed, requirementsLength);
+    const percentage = Math.round((safeCompleted / requirementsLength) * 100);
+    return { completed: safeCompleted, total: requirementsLength, percentage };
   }, [examChecklist]);
 
   // Technical Notes

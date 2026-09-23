@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Award, ArrowRight, CheckCircle2, ChevronRight, Sparkles } from "lucide-react";
+import { Award, ArrowRight, CheckCircle2, Sparkles, ExternalLink } from "lucide-react";
 import { Belt } from "../../types";
 
 interface BeltProgressionTrackProps {
@@ -8,16 +8,19 @@ interface BeltProgressionTrackProps {
 }
 
 export function BeltProgressionTrack({ belts }: BeltProgressionTrackProps) {
-  // We showcase the primary kyu-to-dan progression (White, Yellow, Red, Orange, Green, Purple, Brown, Black)
+  // Trilha oficial JKA: 10º Kyu (Branca) até 1º Dan (Preta / Shodan)
   const primaryBelts = belts.filter(b => 
     b.id === "white" || 
     b.id === "yellow" || 
-    b.id === "red" || 
     b.id === "orange" || 
     b.id === "green" || 
+    b.id === "light-blue" || 
     b.id === "purple" || 
-    b.id === "brown" || 
-    b.id === "black"
+    b.id === "dark-blue" || 
+    b.id === "brown-3" || 
+    b.id === "brown-2" || 
+    b.id === "brown-1" || 
+    b.id === "black-1"
   );
 
   const [selectedBeltId, setSelectedBeltId] = useState<string>("white");
@@ -30,13 +33,13 @@ export function BeltProgressionTrack({ belts }: BeltProgressionTrackProps) {
         <div>
           <div className="flex items-center gap-2 text-karate-red font-bold text-xs uppercase tracking-wider mb-1">
             <Award className="w-4 h-4" />
-            <span>Trilha de Graduação Shotokan</span>
+            <span>Trilha Oficial JKA Brasil</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-black font-jp tracking-tight text-neutral-900">
             A Jornada das Faixas
           </h2>
           <p className="text-sm text-neutral-600 mt-0.5">
-            Do primeiro passo na faixa branca ao domínio técnico da faixa preta. Toque em uma faixa para ver os requisitos.
+            Do 10º Kyu (Faixa Branca) ao 1º Dan (Faixa Preta Shodan). Toque em uma faixa para ver o programa técnico.
           </p>
         </div>
 
@@ -44,21 +47,21 @@ export function BeltProgressionTrack({ belts }: BeltProgressionTrackProps) {
           to="/belts"
           className="inline-flex items-center gap-1.5 text-sm font-bold text-karate-red hover:text-red-700 transition-colors shrink-0 group"
         >
-          <span>Ver todas as graduações e Dans</span>
+          <span>Ver todas as graduações e Dans superiores</span>
           <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
         </Link>
       </div>
 
       {/* Horizontal Belts Track */}
       <div className="bg-neutral-900 p-3 sm:p-4 rounded-2xl border border-neutral-800 shadow-sm overflow-x-auto no-scrollbar">
-        <div className="flex items-center gap-2 sm:gap-3 min-w-[700px] justify-between">
-          {primaryBelts.map((belt, index) => {
+        <div className="flex items-center gap-2 sm:gap-2.5 min-w-[850px] justify-between">
+          {primaryBelts.map((belt) => {
             const isSelected = belt.id === selectedBeltId;
             return (
               <button
                 key={belt.id}
                 onClick={() => setSelectedBeltId(belt.id)}
-                className={`flex-1 flex flex-col items-center p-3 rounded-xl transition-all relative group ${
+                className={`flex-1 flex flex-col items-center p-2.5 sm:p-3 rounded-xl transition-all relative group cursor-pointer ${
                   isSelected 
                     ? "bg-neutral-800 ring-2 ring-karate-gold shadow-md scale-[1.03]" 
                     : "hover:bg-neutral-800/60"
@@ -66,13 +69,13 @@ export function BeltProgressionTrack({ belts }: BeltProgressionTrackProps) {
               >
                 {/* Belt Color Swatch */}
                 <div 
-                  className="w-full h-8 sm:h-10 rounded-lg shadow-inner border-2 flex items-center justify-center transition-transform group-hover:scale-105"
+                  className="w-full h-8 sm:h-9 rounded-lg shadow-inner border-2 flex items-center justify-center transition-transform group-hover:scale-105"
                   style={{ 
                     backgroundColor: belt.color,
-                    borderColor: belt.id === "white" ? "#999999" : belt.id === "black" ? "#444444" : "rgba(255,255,255,0.2)"
+                    borderColor: belt.id === "white" ? "#999999" : belt.id.startsWith("black") ? "#444444" : "rgba(255,255,255,0.2)"
                   }}
                 >
-                  {belt.id === "black" && (
+                  {belt.id.startsWith("black") && (
                     <span className="text-white text-[10px] font-bold font-jp tracking-widest">初段</span>
                   )}
                   {belt.id === "white" && (
@@ -81,18 +84,18 @@ export function BeltProgressionTrack({ belts }: BeltProgressionTrackProps) {
                 </div>
 
                 {/* Name & Kyu */}
-                <p className={`text-xs font-bold mt-2 transition-colors ${
+                <p className={`text-[11px] sm:text-xs font-bold mt-2 text-center transition-colors truncate max-w-full ${
                   isSelected ? "text-karate-gold font-extrabold" : "text-white"
                 }`}>
                   {belt.name}
                 </p>
-                <p className="text-[10px] text-neutral-400 font-mono">
-                  {belt.level}
+                <p className="text-[9px] sm:text-[10px] text-neutral-400 font-mono">
+                  {belt.level.split("(")[0].trim()}
                 </p>
 
                 {/* Active Indicator dot */}
                 {isSelected && (
-                  <div className="w-1.5 h-1.5 rounded-full bg-karate-gold mt-1.5 animate-pulse" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-karate-gold mt-1 animate-pulse" />
                 )}
               </button>
             );
@@ -112,7 +115,7 @@ export function BeltProgressionTrack({ belts }: BeltProgressionTrackProps) {
                   borderColor: selectedBelt.id === "white" ? "#E5E5E5" : "rgba(0,0,0,0.15)"
                 }}
               >
-                {selectedBelt.id === "black" && (
+                {selectedBelt.id.startsWith("black") && (
                   <span className="text-white font-bold font-jp text-sm tracking-widest">黒帯</span>
                 )}
                 {selectedBelt.id === "white" && (
@@ -129,41 +132,86 @@ export function BeltProgressionTrack({ belts }: BeltProgressionTrackProps) {
                     {selectedBelt.level}
                   </span>
                 </div>
-                <p className="text-xs sm:text-sm text-neutral-600 mt-1 max-w-xl italic">
-                  "{selectedBelt.meaning}"
-                </p>
+                {selectedBelt.meaning && (
+                  <p className="text-xs sm:text-sm text-neutral-600 mt-1 max-w-xl italic">
+                    "{selectedBelt.meaning}"
+                  </p>
+                )}
               </div>
             </div>
 
             <Link
-              to="/belts"
+              to={`/belts#belt-${selectedBelt.id}`}
               className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-neutral-900 hover:bg-black text-white text-xs sm:text-sm font-bold transition-colors shrink-0"
             >
-              <span>Ver Requisitos Completos</span>
+              <span>Ver Ficha Oficial Completa</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
 
           {/* Requirements Grid */}
-          <div className="pt-5">
-            <h3 className="text-xs uppercase font-bold tracking-wider text-neutral-600 mb-3 flex items-center gap-1.5">
+          <div className="pt-5 space-y-4">
+            <h3 className="text-xs uppercase font-bold tracking-wider text-neutral-600 flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-karate-red" />
-              Requisitos Principais de Exame
+              Requisitos Oficiais JKA Brasil
             </h3>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-              {selectedBelt.requirements.map((req, i) => (
-                <div 
-                  key={i}
-                  className="flex items-start gap-2.5 p-3 rounded-xl bg-neutral-50 border border-neutral-100"
-                >
-                  <CheckCircle2 className="w-4 h-4 text-karate-red shrink-0 mt-0.5" />
-                  <span className="text-xs sm:text-sm text-neutral-800 font-medium leading-snug">
-                    {req}
+            {/* Kihon, Kata, Kumite Highlights */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {/* Kihon */}
+              {selectedBelt.kihon && selectedBelt.kihon.length > 0 && (
+                <div className="p-3.5 rounded-xl bg-neutral-50 border border-neutral-200/80 space-y-2">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-karate-red block">
+                    Kihon ({selectedBelt.kihon.length} técnicas)
                   </span>
+                  <div className="space-y-1 font-mono text-xs text-neutral-800">
+                    {selectedBelt.kihon.slice(0, 3).map((k, i) => (
+                      <div key={i} className="truncate">• {k}</div>
+                    ))}
+                    {selectedBelt.kihon.length > 3 && (
+                      <div className="text-[11px] text-neutral-400 font-sans italic">
+                        +{selectedBelt.kihon.length - 3} mais...
+                      </div>
+                    )}
+                  </div>
                 </div>
-              ))}
+              )}
+
+              {/* Kata */}
+              {selectedBelt.kata && selectedBelt.kata.length > 0 && (
+                <div className="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200 space-y-2">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-amber-900 block">
+                    Kata Exigido
+                  </span>
+                  <div className="space-y-1 font-mono text-xs text-amber-950 font-bold">
+                    {selectedBelt.kata.map((k, i) => (
+                      <div key={i} className="truncate">🥋 {k}</div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Kumite */}
+              {selectedBelt.kumite && selectedBelt.kumite.length > 0 && (
+                <div className="p-3.5 rounded-xl bg-blue-50/70 border border-blue-200 space-y-2">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-blue-900 block">
+                    Kumite
+                  </span>
+                  <div className="space-y-1 font-mono text-xs text-blue-950">
+                    {selectedBelt.kumite.map((ku, i) => (
+                      <div key={i} className="truncate">• {ku}</div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
+
+            {/* Dan Rules se Shodan */}
+            {selectedBelt.danRules && (
+              <div className="p-3 rounded-xl bg-neutral-100 border border-neutral-200 text-xs text-neutral-700">
+                <strong>Regras Administrativas (JKA 2026):</strong> Carência mínima: {selectedBelt.danRules.minimumTime} | Graduação anterior: {selectedBelt.danRules.previousGrade} | Idade mínima: {selectedBelt.danRules.minimumAge}
+              </div>
+            )}
           </div>
         </div>
       )}

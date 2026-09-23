@@ -188,9 +188,9 @@ export function searchAllData(
         category: "belt",
         categoryLabel: "Faixa",
         title: `Faixa ${belt.name} (${belt.level})`,
-        subtitle: `Graduação Shotokan`,
+        subtitle: `Graduação Shotokan JKA`,
         description: belt.meaning || `Requisitos: ${(belt.requirements || []).slice(0, 2).join(", ")}`,
-        path: `/belts`,
+        path: `/belts#belt-${belt.id}`,
         badgeClass: "bg-blue-50 text-blue-700 border-blue-200"
       });
     }

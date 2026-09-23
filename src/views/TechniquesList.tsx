@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { techniques } from "../data/mockData";
+import { techniques, belts } from "../data/mockData";
 import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { useAppData } from "../contexts/AppDataContext";
@@ -79,7 +79,7 @@ export function TechniquesList() {
               
               <div className="mt-auto">
                 <span className="inline-block bg-neutral-100 text-neutral-600 text-[10px] uppercase font-bold px-2 py-1 rounded">
-                  Recomendado: {tech.recommendedBeltId}
+                  Recomendado: {belts.find(b => b.id === tech.recommendedBeltId)?.name ? `Faixa ${belts.find(b => b.id === tech.recommendedBeltId)?.name}` : tech.recommendedBeltId}
                 </span>
               </div>
             </div>
