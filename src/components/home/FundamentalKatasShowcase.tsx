@@ -74,13 +74,14 @@ export function FundamentalKatasShowcase({ katas, totalKatas }: FundamentalKatas
                   {kata.group}
                 </span>
 
-                <div className="flex items-center gap-1.5 text-xs font-mono text-neutral-500 font-medium">
-                  {kata.movements && kata.movements.length > 0 ? (
-                    <span className="flex items-center gap-1" title="Número de movimentos">
+                <div className="flex flex-col items-end gap-1 text-xs text-neutral-500 font-medium">
+                  {kata.movementsCount > 0 && (
+                    <span className="flex items-center gap-1 font-mono" title="Quantidade oficial de movimentos segundo JKA Headquarters">
                       <Layers className="w-3.5 h-3.5 text-neutral-400" />
-                      {kata.movements.length} mov.
+                      {kata.movementsCount} mov. JKA
                     </span>
-                  ) : (
+                  )}
+                  {(!kata.movements || kata.movements.length === 0) && (
                     <span className="text-[11px] text-neutral-400 font-sans italic">
                       Sequência em atualização
                     </span>
