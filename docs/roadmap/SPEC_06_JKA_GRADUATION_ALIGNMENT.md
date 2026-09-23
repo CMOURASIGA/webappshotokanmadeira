@@ -1,6 +1,6 @@
 # SPEC 06 — Alinhamento Oficial de Graduações Kyu/Dan com JKA Brasil
 
-> **Status:** LIBERADA PARA DESENVOLVIMENTO.
+> **Status:** APROVADA EM HUMAN VALIDATION.
 >
 > **Escopo:** manutenção pós-UX Evolution V2. Esta SPEC não reabre nem altera a aprovação da UX Evolution V2.
 
@@ -667,6 +667,8 @@ Não implementar nesta SPEC:
 ---
 
 ## 19. Critério de conclusão
+
+> **Human Validation:** APROVADA em 23/09/2026.
 
 A SPEC somente poderá ser marcada como concluída após:
 
