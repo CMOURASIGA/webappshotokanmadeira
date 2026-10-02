@@ -247,17 +247,17 @@ export function ChampionshipDashboard() {
       loadAllData();
     }
 
+    // "storage" dispara apenas quando outra aba/janela altera o localStorage.
+    // Não usamos mais evento customizado aqui para evitar recarregamento recursivo.
     const handleStorageUpdate = () => {
       if (isAuthenticated) {
         loadAllData();
       }
     };
 
-    window.addEventListener("madeira_storage_update", handleStorageUpdate);
     window.addEventListener("storage", handleStorageUpdate);
 
     return () => {
-      window.removeEventListener("madeira_storage_update", handleStorageUpdate);
       window.removeEventListener("storage", handleStorageUpdate);
     };
   }, [isAuthenticated, selectedChampId]);
