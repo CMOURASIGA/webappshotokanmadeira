@@ -50,13 +50,12 @@ let memoryCache = {
   initialized: false
 };
 
-// Safe cache helper (only used as auxiliary cache, never as official source)
+// Atualiza apenas o cache em memória.
+// Não dispara eventos globais: os métodos de leitura chamavam esta função e,
+// ao mesmo tempo, o dashboard escutava o evento para recarregar os mesmos dados,
+// criando um loop contínuo de requisições.
 function updateLocalCache() {
-  if (typeof window !== "undefined") {
-    try {
-      window.dispatchEvent(new CustomEvent("madeira_storage_update", { detail: { time: Date.now() } }));
-    } catch {}
-  }
+  // Intencionalmente sem side effects.
 }
 
 /**
