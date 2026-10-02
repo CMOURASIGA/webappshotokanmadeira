@@ -46,6 +46,7 @@ import {
   Layers
 } from "lucide-react";
 import { generatePixCopiaECola, generatePixQrCodeDataUrl } from "../lib/pixUtils";
+import { formatModalidadesList } from "../lib/utils";
 import { championshipService } from "../services/championshipService";
 import { 
   Championship, 
@@ -165,11 +166,13 @@ export function ChampionshipDashboard() {
     const day = String(today.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   });
-  const [newChampLocal, setNewChampLocal] = useState("Dojo Central Madeira Karate");
-  const [newChampValor, setNewChampValor] = useState("75,00");
-  const [newChampDesc, setNewChampDesc] = useState("Competição interna pedagógica e esportiva do Madeira Karate Shotokan.");
+  const [newChampLocal, setNewChampLocal] = useState("");
+  const [newChampValor, setNewChampValor] = useState("");
+  const [newChampDesc, setNewChampDesc] = useState("");
+  const [newChampModalidades, setNewChampModalidades] = useState("Kata, Kumite");
   const [newChampPixTipo, setNewChampPixTipo] = useState<PixKeyType>("TELEFONE");
   const [newChampPixChave, setNewChampPixChave] = useState("21973681109");
+  const [isCheckingPin, setIsCheckingPin] = useState(false);
 
   // Modal PIX & WhatsApp para a linha de inscrição
   const [pixModalRegistration, setPixModalRegistration] = useState<AthleteRegistration | null>(null);
@@ -182,47 +185,61 @@ export function ChampionshipDashboard() {
     setTimeout(() => setToastMessage(null), 3500);
   };
 
-  // Carregar dados
-  const loadAllData = () => {
-    const list = championshipService.getChampionships();
-    setChampionships(list);
+  // Carregar dados oficiais centralmente
+  const loadAllData = async () => {
+    try {
+      const list = await championshipService.fetchChampionships();
+      setChampionships(list);
 
-    let activeId = selectedChampId;
-    if (!activeId && list.length > 0) {
-      activeId = list[0].id;
-      setSelectedChampId(activeId);
+      let activeId = selectedChampId;
+      if ((!activeId || !list.some(c => c.id === activeId)) && list.length > 0) {
+        activeId = list[0].id;
+        setSelectedChampId(activeId);
+      } else if (list.length === 0) {
+        setSelectedChampId("");
+      }
+
+      if (activeId) {
+        const [regs, cats] = await Promise.all([
+          championshipService.fetchRegistrations(activeId),
+          championshipService.fetchCategories(activeId)
+        ]);
+        setRegistrations(regs);
+        setCategories(cats);
+
+        const currentChamp = list.find(c => c.id === activeId);
+        if (currentChamp) {
+          setChampEditNome(currentChamp.nome);
+          setChampEditSlug(currentChamp.slug);
+          setChampEditDesc(currentChamp.descricao);
+          setChampEditData(currentChamp.dataCampeonato);
+          setChampEditLocal(currentChamp.local);
+          setChampEditAbertura(currentChamp.aberturaInscricoes);
+          setChampEditEncerramento(currentChamp.encerramentoInscricoes);
+          setChampEditStatus(currentChamp.status);
+          setChampEditValor(String(currentChamp.valorInscricao));
+          setChampEditModalidades(currentChamp.modalidades ? currentChamp.modalidades.join(", ") : "");
+          setChampEditRegulamento(currentChamp.regulamento || "");
+          setChampEditPermiteMenores(currentChamp.permiteMenores);
+
+          setPixTipo(currentChamp.configuracaoPix.tipoChave);
+          setPixChave(currentChamp.configuracaoPix.chave);
+          setPixNome(currentChamp.configuracaoPix.nomeRecebedor);
+          setPixCidade(currentChamp.configuracaoPix.cidadeRecebedor);
+          setPixIncluirValor(currentChamp.configuracaoPix.incluirValorNoQrCode);
+          setPixInstrucoes(currentChamp.configuracaoPix.instrucoesAdicionais || "");
+        }
+      } else {
+        setRegistrations([]);
+        setCategories([]);
+      }
+
+      const appSettings = await championshipService.fetchSettings();
+      setSettings(appSettings);
+      setSheetWebhookUrl(appSettings.googleAppsScriptUrl || "");
+    } catch (err) {
+      console.error("[Dashboard] Erro ao carregar dados oficiais:", err);
     }
-
-    const currentChamp = list.find(c => c.id === activeId) || list[0];
-    if (currentChamp) {
-      setRegistrations(championshipService.getRegistrations(currentChamp.id));
-      setCategories(championshipService.getCategories(currentChamp.id));
-
-      // Carregar formulários de configuração
-      setChampEditNome(currentChamp.nome);
-      setChampEditSlug(currentChamp.slug);
-      setChampEditDesc(currentChamp.descricao);
-      setChampEditData(currentChamp.dataCampeonato);
-      setChampEditLocal(currentChamp.local);
-      setChampEditAbertura(currentChamp.aberturaInscricoes);
-      setChampEditEncerramento(currentChamp.encerramentoInscricoes);
-      setChampEditStatus(currentChamp.status);
-      setChampEditValor(String(currentChamp.valorInscricao));
-      setChampEditModalidades(currentChamp.modalidades.join(", "));
-      setChampEditRegulamento(currentChamp.regulamento || "");
-      setChampEditPermiteMenores(currentChamp.permiteMenores);
-
-      setPixTipo(currentChamp.configuracaoPix.tipoChave);
-      setPixChave(currentChamp.configuracaoPix.chave);
-      setPixNome(currentChamp.configuracaoPix.nomeRecebedor);
-      setPixCidade(currentChamp.configuracaoPix.cidadeRecebedor);
-      setPixIncluirValor(currentChamp.configuracaoPix.incluirValorNoQrCode);
-      setPixInstrucoes(currentChamp.configuracaoPix.instrucoesAdicionais || "");
-    }
-
-    const appSettings = championshipService.getSettings();
-    setSettings(appSettings);
-    setSheetWebhookUrl(appSettings.googleAppsScriptUrl || "");
   };
 
   useEffect(() => {
@@ -230,7 +247,7 @@ export function ChampionshipDashboard() {
       loadAllData();
     }
 
-    const handleStorageUpdate = (e: any) => {
+    const handleStorageUpdate = () => {
       if (isAuthenticated) {
         loadAllData();
       }
@@ -245,16 +262,38 @@ export function ChampionshipDashboard() {
     };
   }, [isAuthenticated, selectedChampId]);
 
-  // Autenticação do Sensei
-  const handlePinSubmit = (e: React.FormEvent) => {
+  // Fechar gavetas laterais com a tecla ESC
+  useEffect(() => {
+    if (!isNewChampDrawerOpen && !isEditDrawerOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setIsNewChampDrawerOpen(false);
+        setIsEditDrawerOpen(false);
+        setEditingChampId(null);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isNewChampDrawerOpen, isEditDrawerOpen]);
+
+  // Autenticação do Sensei com validação server-side
+  const handlePinSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (championshipService.verifyAdminPin(pinInput)) {
-      setIsAuthenticated(true);
-      sessionStorage.setItem("madeira_admin_authenticated", "true");
-      setPinError(false);
-      setPinInput("");
-    } else {
+    setIsCheckingPin(true);
+    try {
+      const ok = await championshipService.verifyAdminPin(pinInput);
+      if (ok) {
+        setIsAuthenticated(true);
+        sessionStorage.setItem("madeira_admin_authenticated", "true");
+        setPinError(false);
+        setPinInput("");
+      } else {
+        setPinError(true);
+      }
+    } catch {
       setPinError(true);
+    } finally {
+      setIsCheckingPin(false);
     }
   };
 
@@ -454,14 +493,14 @@ export function ChampionshipDashboard() {
   }, [registrations, searchTerm, filterStatus, filterPayment, filterCategoryOnlyWithout]);
 
   // Ações de Pagamento e Status
-  const handleConfirmPayment = (regId: string) => {
+  const handleConfirmPayment = async (regId: string) => {
     try {
-      const updated = championshipService.adminUpdateStatus(regId, {
+      const updated = await championshipService.adminUpdateStatus(regId, {
         paymentStatus: "PAGAMENTO_CONFIRMADO",
         status: "CONFIRMADA",
         adminName: "Sensei Madeira"
       });
-      loadAllData();
+      await loadAllData();
       if (selectedRegistration?.id === regId) setSelectedRegistration(updated);
       if (pixModalRegistration?.id === regId) setPixModalRegistration(updated);
       showToast(`Pagamento da inscrição ${regId} CONFIRMADO com sucesso!`);
@@ -476,15 +515,15 @@ export function ChampionshipDashboard() {
     setShowRejectModal(true);
   };
 
-  const handleConfirmRejection = () => {
+  const handleConfirmRejection = async () => {
     if (!rejectingRegId) return;
     try {
-      const updated = championshipService.adminUpdateStatus(rejectingRegId, {
+      const updated = await championshipService.adminUpdateStatus(rejectingRegId, {
         paymentStatus: "PAGAMENTO_REJEITADO",
         motivo: rejectionReason || "Comprovante divergente ou não localizado.",
         adminName: "Sensei Madeira"
       });
-      loadAllData();
+      await loadAllData();
       if (selectedRegistration?.id === rejectingRegId) setSelectedRegistration(updated);
       if (pixModalRegistration?.id === rejectingRegId) setPixModalRegistration(updated);
       setShowRejectModal(false);
@@ -495,13 +534,13 @@ export function ChampionshipDashboard() {
     }
   };
 
-  const handleMarkAwaitingCheck = (regId: string) => {
+  const handleMarkAwaitingCheck = async (regId: string) => {
     try {
-      const updated = championshipService.adminUpdateStatus(regId, {
+      const updated = await championshipService.adminUpdateStatus(regId, {
         paymentStatus: "AGUARDANDO_CONFERENCIA",
         adminName: "Sensei Madeira"
       });
-      loadAllData();
+      await loadAllData();
       if (selectedRegistration?.id === regId) setSelectedRegistration(updated);
       if (pixModalRegistration?.id === regId) setPixModalRegistration(updated);
       showToast(`Inscrição ${regId} marcada como Aguardando Conferência.`);
@@ -510,16 +549,16 @@ export function ChampionshipDashboard() {
     }
   };
 
-  const handleCancelRegistration = (regId: string) => {
+  const handleCancelRegistration = async (regId: string) => {
     const motivo = prompt("Motivo administrativo do cancelamento da inscrição:");
     if (motivo === null) return; // cancelou o prompt
     try {
-      const updated = championshipService.adminUpdateStatus(regId, {
+      const updated = await championshipService.adminUpdateStatus(regId, {
         status: "CANCELADA",
         motivo: motivo || "Cancelamento administrativo pelo Dojo.",
         adminName: "Sensei Madeira"
       });
-      loadAllData();
+      await loadAllData();
       if (selectedRegistration?.id === regId) setSelectedRegistration(updated);
       showToast(`Inscrição ${regId} cancelada administrativamente.`);
     } catch (err: any) {
@@ -527,13 +566,13 @@ export function ChampionshipDashboard() {
     }
   };
 
-  const handleAssignCategory = (regId: string, catId: string) => {
+  const handleAssignCategory = async (regId: string, catId: string) => {
     try {
-      const updated = championshipService.adminUpdateStatus(regId, {
+      const updated = await championshipService.adminUpdateStatus(regId, {
         categoriaId: catId,
         adminName: "Sensei Madeira"
       });
-      loadAllData();
+      await loadAllData();
       if (selectedRegistration?.id === regId) setSelectedRegistration(updated);
       showToast(`Categoria atualizada para a inscrição ${regId}.`);
     } catch (err: any) {
@@ -632,7 +671,7 @@ export function ChampionshipDashboard() {
   };
 
   // Salvar Campeonato Editado
-  const handleSaveChampionship = (e: React.FormEvent) => {
+  const handleSaveChampionship = async (e: React.FormEvent) => {
     e.preventDefault();
     const targetId = editingChampId || selectedChampId;
     const targetChamp = championships.find(c => c.id === targetId) || selectedChampionship;
@@ -640,7 +679,7 @@ export function ChampionshipDashboard() {
 
     try {
       const mods = champEditModalidades
-        .split(",")
+        .split(/[,;]/)
         .map(s => s.trim())
         .filter(Boolean);
 
@@ -655,11 +694,11 @@ export function ChampionshipDashboard() {
 
       const updated: Championship = {
         ...targetChamp,
-        nome: champEditNome,
-        slug: champEditSlug,
-        descricao: champEditDesc,
+        nome: champEditNome.trim(),
+        slug: champEditSlug.trim(),
+        descricao: champEditDesc.trim(),
         dataCampeonato: champEditData,
-        local: champEditLocal,
+        local: champEditLocal.trim(),
         aberturaInscricoes: champEditAbertura,
         encerramentoInscricoes: champEditEncerramento,
         status: champEditStatus,
@@ -669,16 +708,16 @@ export function ChampionshipDashboard() {
         permiteMenores: champEditPermiteMenores,
         configuracaoPix: {
           tipoChave: pixTipo,
-          chave: pixChave,
-          nomeRecebedor: pixNome,
-          cidadeRecebedor: pixCidade,
+          chave: pixChave.trim(),
+          nomeRecebedor: pixNome.trim(),
+          cidadeRecebedor: pixCidade.trim(),
           incluirValorNoQrCode: pixIncluirValor,
           instrucoesAdicionais: pixInstrucoes
         }
       };
 
-      championshipService.saveChampionship(updated);
-      loadAllData();
+      await championshipService.saveChampionship(updated);
+      await loadAllData();
       setIsEditDrawerOpen(false);
       setEditingChampId(null);
       showToast("Configurações do campeonato salvas com sucesso!");
@@ -703,7 +742,7 @@ export function ChampionshipDashboard() {
     setChampEditEncerramento(target.encerramentoInscricoes);
     setChampEditStatus(target.status);
     setChampEditValor(String(target.valorInscricao));
-    setChampEditModalidades(target.modalidades.join(", "));
+    setChampEditModalidades(target.modalidades ? target.modalidades.join(", ") : "");
     setChampEditRegulamento(target.regulamento || "");
     setChampEditPermiteMenores(target.permiteMenores);
 
@@ -725,9 +764,9 @@ export function ChampionshipDashboard() {
   };
 
   // Validação e Exclusão de Campeonato (CRUD)
-  const handleDeleteChampionship = (champ: Championship) => {
+  const handleDeleteChampionship = async (champ: Championship) => {
     setDeleteBlockedMessage(null);
-    const champRegs = championshipService.getRegistrations(champ.id);
+    const champRegs = await championshipService.fetchRegistrations(champ.id);
     if (champRegs.length > 0) {
       setDeleteBlockedMessage(
         `Não é possível excluir o campeonato "${champ.nome}" porque ele já possui ${champRegs.length} inscrição(ões) cadastrada(s). Para excluir o torneio, é necessário primeiro cancelar ou remover todas as inscrições vinculadas.`
@@ -738,23 +777,27 @@ export function ChampionshipDashboard() {
     setDeletingChampionship(champ);
   };
 
-  const confirmDeleteChampionship = () => {
+  const confirmDeleteChampionship = async () => {
     if (!deletingChampionship) return;
-    championshipService.deleteChampionship(deletingChampionship.id);
-    setDeletingChampionship(null);
-    loadAllData();
-    showToast(`Campeonato "${deletingChampionship.nome}" excluído com sucesso.`);
+    try {
+      await championshipService.deleteChampionship(deletingChampionship.id);
+      setDeletingChampionship(null);
+      await loadAllData();
+      showToast(`Campeonato "${deletingChampionship.nome}" excluído com sucesso.`);
+    } catch (err: any) {
+      showToast(`Erro ao excluir: ${err.message}`);
+    }
   };
 
   // Salvar Categorias
-  const handleSaveCategory = (e: React.FormEvent) => {
+  const handleSaveCategory = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedChampionship) return;
+    if (!selectedChampionship || !catNome.trim()) return;
 
     const newCat: ChampionshipCategory = {
       id: editingCategory ? editingCategory.id : `cat-${Date.now()}`,
       championshipId: selectedChampionship.id,
-      nome: catNome,
+      nome: catNome.trim(),
       modalidade: "Geral (Kata e Kumite)",
       sexo: catSexo,
       idadeMinima: catIdadeMin ? parseInt(catIdadeMin, 10) : undefined,
@@ -762,40 +805,52 @@ export function ChampionshipDashboard() {
       pesoMaximo: catPesoMax ? parseFloat(catPesoMax.replace(",", ".")) : undefined
     };
 
-    championshipService.saveCategory(newCat);
-    loadAllData();
-    setShowCategoryModal(false);
-    setEditingCategory(null);
-    setCatNome("");
-    setCatIdadeMin("");
-    setCatIdadeMax("");
-    setCatPesoMax("");
-    showToast("Chave / Categoria salva com sucesso!");
+    try {
+      await championshipService.saveCategory(newCat);
+      await loadAllData();
+      setShowCategoryModal(false);
+      setEditingCategory(null);
+      setCatNome("");
+      setCatIdadeMin("");
+      setCatIdadeMax("");
+      setCatPesoMax("");
+      showToast("Chave / Categoria salva com sucesso!");
+    } catch (err: any) {
+      showToast(`Erro ao salvar categoria: ${err.message}`);
+    }
   };
 
-  const handleDeleteCategory = (catId: string) => {
+  const handleDeleteCategory = async (catId: string) => {
     if (!confirm("Deseja realmente remover esta categoria?")) return;
-    championshipService.deleteCategory(catId);
-    loadAllData();
-    showToast("Categoria excluída.");
+    try {
+      await championshipService.deleteCategory(catId);
+      await loadAllData();
+      showToast("Categoria excluída.");
+    } catch (err: any) {
+      showToast(`Erro ao excluir categoria: ${err.message}`);
+    }
   };
 
   // Salvar Configurações Gerais e Google Sheets
-  const handleSaveGeneralSettings = (e: React.FormEvent) => {
+  const handleSaveGeneralSettings = async (e: React.FormEvent) => {
     e.preventDefault();
-    const updatedSettings: ChampionshipSettings = {
-      ...settings,
-      googleAppsScriptUrl: sheetWebhookUrl.trim(),
-      adminPin: newAdminPin.trim() ? newAdminPin.trim() : settings.adminPin
-    };
-    championshipService.saveSettings(updatedSettings);
-    setSettings(updatedSettings);
-    setNewAdminPin("");
-    showToast("Configurações do sistema e Google Sheets atualizadas!");
+    try {
+      const updatedSettings: ChampionshipSettings = {
+        ...settings,
+        googleAppsScriptUrl: sheetWebhookUrl.trim(),
+        adminPin: newAdminPin.trim() ? newAdminPin.trim() : settings.adminPin
+      };
+      await championshipService.saveSettings(updatedSettings);
+      setSettings(updatedSettings);
+      setNewAdminPin("");
+      showToast("Configurações do sistema e Google Sheets atualizadas!");
+    } catch (err: any) {
+      showToast(`Erro ao salvar configurações: ${err.message}`);
+    }
   };
 
   // Criar Novo Campeonato
-  const handleCreateNewChampionship = (e: React.FormEvent) => {
+  const handleCreateNewChampionship = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newChampNome.trim()) {
       showToast("Informe o nome do campeonato.");
@@ -809,13 +864,17 @@ export function ChampionshipDashboard() {
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "") || `torneio-${Date.now()}`;
 
-    const numVal = parseFloat(newChampValor.replace(",", ".")) || 75;
+    const numVal = parseFloat(newChampValor.replace(",", ".")) || 0;
+    const parsedMods = newChampModalidades
+      .split(/[,;]/)
+      .map(s => s.trim())
+      .filter(Boolean);
 
     const basePix: PixConfig = {
       tipoChave: newChampPixTipo,
-      chave: newChampPixChave.trim() || selectedChampionship?.configuracaoPix.chave || "21973681109",
-      nomeRecebedor: selectedChampionship?.configuracaoPix.nomeRecebedor || "MADEIRA KARATE",
-      cidadeRecebedor: selectedChampionship?.configuracaoPix.cidadeRecebedor || "RIO DE JANEIRO",
+      chave: newChampPixChave.trim() || "21973681109",
+      nomeRecebedor: "MADEIRA KARATE",
+      cidadeRecebedor: "RIO DE JANEIRO",
       incluirValorNoQrCode: true,
       instrucoesAdicionais: "Pagamento referente à inscrição no torneio. Envie o comprovante pelo WhatsApp do Dojo."
     };
@@ -826,25 +885,32 @@ export function ChampionshipDashboard() {
       nome: newChampNome.trim(),
       descricao: newChampDesc.trim(),
       dataCampeonato: newChampData,
-      local: newChampLocal.trim(),
+      local: newChampLocal.trim() || "Dojo Central Madeira Karate",
       aberturaInscricoes: new Date().toISOString(),
       encerramentoInscricoes: new Date(Date.now() + 30 * 86400000).toISOString(),
       status: "INSCRICOES_ABERTAS",
       valorInscricao: numVal,
-      modalidades: ["Todas as Modalidades (Kata e Kumite)"],
+      modalidades: parsedMods.length > 0 ? parsedMods : ["Kata", "Kumite"],
       configuracaoPix: basePix,
-      regulamento: selectedChampionship?.regulamento || "Regras oficiais de competição baseadas nos critérios da JKA Brasil.",
+      regulamento: "Regras oficiais de competição baseadas nos critérios da JKA Brasil.",
       permiteMenores: true,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
 
-    championshipService.saveChampionship(newChamp);
-    setSelectedChampId(newChamp.id);
-    loadAllData();
-    setIsNewChampDrawerOpen(false);
-    setNewChampNome("");
-    showToast(`Campeonato "${newChamp.nome}" cadastrado com sucesso!`);
+    try {
+      await championshipService.saveChampionship(newChamp);
+      setSelectedChampId(newChamp.id);
+      await loadAllData();
+      setIsNewChampDrawerOpen(false);
+      setNewChampNome("");
+      setNewChampLocal("");
+      setNewChampValor("");
+      setNewChampDesc("");
+      showToast(`Campeonato "${newChamp.nome}" cadastrado com sucesso!`);
+    } catch (err: any) {
+      showToast(`Erro ao criar campeonato: ${err.message}`);
+    }
   };
 
   // ==========================================
@@ -878,11 +944,17 @@ export function ChampionshipDashboard() {
                 placeholder="Digite o PIN do Sensei"
                 value={pinInput}
                 onChange={(e) => setPinInput(e.target.value)}
-                className="w-full px-4 py-3 bg-neutral-50 border border-neutral-300 rounded-xl text-center text-lg font-mono tracking-widest text-neutral-900 focus:outline-none focus:ring-2 focus:ring-karate-red"
+                disabled={isCheckingPin}
+                className="w-full px-4 py-3 bg-neutral-50 border border-neutral-300 rounded-xl text-center text-lg font-mono tracking-widest text-neutral-900 focus:outline-none focus:ring-2 focus:ring-karate-red disabled:opacity-50"
               />
-              <span className="text-[11px] text-neutral-400 mt-1 block text-left">
-                * PIN padrão institucional: <strong>1926</strong> (alterável nas configurações).
-              </span>
+              <div className="mt-2 text-left space-y-1">
+                <span className="text-[11px] text-neutral-500 block">
+                  * PIN administrativo padrão: <strong>1926</strong> (alterável no painel).
+                </span>
+                <p className="text-[10px] text-neutral-400 bg-neutral-50 p-2 rounded-lg border border-neutral-200 leading-relaxed">
+                  Aviso de Segurança (SPEC 08): Autenticação operacional validada pelo backend do Dojo (modo administrativo para gestão técnica e conferência manual).
+                </p>
+              </div>
             </div>
 
             {pinError && (
@@ -893,9 +965,11 @@ export function ChampionshipDashboard() {
 
             <button
               type="submit"
-              className="w-full py-3.5 bg-neutral-900 hover:bg-neutral-800 text-white rounded-xl text-xs font-bold font-jp transition-colors cursor-pointer shadow-sm flex items-center justify-center gap-2"
+              disabled={isCheckingPin}
+              className="w-full py-3.5 bg-neutral-900 hover:bg-neutral-800 text-white rounded-xl text-xs font-bold font-jp transition-colors cursor-pointer shadow-sm flex items-center justify-center gap-2 disabled:opacity-50"
             >
-              <Unlock className="w-4 h-4" /> Entrar no Dashboard
+              <Unlock className="w-4 h-4" /> 
+              <span>{isCheckingPin ? "Validando no servidor..." : "Entrar no Dashboard"}</span>
             </button>
           </form>
 
@@ -1113,17 +1187,23 @@ export function ChampionshipDashboard() {
           </div>
         </div>
       ) : (
-        <div className="p-8 bg-neutral-100 rounded-3xl border border-neutral-200 text-center space-y-3">
-          <Trophy className="w-10 h-10 text-neutral-400 mx-auto" />
-          <h3 className="font-bold text-neutral-800 text-base">Nenhum Campeonato Ativo</h3>
-          <p className="text-xs text-neutral-500 max-w-md mx-auto">
-            Crie seu primeiro campeonato para iniciar a gestão de atletas e conferência de pagamentos.
-          </p>
+        <div className="p-12 sm:p-16 bg-neutral-50 rounded-3xl border-2 border-dashed border-neutral-300 text-center space-y-4 shadow-sm animate-in fade-in duration-200">
+          <div className="w-16 h-16 bg-neutral-100 rounded-2xl flex items-center justify-center mx-auto text-neutral-400">
+            <Trophy className="w-8 h-8" />
+          </div>
+          <div className="space-y-1 max-w-md mx-auto">
+            <h3 className="font-extrabold font-jp text-neutral-900 text-xl">Nenhum campeonato cadastrado</h3>
+            <p className="text-xs text-neutral-500 leading-relaxed">
+              Não há campeonatos registrados na base oficial do Dojo. Crie o primeiro campeonato para iniciar a gestão de atletas e conferência de pagamentos.
+            </p>
+          </div>
           <button
             onClick={() => setIsNewChampDrawerOpen(true)}
-            className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-karate-red hover:bg-red-700 text-white rounded-xl text-xs font-bold transition-colors cursor-pointer shadow-sm"
+            className="inline-flex items-center gap-2 px-5 py-3 bg-neutral-900 hover:bg-neutral-800 text-white rounded-xl text-xs font-bold font-jp transition-colors cursor-pointer shadow-md"
+            title="Criar campeonato"
           >
-            <Plus className="w-4 h-4" /> + Cadastrar Novo Torneio
+            <Plus className="w-4 h-4 text-karate-red" />
+            <span>Criar campeonato</span>
           </button>
         </div>
       )}
@@ -1292,7 +1372,7 @@ export function ChampionshipDashboard() {
                       Participação Integral Unificada
                     </span>
                     <p className="text-xs text-emerald-950 font-medium">
-                      100% dos atletas ({metrics.totalInscritos}) competem em <strong>todas as modalidades (Kata + Kumite)</strong>.
+                      100% dos atletas ({metrics.totalInscritos}) competem em <strong>todas as modalidades do campeonato ({formatModalidadesList(selectedChampionship?.modalidades)})</strong>.
                     </p>
                   </div>
 
@@ -1689,7 +1769,7 @@ export function ChampionshipDashboard() {
             <div>
               <h2 className="text-lg font-bold font-jp text-neutral-900">Chaves e Categorias Oficiais</h2>
               <p className="text-xs text-neutral-500">
-                Como todos os atletas participam de todas as modalidades (Kata e Kumite), as categorias organizam as chaves oficiais de disputa por faixa etária, sexo, graduação e peso.
+                Como todos os atletas participam de todas as modalidades configuradas ({formatModalidadesList(selectedChampionship?.modalidades)}), as categorias organizam as chaves oficiais de disputa por faixa etária, sexo, graduação e peso.
               </p>
             </div>
 
@@ -2072,7 +2152,7 @@ export function ChampionshipDashboard() {
               <div className="bg-emerald-50 border border-emerald-200 p-2.5 rounded-xl text-emerald-950 flex items-center gap-2">
                 <Trophy className="w-4 h-4 text-emerald-700 shrink-0" />
                 <span className="text-[11px] leading-tight font-medium">
-                  <strong>Formato Unificado:</strong> Chave de disputa válida para todas as modalidades (Kata e Kumite).
+                  <strong>Formato Unificado:</strong> Chave de disputa válida para todas as modalidades do evento ({formatModalidadesList(selectedChampionship?.modalidades)}).
                 </span>
               </div>
 
@@ -2222,17 +2302,17 @@ export function ChampionshipDashboard() {
       {/* ======================================================== */}
       {/* DRAWER LATERAL: CADASTRO DE NOVO TORNEIO / CAMPEONATO   */}
       {/* ======================================================== */}
-      {isNewChampDrawerOpen && (
-        <div className="fixed inset-0 z-50 overflow-hidden bg-black/60 backdrop-blur-xs flex justify-end animate-in fade-in duration-200">
-          {/* Backdrop semi-transparente que fecha a gaveta ao clicar fora */}
+      {typeof document !== "undefined" && isNewChampDrawerOpen && createPortal(
+        <div className="fixed inset-0 z-[150] flex justify-end items-stretch overflow-hidden animate-in fade-in duration-200" role="dialog" aria-modal="true" aria-label="Novo Torneio ou Campeonato">
+          {/* Backdrop semi-transparente que escurece a tela atual e fecha ao clicar fora */}
           <div 
-            className="fixed inset-0 -z-10"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
             onClick={() => setIsNewChampDrawerOpen(false)}
             aria-hidden="true"
           />
 
-          {/* Container do Drawer lateral posicionado na borda direita */}
-          <div className="w-full max-w-xl bg-white h-full shadow-2xl flex flex-col animate-in slide-in-from-right duration-300 relative z-10 border-l border-neutral-200">
+          {/* Painel do Drawer lateral que desliza diante da tela atual */}
+          <div className="relative w-full max-w-xl bg-white h-full shadow-2xl flex flex-col z-10 border-l border-neutral-200 animate-in slide-in-from-right duration-300">
             {/* Header do Drawer */}
             <div className="p-5 border-b border-neutral-200 flex items-center justify-between bg-neutral-900 text-white shrink-0">
               <div className="flex items-center gap-2.5">
@@ -2263,7 +2343,7 @@ export function ChampionshipDashboard() {
                 <div className="p-3.5 bg-neutral-50 rounded-2xl border border-neutral-200 text-xs text-neutral-600 flex items-center gap-2">
                   <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
                   <span>
-                    Cada torneio possui gestão independente: atletas, categorias unificadas de Kata &amp; Kumite e conferência de pagamentos.
+                    Cada torneio possui gestão independente: atletas, categorias e conferência de pagamentos.
                   </span>
                 </div>
 
@@ -2334,6 +2414,23 @@ export function ChampionshipDashboard() {
                       onChange={(e) => setNewChampLocal(e.target.value)}
                       className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-300 rounded-xl text-xs font-medium text-neutral-900 focus:outline-none focus:ring-2 focus:ring-karate-red"
                     />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-neutral-700 mb-1">
+                      Modalidades do Campeonato * (separadas por vírgula)
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Ex: Kata, Kumite"
+                      value={newChampModalidades}
+                      onChange={(e) => setNewChampModalidades(e.target.value)}
+                      className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-300 rounded-xl text-xs font-medium text-neutral-900 focus:outline-none focus:ring-2 focus:ring-karate-red"
+                    />
+                    <span className="text-[10px] text-neutral-400 mt-1 block">
+                      A inscrição do atleta é única e válida para todas as modalidades configuradas neste evento.
+                    </span>
                   </div>
 
                   <div>
@@ -2451,7 +2548,8 @@ export function ChampionshipDashboard() {
                 </div>
               </form>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
 
       {/* Modal de Cobrança / Pagamento PIX e WhatsApp */}
@@ -2566,8 +2664,8 @@ export function ChampionshipDashboard() {
 
               {/* Botão 1: Enviar cobrança / chave PIX para o atleta */}
               <a
-                href={`https://api.whatsapp.com/send?phone=${pixModalRegistration.telefone.replace(/\D/g, "").startsWith("55") ? pixModalRegistration.telefone.replace(/\D/g, "") : `55${pixModalRegistration.telefone.replace(/\D/g, "")}`}&text=${encodeURIComponent(
-                  `🥋 *Madeira Karate — Pagamento de Inscrição*\n\nOlá, *${pixModalRegistration.nomeCompleto}*!\n\nIdentificamos a sua inscrição (*${pixModalRegistration.id}*) no *${selectedChampionship?.nome || "Campeonato"}*.\n\n*Valor:* R$ ${pixModalRegistration.valorInscricao.toFixed(2).replace(".", ",")}\n*Chave PIX:* ${selectedChampionship?.configuracaoPix.chave} (${selectedChampionship?.configuracaoPix.tipoChave})\n*Titular:* ${selectedChampionship?.configuracaoPix.nomeRecebedor}\n\n*Código PIX Copia e Cola:*\n\`\`\`${modalPixPayload}\`\`\`\n\nPor favor, após efetuar o pagamento, envie o comprovante por aqui para confirmarmos a sua vaga! Oss!`
+                href={`https://wa.me/${pixModalRegistration.telefone.replace(/\D/g, "").startsWith("55") ? pixModalRegistration.telefone.replace(/\D/g, "") : `55${pixModalRegistration.telefone.replace(/\D/g, "")}`}?text=${encodeURIComponent(
+                  `Madeira Karate - Pagamento de Inscrição\n\nOlá, ${pixModalRegistration.nomeCompleto}!\n\nIdentificamos a sua inscrição (${pixModalRegistration.id}) no ${selectedChampionship?.nome || "Campeonato"}.\n\nParticipação: Todas as modalidades do campeonato\nModalidades do evento: ${formatModalidadesList(selectedChampionship?.modalidades)}\nValor: R$ ${pixModalRegistration.valorInscricao.toFixed(2).replace(".", ",")}\nChave PIX: ${selectedChampionship?.configuracaoPix.chave} (${selectedChampionship?.configuracaoPix.tipoChave})\nTitular: ${selectedChampionship?.configuracaoPix.nomeRecebedor}\n\nCódigo PIX Copia e Cola:\n${modalPixPayload}\n\nPor favor, após efetuar o pagamento, envie o comprovante por aqui para confirmarmos a sua vaga! Oss!`
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -2580,8 +2678,8 @@ export function ChampionshipDashboard() {
 
               {/* Botão 2: Enviar comprovante para o WhatsApp do Dojo */}
               <a
-                href={`https://api.whatsapp.com/send?phone=${dojoWhatsappNumber}&text=${encodeURIComponent(
-                  `Olá Sensei! Segue o comprovante de pagamento da inscrição ${pixModalRegistration.id} do atleta ${pixModalRegistration.nomeCompleto} no valor de R$ ${pixModalRegistration.valorInscricao.toFixed(2).replace(".", ",")}. Segue o comprovante em anexo:`
+                href={`https://wa.me/${dojoWhatsappNumber}?text=${encodeURIComponent(
+                  `Olá Sensei! Segue o comprovante de pagamento da inscrição ${pixModalRegistration.id} do atleta ${pixModalRegistration.nomeCompleto} no valor de R$ ${pixModalRegistration.valorInscricao.toFixed(2).replace(".", ",")}.\nParticipação: Todas as modalidades do campeonato\nModalidades do evento: ${formatModalidadesList(selectedChampionship?.modalidades)}\n\nSegue o comprovante em anexo:`
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -2631,17 +2729,19 @@ export function ChampionshipDashboard() {
       {/* ======================================================== */}
       {/* DRAWER LATERAL DE EDIÇÃO DO CAMPEONATO (SPEC DO USUÁRIO) */}
       {/* ======================================================== */}
-      {isEditDrawerOpen && (
-        <div className="fixed inset-0 z-50 overflow-hidden bg-black/60 backdrop-blur-xs flex justify-end animate-in fade-in duration-200">
+      {typeof document !== "undefined" && isEditDrawerOpen && createPortal(
+        <div className="fixed inset-0 z-[150] flex justify-end items-stretch overflow-hidden animate-in fade-in duration-200" role="dialog" aria-modal="true" aria-label="Edição de Campeonato">
+          {/* Backdrop semi-transparente que escurece a tela atual e fecha ao clicar fora */}
           <div 
-            className="fixed inset-0 -z-10"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
             onClick={() => {
               setIsEditDrawerOpen(false);
               setEditingChampId(null);
             }}
             aria-hidden="true"
           />
-          <div className="w-full max-w-xl bg-white h-full shadow-2xl flex flex-col animate-in slide-in-from-right duration-300 relative z-10 border-l border-neutral-200">
+          {/* Painel do Drawer lateral que desliza diante da tela atual */}
+          <div className="relative w-full max-w-xl bg-white h-full shadow-2xl flex flex-col z-10 border-l border-neutral-200 animate-in slide-in-from-right duration-300">
             {/* Header do Drawer */}
             <div className="p-5 border-b border-neutral-200 flex items-center justify-between bg-neutral-900 text-white shrink-0">
               <div className="flex items-center gap-2.5">
@@ -2744,6 +2844,23 @@ export function ChampionshipDashboard() {
                       className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-300 rounded-xl text-xs font-mono font-bold"
                     />
                   </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-neutral-700 mb-1">
+                    Modalidades do Campeonato * (separadas por vírgula)
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Ex: Kata, Kumite"
+                    value={champEditModalidades}
+                    onChange={(e) => setChampEditModalidades(e.target.value)}
+                    className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-300 rounded-xl text-xs font-medium text-neutral-900 focus:outline-none focus:ring-2 focus:ring-karate-red"
+                  />
+                  <span className="text-[10px] text-neutral-400 mt-1 block">
+                    A inscrição do atleta é única e válida para todas as modalidades configuradas neste evento.
+                  </span>
                 </div>
 
                 <div>
@@ -3009,7 +3126,8 @@ export function ChampionshipDashboard() {
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* ======================================================== */}

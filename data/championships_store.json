@@ -1,0 +1,11 @@
+{
+  "championships": [],
+  "registrations": [],
+  "categories": [],
+  "settings": {
+    "adminPin": "1926",
+    "googleSheetId": "1cqiHLjSY7tCKnur0FMH8s5lU2EUbSGB4vC6g2ABTjCM",
+    "googleAppsScriptUrl": "",
+    "webhookSecret": "madeira_sensei_secret_2026"
+  }
+}

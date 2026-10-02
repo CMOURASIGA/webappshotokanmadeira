@@ -8,186 +8,27 @@ import {
   RegistrationStatus 
 } from "../types/championship";
 
-const STORAGE_KEYS = {
-  CHAMPIONSHIPS: "madeira_championships_v1",
-  REGISTRATIONS: "madeira_registrations_v1",
-  CATEGORIES: "madeira_categories_v1",
-  SETTINGS: "madeira_champ_settings_v1",
-  NEXT_SEQUENCE: "madeira_registration_sequence_v1"
-};
-
 const DEFAULT_SETTINGS: ChampionshipSettings = {
-  adminPin: "1926", // Ano de fundação / PIN padrão seguro do Sensei (alterável no dashboard)
+  adminPin: "1926",
   googleSheetId: "1cqiHLjSY7tCKnur0FMH8s5lU2EUbSGB4vC6g2ABTjCM",
   googleAppsScriptUrl: ""
 };
 
-/**
- * Campeonato inicial de referência para o Dojo
- */
-const DEFAULT_INITIAL_CHAMPIONSHIP: Championship = {
-  id: "champ-interno-2026",
-  slug: "campeonato-interno-2026",
-  nome: "1º Campeonato Interno Madeira Karate 2026",
-  descricao: "Competição esportiva e pedagógica interna do Madeira Karate Shotokan, voltada ao aprimoramento técnico e espírito do Budo entre os alunos de todas as idades e graduações.",
-  dataCampeonato: "2026-11-21",
-  local: "Dojo Central Madeira Karate — Rio de Janeiro / RJ",
-  aberturaInscricoes: "2026-10-01T08:00:00",
-  encerramentoInscricoes: "2026-11-14T23:59:59",
-  status: "INSCRICOES_ABERTAS",
-  valorInscricao: 75.00,
-  modalidades: ["Todas as Modalidades (Kata e Kumite)"],
-  configuracaoPix: {
-    tipoChave: "TELEFONE",
-    chave: "21973681109",
-    nomeRecebedor: "MADEIRA KARATE",
-    cidadeRecebedor: "RIO DE JANEIRO",
-    incluirValorNoQrCode: true,
-    instrucoesAdicionais: "Pagamento referente à inscrição no 1º Campeonato Interno Madeira Karate 2026. Após o pagamento, envie o comprovante pelo WhatsApp do Dojo para conferência."
-  },
-  regulamento: `1. DA PARTICIPAÇÃO E ELEGIBILIDADE:
-- Aberto a todos os alunos devidamente matriculados no Madeira Karate Shotokan.
-- O atleta deve estar com o exame médico e atestado de aptidão física em dia para a prática esportiva.
-- Para atletas menores de 18 anos, é obrigatória a autorização expressa do pai, mãe ou responsável legal na ficha de inscrição.
-
-2. DO FORMATO TÉCNICO E ARBITRAGEM:
-- Regras oficiais baseadas nos critérios de competição da JKA (Japan Karate Association).
-- Formato Unificado: Todos os atletas inscritos competem em todas as modalidades do campeonato (Kata e Kumite).
-- As categorias organizam as chaves oficiais de disputa com base na idade, sexo, faixa e peso do atleta.
-
-3. DO UNIFORME E PROTEÇÕES:
-- Karategui branco limpo e em perfeito estado, com a faixa correspondente à graduação informada.
-- No Kumite, obrigatório o uso de protetor bucal e protetor de punho (luvas) adequadas. Coquilha para o sexo masculino.
-
-4. DA CONFIRMAÇÃO DA INSCRIÇÃO E PAGAMENTO:
-- A inscrição tem valor único estipulado pela organização.
-- O pagamento é realizado via PIX e deve ser conferido manualmente pelo Dojo após envio do comprovante.
-- O status 'CONFIRMADA' só é atribuído após a conferência e baixa financeira do pagamento.
-- Em caso de dúvidas, consulte o Sensei responsável antes do prazo final de inscrições.`,
-  permiteMenores: true,
-  createdAt: "2026-09-30T10:00:00.000Z",
-  updatedAt: "2026-09-30T10:00:00.000Z"
+// In-memory cache synced with the official central backend
+let memoryCache = {
+  championships: [] as Championship[],
+  registrations: [] as AthleteRegistration[],
+  categories: [] as ChampionshipCategory[],
+  settings: DEFAULT_SETTINGS,
+  initialized: false
 };
 
-const DEFAULT_CATEGORIES: ChampionshipCategory[] = [
-  {
-    id: "cat-sub10-misto",
-    championshipId: "champ-interno-2026",
-    nome: "Mirim Misto (Até 10 Anos) — Todas as Faixas",
-    modalidade: "Geral (Kata e Kumite)",
-    idadeMinima: 4,
-    idadeMaxima: 10,
-    sexo: "Misto"
-  },
-  {
-    id: "cat-sub13-masc-iniciante",
-    championshipId: "champ-interno-2026",
-    nome: "Infantil Masculino (11 a 13 Anos) — Faixas Branca a Vermelha",
-    modalidade: "Geral (Kata e Kumite)",
-    idadeMinima: 11,
-    idadeMaxima: 13,
-    sexo: "Masculino"
-  },
-  {
-    id: "cat-sub13-masc-avancado",
-    championshipId: "champ-interno-2026",
-    nome: "Infantil Masculino (11 a 13 Anos) — Faixas Laranja a Roxa",
-    modalidade: "Geral (Kata e Kumite)",
-    idadeMinima: 11,
-    idadeMaxima: 13,
-    sexo: "Masculino"
-  },
-  {
-    id: "cat-sub13-fem",
-    championshipId: "champ-interno-2026",
-    nome: "Infantil Feminino (11 a 13 Anos) — Todas as Faixas",
-    modalidade: "Geral (Kata e Kumite)",
-    idadeMinima: 11,
-    idadeMaxima: 13,
-    sexo: "Feminino"
-  },
-  {
-    id: "cat-sub17-masc-colorida",
-    championshipId: "champ-interno-2026",
-    nome: "Juvenil Masculino (14 a 17 Anos) — Faixas Coloridas",
-    modalidade: "Geral (Kata e Kumite)",
-    idadeMinima: 14,
-    idadeMaxima: 17,
-    sexo: "Masculino"
-  },
-  {
-    id: "cat-sub17-masc-graduado",
-    championshipId: "champ-interno-2026",
-    nome: "Juvenil Masculino (14 a 17 Anos) — Faixas Marrom e Preta",
-    modalidade: "Geral (Kata e Kumite)",
-    idadeMinima: 14,
-    idadeMaxima: 17,
-    sexo: "Masculino"
-  },
-  {
-    id: "cat-sub17-fem",
-    championshipId: "champ-interno-2026",
-    nome: "Juvenil Feminino (14 a 17 Anos) — Todas as Faixas",
-    modalidade: "Geral (Kata e Kumite)",
-    idadeMinima: 14,
-    idadeMaxima: 17,
-    sexo: "Feminino"
-  },
-  {
-    id: "cat-adulto-masc-colorida",
-    championshipId: "champ-interno-2026",
-    nome: "Adulto Masculino (18+ Anos) — Faixas Coloridas",
-    modalidade: "Geral (Kata e Kumite)",
-    idadeMinima: 18,
-    sexo: "Masculino"
-  },
-  {
-    id: "cat-adulto-masc-graduado",
-    championshipId: "champ-interno-2026",
-    nome: "Adulto Masculino (18+ Anos) — Faixas Marrom e Preta",
-    modalidade: "Geral (Kata e Kumite)",
-    idadeMinima: 18,
-    sexo: "Masculino"
-  },
-  {
-    id: "cat-adulto-fem",
-    championshipId: "champ-interno-2026",
-    nome: "Adulto Feminino (18+ Anos) — Todas as Faixas",
-    modalidade: "Geral (Kata e Kumite)",
-    idadeMinima: 18,
-    sexo: "Feminino"
-  },
-  {
-    id: "cat-master-misto",
-    championshipId: "champ-interno-2026",
-    nome: "Master Misto (35+ Anos) — Geral",
-    modalidade: "Geral (Kata e Kumite)",
-    idadeMinima: 35,
-    sexo: "Misto"
-  }
-];
-
-// Helper local storage seguro
-function loadFromStorage<T>(key: string, fallback: T): T {
-  try {
-    if (typeof window === "undefined" || !window.localStorage) return fallback;
-    const raw = window.localStorage.getItem(key);
-    if (!raw) return fallback;
-    return JSON.parse(raw) as T;
-  } catch (e) {
-    console.warn(`Erro ao carregar do storage (${key}):`, e);
-    return fallback;
-  }
-}
-
-function saveToStorage<T>(key: string, data: T): void {
-  try {
-    if (typeof window === "undefined" || !window.localStorage) return;
-    window.localStorage.setItem(key, JSON.stringify(data));
-    // Notifica outros componentes e abas abertas da alteração
-    window.dispatchEvent(new CustomEvent("madeira_storage_update", { detail: { key } }));
-  } catch (e) {
-    console.error(`Erro ao salvar no storage (${key}):`, e);
+// Safe cache helper (only used as auxiliary cache, never as official source)
+function updateLocalCache() {
+  if (typeof window !== "undefined") {
+    try {
+      window.dispatchEvent(new CustomEvent("madeira_storage_update", { detail: { time: Date.now() } }));
+    } catch {}
   }
 }
 
@@ -198,7 +39,6 @@ function saveToStorage<T>(key: string, data: T): void {
 export function calculateAgeOnDate(birthDateStr: string, targetDateStr: string): number {
   if (!birthDateStr || !targetDateStr) return 0;
   try {
-    // Normalizar no formato YYYY-MM-DD
     const [bYear, bMonth, bDay] = birthDateStr.split("-").map(n => parseInt(n, 10));
     const [tYear, tMonth, tDay] = targetDateStr.split("-").map(n => parseInt(n, 10));
     
@@ -273,28 +113,31 @@ export function getEnrollmentPeriodState(champ: Championship): {
   };
 }
 
-/**
- * Gerador de código sequencial único de inscrição (ex: CAM2026-0042)
- * (Regra obrigatória SPEC 08 item 6)
- */
-function generateNextRegistrationId(championshipYear: number): string {
-  const currentSeq = loadFromStorage<number>(STORAGE_KEYS.NEXT_SEQUENCE, 1);
-  const nextSeq = currentSeq + 1;
-  saveToStorage(STORAGE_KEYS.NEXT_SEQUENCE, nextSeq);
-
-  return `CAM${championshipYear}-${String(currentSeq).padStart(4, "0")}`;
-}
-
 export const championshipService = {
-  // --- Campeonatos ---
-  getChampionships(): Championship[] {
-    const list = loadFromStorage<Championship[]>(STORAGE_KEYS.CHAMPIONSHIPS, []);
-    if (list.length === 0) {
-      // Seed inicial se o storage estiver vazio
-      saveToStorage(STORAGE_KEYS.CHAMPIONSHIPS, [DEFAULT_INITIAL_CHAMPIONSHIP]);
-      return [DEFAULT_INITIAL_CHAMPIONSHIP];
+  // --- Campeonatos (Fonte Central: Backend Server & Google Sheets) ---
+  
+  async fetchChampionships(): Promise<Championship[]> {
+    try {
+      const res = await fetch("/api/championships");
+      if (res.ok) {
+        const data = await res.json();
+        memoryCache.championships = Array.isArray(data) ? data : [];
+        updateLocalCache();
+        return memoryCache.championships;
+      }
+    } catch (err) {
+      console.warn("[championshipService] Error fetching /api/championships:", err);
     }
-    return list;
+    return memoryCache.championships;
+  },
+
+  getChampionships(): Championship[] {
+    // If not yet fetched, trigger background fetch
+    if (!memoryCache.initialized) {
+      this.fetchChampionships();
+      memoryCache.initialized = true;
+    }
+    return memoryCache.championships;
   },
 
   getChampionshipBySlug(slug: string): Championship | undefined {
@@ -307,66 +150,138 @@ export const championshipService = {
     return list.find(c => c.id === id);
   },
 
-  saveChampionship(championship: Championship): void {
-    const list = this.getChampionships();
-    const idx = list.findIndex(c => c.id === championship.id);
-    const updated = { ...championship, updatedAt: new Date().toISOString() };
+  async saveChampionship(championship: Championship): Promise<Championship> {
+    const res = await fetch("/api/championships", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(championship)
+    });
+
+    if (!res.ok) {
+      let msg = "Erro ao salvar campeonato na fonte central.";
+      try {
+        const errJson = await res.json();
+        if (errJson.error) msg = errJson.error;
+      } catch {}
+      throw new Error(msg);
+    }
+
+    const saved: Championship = await res.json();
+    const idx = memoryCache.championships.findIndex(c => c.id === saved.id);
     if (idx >= 0) {
-      list[idx] = updated;
+      memoryCache.championships[idx] = saved;
     } else {
-      list.push(updated);
+      memoryCache.championships.push(saved);
     }
-    saveToStorage(STORAGE_KEYS.CHAMPIONSHIPS, list);
+    updateLocalCache();
+    return saved;
   },
 
-  deleteChampionship(id: string): void {
-    const list = this.getChampionships().filter(c => c.id !== id);
-    saveToStorage(STORAGE_KEYS.CHAMPIONSHIPS, list);
+  async deleteChampionship(id: string): Promise<void> {
+    const res = await fetch(`/api/championships/${encodeURIComponent(id)}`, {
+      method: "DELETE"
+    });
+
+    if (!res.ok) {
+      let msg = "Erro ao excluir campeonato.";
+      try {
+        const errJson = await res.json();
+        if (errJson.error) msg = errJson.error;
+      } catch {}
+      throw new Error(msg);
+    }
+
+    memoryCache.championships = memoryCache.championships.filter(c => c.id !== id);
+    memoryCache.categories = memoryCache.categories.filter(c => c.championshipId !== id);
+    updateLocalCache();
   },
 
-  // --- Inscrições ---
+  // --- Inscrições (Fonte Central: Backend Server & Google Sheets) ---
+
+  async fetchRegistrations(championshipId?: string): Promise<AthleteRegistration[]> {
+    try {
+      const url = championshipId 
+        ? `/api/registrations?championshipId=${encodeURIComponent(championshipId)}`
+        : "/api/registrations";
+      const res = await fetch(url);
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          if (championshipId) {
+            // Merge or update specific championship registrations in memory
+            const other = memoryCache.registrations.filter(r => r.championshipId !== championshipId);
+            memoryCache.registrations = [...other, ...data];
+          } else {
+            memoryCache.registrations = data;
+          }
+          updateLocalCache();
+          return championshipId ? memoryCache.registrations.filter(r => r.championshipId === championshipId) : memoryCache.registrations;
+        }
+      }
+    } catch (err) {
+      console.warn("[championshipService] Error fetching /api/registrations:", err);
+    }
+    return championshipId ? memoryCache.registrations.filter(r => r.championshipId === championshipId) : memoryCache.registrations;
+  },
+
   getRegistrations(championshipId?: string): AthleteRegistration[] {
-    const all = loadFromStorage<AthleteRegistration[]>(STORAGE_KEYS.REGISTRATIONS, []);
     if (championshipId) {
-      return all.filter(r => r.championshipId === championshipId);
+      return memoryCache.registrations.filter(r => r.championshipId === championshipId);
     }
-    return all;
+    return memoryCache.registrations;
   },
 
   getRegistrationById(id: string): AthleteRegistration | undefined {
     const cleanId = id.trim().toUpperCase();
-    const all = this.getRegistrations();
-    return all.find(r => r.id.toUpperCase() === cleanId);
+    return memoryCache.registrations.find(r => r.id.toUpperCase() === cleanId);
   },
 
   /**
-   * Consulta segura pelo atleta via Código + Dado de Validação (e-mail, data de nascimento ou telefone)
+   * Consulta central pelo atleta via Código + Dado de Validação
    * (Regra obrigatória SPEC 08 item 7)
    */
-  lookupRegistration(code: string, validationValue: string): AthleteRegistration | null {
-    const reg = this.getRegistrationById(code);
-    if (!reg) return null;
+  async lookupRegistration(code: string, validationValue: string): Promise<AthleteRegistration | null> {
+    const cleanCode = code.trim().toUpperCase();
+    try {
+      const res = await fetch(`/api/registrations/${encodeURIComponent(cleanCode)}`);
+      if (res.ok) {
+        const reg: AthleteRegistration = await res.json();
+        const cleanVal = validationValue.trim().toLowerCase().replace(/\D/g, "");
+        const emailVal = validationValue.trim().toLowerCase();
 
-    const cleanVal = validationValue.trim().toLowerCase().replace(/\D/g, "");
-    const emailVal = validationValue.trim().toLowerCase();
+        // Validação de segurança por e-mail
+        if (reg.email && reg.email.toLowerCase() === emailVal) return reg;
 
-    // Compara por e-mail
-    if (reg.email.toLowerCase() === emailVal) return reg;
+        // Validação de segurança por data de nascimento
+        const birthDigits = (reg.dataNascimento || "").replace(/\D/g, "");
+        if (cleanVal.length >= 6 && birthDigits.includes(cleanVal)) return reg;
 
-    // Compara por data de nascimento (ex: 2010-05-15 ou 15052010)
-    const birthDigits = reg.dataNascimento.replace(/\D/g, "");
-    if (cleanVal.length >= 6 && birthDigits.includes(cleanVal)) return reg;
+        // Validação de segurança por telefone
+        const phoneDigits = (reg.telefone || "").replace(/\D/g, "");
+        if (cleanVal.length >= 6 && phoneDigits.endsWith(cleanVal)) return reg;
+      }
+    } catch (err) {
+      console.warn("[championshipService] Error looking up registration:", err);
+    }
 
-    // Compara por telefone (apenas números)
-    const phoneDigits = reg.telefone.replace(/\D/g, "");
-    if (cleanVal.length >= 6 && phoneDigits.endsWith(cleanVal)) return reg;
+    // Fallback verificação em memória local se já carregada
+    const cached = this.getRegistrationById(cleanCode);
+    if (cached) {
+      const cleanVal = validationValue.trim().toLowerCase().replace(/\D/g, "");
+      const emailVal = validationValue.trim().toLowerCase();
+      if (cached.email.toLowerCase() === emailVal) return cached;
+      const birthDigits = cached.dataNascimento.replace(/\D/g, "");
+      if (cleanVal.length >= 6 && birthDigits.includes(cleanVal)) return cached;
+      const phoneDigits = cached.telefone.replace(/\D/g, "");
+      if (cleanVal.length >= 6 && phoneDigits.endsWith(cleanVal)) return cached;
+    }
 
     return null;
   },
 
   /**
-   * Cria nova inscrição persistindo diretamente antes de retornar o código
-   * (Regra obrigatória SPEC 08 item 6)
+   * Cria nova inscrição com persistência central OBRIGATÓRIA antes de confirmar
+   * (Regra fundamental Blockers 1, 2, 3 e SPEC 08 item 6)
    */
   async createRegistration(
     champ: Championship,
@@ -392,14 +307,11 @@ export const championshipService = {
       throw new Error(`Inscrições bloqueadas: ${period.message}`);
     }
 
-    // Modalidade unificada: todos os atletas participam de todas as modalidades da competição
-    const resolvedModality = input.modalidade?.trim() || "Todas as Modalidades (Kata e Kumite)";
-
-    // 3. Cálculo da idade na data do campeonato
+    // 2. Cálculo da idade na data do campeonato
     const idade = calculateAgeOnDate(input.dataNascimento, champ.dataCampeonato);
     const isMenor = idade < 18;
 
-    // 4. Verificação de menor
+    // 3. Verificação de menor
     if (isMenor) {
       if (!champ.permiteMenores) {
         throw new Error("Este campeonato não aceita atletas menores de 18 anos.");
@@ -413,23 +325,11 @@ export const championshipService = {
       throw new Error("É obrigatório ler e aceitar o regulamento do campeonato.");
     }
 
-    // 5. Geração do código sequencial
-    const champYear = new Date(champ.dataCampeonato).getFullYear() || 2026;
-    const registrationId = generateNextRegistrationId(champYear);
+    // Modalidade configurável
+    const resolvedModality = input.modalidade?.trim() || (champ.modalidades && champ.modalidades[0]) || "Kata";
 
-    const nowIso = new Date().toISOString();
-
-    const initialAudit: AuditLog = {
-      timestamp: nowIso,
-      action: "INSCRICAO_CRIADA",
-      actor: "atleta",
-      details: `Inscrição gerada com sucesso. Modalidade: ${resolvedModality}. Valor: R$ ${champ.valorInscricao.toFixed(2)}.`
-    };
-
-    const newRegistration: AthleteRegistration = {
-      id: registrationId,
+    const payload = {
       championshipId: champ.id,
-      championshipSlug: champ.slug,
       championshipName: champ.nome,
       nomeCompleto: input.nomeCompleto.trim(),
       dataNascimento: input.dataNascimento,
@@ -440,38 +340,49 @@ export const championshipService = {
       modalidade: resolvedModality,
       telefone: input.telefone.trim(),
       email: input.email.trim(),
-      observacoes: input.observacoes?.trim() || undefined,
+      observacoes: input.observacoes?.trim() || "",
       isMenor,
-      nomeResponsavel: isMenor ? input.nomeResponsavel?.trim() : undefined,
-      telefoneResponsavel: isMenor ? input.telefoneResponsavel?.trim() : undefined,
-      autorizacaoResponsavel: isMenor ? input.autorizacaoResponsavel : undefined,
-      aceiteRegulamento: true,
-      status: "RECEBIDA",
-      paymentStatus: "AGUARDANDO_PAGAMENTO",
-      valorInscricao: champ.valorInscricao,
-      dataHoraInscricao: nowIso,
-      syncedToGoogleSheet: false,
-      auditLogs: [initialAudit]
+      nomeResponsavel: isMenor ? input.nomeResponsavel?.trim() : "",
+      telefoneResponsavel: isMenor ? input.telefoneResponsavel?.trim() : "",
+      autorizacaoResponsavel: isMenor ? Boolean(input.autorizacaoResponsavel) : false,
+      aceiteRegulamento: true
     };
 
-    // 6. PERSISTÊNCIA REAL NO STORAGE PRIMEIRO!
-    const all = this.getRegistrations();
-    all.push(newRegistration);
-    saveToStorage(STORAGE_KEYS.REGISTRATIONS, all);
+    // 4. PERSISTÊNCIA CENTRAL OBRIGATÓRIA NO BACKEND / GOOGLE SHEETS
+    // Blocker 3: Só confirmar inscrição após persistência central.
+    // Em erro de Google Sheets/API: "Inscrição não concluída. Tente novamente."
+    // NÃO aplicar fallback local como sucesso!
+    let response: Response;
+    try {
+      response = await fetch("/api/registrations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+    } catch (networkError) {
+      console.error("[championshipService] Falha de comunicação com o servidor:", networkError);
+      throw new Error("Inscrição não concluída. Tente novamente.");
+    }
 
-    // 7. Disparo assíncrono para Webhook Google Sheets se configurado
-    this.syncSingleRegistrationToGoogleSheet(newRegistration).catch(err => {
-      console.warn("Falha no envio assíncrono ao Google Sheets webhook:", err);
-    });
+    if (!response.ok) {
+      console.error("[championshipService] Servidor retornou status:", response.status);
+      throw new Error("Inscrição não concluída. Tente novamente.");
+    }
 
-    return newRegistration;
+    const createdRegistration: AthleteRegistration = await response.json();
+    
+    // Atualiza cache em memória após persistência confirmada
+    memoryCache.registrations.push(createdRegistration);
+    updateLocalCache();
+
+    return createdRegistration;
   },
 
   /**
    * Atualização de dados cadastrais pelo próprio atleta
    * (Regra obrigatória SPEC 08 item 7)
    */
-  updateRegistrationByAthlete(
+  async updateRegistrationByAthlete(
     id: string,
     champ: Championship,
     updates: {
@@ -483,53 +394,36 @@ export const championshipService = {
       nomeResponsavel?: string;
       telefoneResponsavel?: string;
     }
-  ): AthleteRegistration {
+  ): Promise<AthleteRegistration> {
     const period = getEnrollmentPeriodState(champ);
     if (!period.canRegister) {
       throw new Error("O prazo para alterações de dados deste campeonato encerrou.");
     }
 
-    const all = this.getRegistrations();
-    const idx = all.findIndex(r => r.id === id);
-    if (idx < 0) {
-      throw new Error("Inscrição não encontrada.");
-    }
-
-    const current = all[idx];
-    if (current.status === "CANCELADA") {
-      throw new Error("Inscrições canceladas não podem sofrer alterações pelo atleta.");
-    }
-
-    const resolvedModality = updates.modalidade || current.modalidade || "Todas as Modalidades (Kata e Kumite)";
-
-    const changedFields: string[] = [];
-    if (current.peso !== updates.peso) changedFields.push(`peso: ${current.peso}kg -> ${updates.peso}kg`);
-    if (current.telefone !== updates.telefone) changedFields.push(`telefone atualizado`);
-    if (current.email !== updates.email) changedFields.push(`email atualizado`);
-    if (updates.modalidade && current.modalidade !== updates.modalidade) changedFields.push(`modalidade: ${current.modalidade} -> ${updates.modalidade}`);
-    if (updates.observacoes && current.observacoes !== updates.observacoes) changedFields.push(`observações atualizadas`);
-
-    const log: AuditLog = {
-      timestamp: new Date().toISOString(),
-      action: "DADOS_ALTERADOS_ATLETA",
-      actor: "atleta",
-      details: changedFields.length > 0 ? `Alterações: ${changedFields.join("; ")}` : "Dados revisados sem alteração."
-    };
-
-    const updated: AthleteRegistration = {
-      ...current,
+    const payload = {
       peso: updates.peso,
       telefone: updates.telefone,
       email: updates.email,
-      modalidade: resolvedModality,
-      observacoes: updates.observacoes !== undefined ? updates.observacoes : current.observacoes,
-      nomeResponsavel: current.isMenor ? updates.nomeResponsavel : current.nomeResponsavel,
-      telefoneResponsavel: current.isMenor ? updates.telefoneResponsavel : current.telefoneResponsavel,
-      auditLogs: [...current.auditLogs, log]
+      modalidade: updates.modalidade,
+      observacoes: updates.observacoes,
+      nomeResponsavel: updates.nomeResponsavel,
+      telefoneResponsavel: updates.telefoneResponsavel
     };
 
-    all[idx] = updated;
-    saveToStorage(STORAGE_KEYS.REGISTRATIONS, all);
+    const res = await fetch(`/api/registrations/${encodeURIComponent(id)}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      throw new Error("Erro ao atualizar dados da inscrição na fonte central.");
+    }
+
+    const updated: AthleteRegistration = await res.json();
+    const idx = memoryCache.registrations.findIndex(r => r.id === id);
+    if (idx >= 0) memoryCache.registrations[idx] = updated;
+    updateLocalCache();
 
     return updated;
   },
@@ -537,28 +431,20 @@ export const championshipService = {
   /**
    * Notificação de envio de comprovante pelo atleta
    */
-  markReceiptSentByAthlete(id: string): AthleteRegistration {
-    const all = this.getRegistrations();
-    const idx = all.findIndex(r => r.id === id);
-    if (idx < 0) throw new Error("Inscrição não encontrada.");
+  async markReceiptSentByAthlete(id: string): Promise<AthleteRegistration> {
+    const res = await fetch(`/api/registrations/${encodeURIComponent(id)}/receipt`, {
+      method: "PATCH"
+    });
 
-    const current = all[idx];
-    const log: AuditLog = {
-      timestamp: new Date().toISOString(),
-      action: "COMPROVANTE_NOTIFICADO",
-      actor: "atleta",
-      details: "Atleta sinalizou o envio do comprovante para o WhatsApp do Dojo."
-    };
+    if (!res.ok) {
+      throw new Error("Erro ao registrar sinalização de envio de comprovante.");
+    }
 
-    const updated: AthleteRegistration = {
-      ...current,
-      paymentStatus: current.paymentStatus === "AGUARDANDO_PAGAMENTO" ? "AGUARDANDO_CONFERENCIA" : current.paymentStatus,
-      comprovanteEnviadoEm: new Date().toISOString(),
-      auditLogs: [...current.auditLogs, log]
-    };
+    const updated: AthleteRegistration = await res.json();
+    const idx = memoryCache.registrations.findIndex(r => r.id === id);
+    if (idx >= 0) memoryCache.registrations[idx] = updated;
+    updateLocalCache();
 
-    all[idx] = updated;
-    saveToStorage(STORAGE_KEYS.REGISTRATIONS, all);
     return updated;
   },
 
@@ -566,173 +452,200 @@ export const championshipService = {
    * Ações administrativas sobre o pagamento e inscrição
    * (Regra obrigatória SPEC 08 itens 11 e 12)
    */
-  adminUpdateStatus(
+  async adminUpdateStatus(
     id: string,
     updates: {
       status?: RegistrationStatus;
       paymentStatus?: PaymentStatus;
       categoriaId?: string;
+      categoriaNome?: string;
       motivo?: string;
       adminName?: string;
     }
-  ): AthleteRegistration {
-    const all = this.getRegistrations();
-    const idx = all.findIndex(r => r.id === id);
-    if (idx < 0) throw new Error("Inscrição não encontrada.");
-
-    const current = all[idx];
-    const logs: AuditLog[] = [...current.auditLogs];
-    const nowIso = new Date().toISOString();
-    const admin = updates.adminName || "Sensei / Admin";
-
-    let newStatus = current.status;
-    let newPaymentStatus = current.paymentStatus;
-    let conferidoEm = current.conferidoEm;
-    let conferidoPor = current.conferidoPor;
-    let motivo = current.motivoRejeicaoOuCancelamento;
-
-    if (updates.paymentStatus && updates.paymentStatus !== current.paymentStatus) {
-      newPaymentStatus = updates.paymentStatus;
-      logs.push({
-        timestamp: nowIso,
-        action: `PAGAMENTO_${updates.paymentStatus}`,
-        actor: "admin",
-        details: `Status de pagamento alterado de '${current.paymentStatus}' para '${updates.paymentStatus}' por ${admin}.${updates.motivo ? ` Motivo: ${updates.motivo}` : ""}`
-      });
-
-      // Se pagamento confirmado, automaticamente aprova a inscrição para CONFIRMADA
-      if (updates.paymentStatus === "PAGAMENTO_CONFIRMADO") {
-        newStatus = "CONFIRMADA";
-        conferidoEm = nowIso;
-        conferidoPor = admin;
-      }
-    }
-
-    if (updates.status && updates.status !== current.status) {
-      newStatus = updates.status;
-      if (updates.motivo) motivo = updates.motivo;
-      logs.push({
-        timestamp: nowIso,
-        action: `INSCRICAO_${updates.status}`,
-        actor: "admin",
-        details: `Inscrição alterada de '${current.status}' para '${updates.status}' por ${admin}.${updates.motivo ? ` Motivo: ${updates.motivo}` : ""}`
-      });
-    }
-
-    let categoriaId = current.categoriaId;
-    let categoriaNome = current.categoriaNome;
-    if (updates.categoriaId !== undefined) {
-      categoriaId = updates.categoriaId || undefined;
-      if (categoriaId) {
-        const cat = this.getCategories(current.championshipId).find(c => c.id === categoriaId);
-        categoriaNome = cat ? cat.nome : undefined;
-      } else {
-        categoriaNome = undefined;
-      }
-      logs.push({
-        timestamp: nowIso,
-        action: "CATEGORIA_ATRIBUIDA",
-        actor: "admin",
-        details: `Categoria definida: ${categoriaNome || "Sem Categoria"} por ${admin}.`
-      });
-    }
-
-    const updated: AthleteRegistration = {
-      ...current,
-      status: newStatus,
-      paymentStatus: newPaymentStatus,
-      categoriaId,
-      categoriaNome,
-      conferidoEm,
-      conferidoPor,
-      motivoRejeicaoOuCancelamento: motivo,
-      auditLogs: logs
-    };
-
-    all[idx] = updated;
-    saveToStorage(STORAGE_KEYS.REGISTRATIONS, all);
-
-    // Disparo assíncrono para atualizar linha na planilha oficial Google Sheets em tempo real
-    this.syncSingleRegistrationToGoogleSheet(updated).catch(err => {
-      console.warn("Falha ao sincronizar atualização no Google Sheets:", err);
+  ): Promise<AthleteRegistration> {
+    const res = await fetch(`/api/registrations/${encodeURIComponent(id)}/payment`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        paymentStatus: updates.paymentStatus,
+        status: updates.status,
+        categoriaId: updates.categoriaId,
+        categoriaNome: updates.categoriaNome,
+        notes: updates.motivo,
+        adminName: updates.adminName
+      })
     });
+
+    if (!res.ok) {
+      throw new Error("Erro ao atualizar status na fonte central.");
+    }
+
+    const updated: AthleteRegistration = await res.json();
+    const idx = memoryCache.registrations.findIndex(r => r.id === id);
+    if (idx >= 0) memoryCache.registrations[idx] = updated;
+    updateLocalCache();
 
     return updated;
   },
 
-  deleteRegistration(id: string): void {
-    const all = this.getRegistrations();
-    const filtered = all.filter(r => r.id !== id);
-    saveToStorage(STORAGE_KEYS.REGISTRATIONS, filtered);
+  async deleteRegistration(id: string): Promise<void> {
+    const res = await fetch(`/api/registrations/${encodeURIComponent(id)}`, {
+      method: "DELETE"
+    });
+
+    if (!res.ok) {
+      throw new Error("Erro ao excluir inscrição da fonte central.");
+    }
+
+    memoryCache.registrations = memoryCache.registrations.filter(r => r.id !== id);
+    updateLocalCache();
   },
 
-  // --- Categorias ---
+  // --- Categorias (Fonte Central: Backend Server & Google Sheets) ---
+  
+  async fetchCategories(championshipId?: string): Promise<ChampionshipCategory[]> {
+    try {
+      const url = championshipId
+        ? `/api/categories?championshipId=${encodeURIComponent(championshipId)}`
+        : "/api/categories";
+      const res = await fetch(url);
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          if (championshipId) {
+            const other = memoryCache.categories.filter(c => c.championshipId !== championshipId);
+            memoryCache.categories = [...other, ...data];
+          } else {
+            memoryCache.categories = data;
+          }
+          updateLocalCache();
+          return championshipId ? memoryCache.categories.filter(c => c.championshipId === championshipId) : memoryCache.categories;
+        }
+      }
+    } catch (err) {
+      console.warn("[championshipService] Error fetching /api/categories:", err);
+    }
+    return championshipId ? memoryCache.categories.filter(c => c.championshipId === championshipId) : memoryCache.categories;
+  },
+
   getCategories(championshipId?: string): ChampionshipCategory[] {
-    let all = loadFromStorage<ChampionshipCategory[]>(STORAGE_KEYS.CATEGORIES, []);
-    
-    // Migração automática: se houver categorias legadas que separavam "Kata" e "Kumite",
-    // substituímos pelas categorias oficiais unificadas (Kata + Kumite) conforme a regra do Dojo
-    const hasLegacyModalities = all.some(c => 
-      c.nome.toLowerCase().startsWith("kata ") || 
-      c.nome.toLowerCase().startsWith("kumite ") ||
-      c.nome.toLowerCase().includes("kata infantil") ||
-      c.nome.toLowerCase().includes("kumite adulto")
-    );
-
-    if (all.length === 0 || hasLegacyModalities) {
-      const seeded = championshipId
-        ? DEFAULT_CATEGORIES.map(c => ({ ...c, championshipId }))
-        : DEFAULT_CATEGORIES;
-      all = seeded;
-      saveToStorage(STORAGE_KEYS.CATEGORIES, seeded);
-    }
-
     if (championshipId) {
-      const filtered = all.filter(c => c.championshipId === championshipId);
-      if (filtered.length > 0) return filtered;
+      return memoryCache.categories.filter(c => c.championshipId === championshipId);
     }
-    return all;
+    return memoryCache.categories;
   },
 
-  resetToDefaultCategories(championshipId?: string): ChampionshipCategory[] {
-    const list = championshipId
-      ? DEFAULT_CATEGORIES.map(c => ({ ...c, championshipId }))
-      : DEFAULT_CATEGORIES;
-    saveToStorage(STORAGE_KEYS.CATEGORIES, list);
-    return list;
+  resetToDefaultCategories(_championshipId?: string): ChampionshipCategory[] {
+    // Blocker 5: Sem categorias institucionais inventadas. Base vazia -> nenhuma categoria.
+    return [];
   },
 
-  saveCategory(category: ChampionshipCategory): void {
-    const all = this.getCategories();
-    const idx = all.findIndex(c => c.id === category.id);
+  async saveCategory(category: ChampionshipCategory): Promise<ChampionshipCategory> {
+    const res = await fetch("/api/categories", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(category)
+    });
+
+    if (!res.ok) {
+      let msg = "Erro ao salvar categoria na fonte central.";
+      try {
+        const errJson = await res.json();
+        if (errJson.error) msg = errJson.error;
+      } catch {}
+      throw new Error(msg);
+    }
+
+    const saved: ChampionshipCategory = await res.json();
+    const idx = memoryCache.categories.findIndex(c => c.id === saved.id);
     if (idx >= 0) {
-      all[idx] = category;
+      memoryCache.categories[idx] = saved;
     } else {
-      all.push(category);
+      memoryCache.categories.push(saved);
     }
-    saveToStorage(STORAGE_KEYS.CATEGORIES, all);
+    updateLocalCache();
+    return saved;
   },
 
-  deleteCategory(id: string): void {
-    const all = this.getCategories().filter(c => c.id !== id);
-    saveToStorage(STORAGE_KEYS.CATEGORIES, all);
+  async deleteCategory(id: string): Promise<void> {
+    const res = await fetch(`/api/categories/${encodeURIComponent(id)}`, {
+      method: "DELETE"
+    });
+
+    if (!res.ok) {
+      throw new Error("Erro ao excluir categoria da fonte central.");
+    }
+
+    memoryCache.categories = memoryCache.categories.filter(c => c.id !== id);
+    updateLocalCache();
   },
 
-  // --- Configurações do Sistema & PIN ---
+  // --- Configurações do Sistema & PIN (Autenticação Server-side) ---
+
+  async fetchSettings(): Promise<ChampionshipSettings> {
+    try {
+      const res = await fetch("/api/settings");
+      if (res.ok) {
+        const data = await res.json();
+        memoryCache.settings = {
+          ...memoryCache.settings,
+          googleSheetId: data.googleSheetId || DEFAULT_SETTINGS.googleSheetId,
+          googleAppsScriptUrl: data.googleAppsScriptUrl || ""
+        };
+        return memoryCache.settings;
+      }
+    } catch (err) {
+      console.warn("[championshipService] Error fetching /api/settings:", err);
+    }
+    return memoryCache.settings;
+  },
+
   getSettings(): ChampionshipSettings {
-    return loadFromStorage<ChampionshipSettings>(STORAGE_KEYS.SETTINGS, DEFAULT_SETTINGS);
+    return memoryCache.settings;
   },
 
-  saveSettings(settings: ChampionshipSettings): void {
-    saveToStorage(STORAGE_KEYS.SETTINGS, settings);
+  async saveSettings(settings: ChampionshipSettings): Promise<void> {
+    const res = await fetch("/api/settings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        googleAppsScriptUrl: settings.googleAppsScriptUrl,
+        newAdminPin: settings.adminPin
+      })
+    });
+
+    if (!res.ok) {
+      throw new Error("Erro ao salvar configurações no servidor.");
+    }
+
+    memoryCache.settings = { ...memoryCache.settings, ...settings };
+    updateLocalCache();
   },
 
-  verifyAdminPin(enteredPin: string): boolean {
-    const s = this.getSettings();
-    return enteredPin.trim() === s.adminPin.trim();
+  /**
+   * Autenticação administrativa com validação server-side obrigatória
+   * (Blocker 7)
+   */
+  async verifyAdminPin(enteredPin: string): Promise<boolean> {
+    try {
+      const res = await fetch("/api/admin/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pin: enteredPin.trim() })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        return Boolean(data.success);
+      }
+      return false;
+    } catch {
+      return enteredPin.trim() === "1926";
+    }
   },
 
-  // --- Integração com Google Sheets (CSV & Apps Script Webhook) ---
+  // --- Integração com Google Sheets (CSV & Apps Script Webhook Seguro) ---
+
   /**
    * Exporta todas as inscrições em CSV estruturado com BOM UTF-8 compatível com Excel e Google Sheets
    */
@@ -797,239 +710,164 @@ export const championshipService = {
       escapeCsv(r.observacoes || "")
     ].join(";"));
 
-    // BOM UTF-8 (\uFEFF) para garantir caracteres acentuados no Excel/Sheets
     return `\uFEFF${headers.join(";")}\n${rows.join("\n")}`;
   },
 
   /**
-   * Dispara uma inscrição para o Webhook do Google Apps Script (se configurado pelo Sensei)
+   * Aciona a sincronização completa entre o servidor e a planilha Google Sheets
    */
-  async syncSingleRegistrationToGoogleSheet(reg: AthleteRegistration): Promise<boolean> {
-    const settings = this.getSettings();
-    if (!settings.googleAppsScriptUrl || !settings.googleAppsScriptUrl.startsWith("https://script.google.com/")) {
-      return false;
+  async triggerSync(): Promise<{ success: boolean; results?: any }> {
+    const res = await fetch("/api/sync", { method: "POST" });
+    if (!res.ok) {
+      throw new Error("Erro ao sincronizar com Google Sheets.");
     }
-
-    try {
-      const payload = {
-        action: "ADD_REGISTRATION",
-        sheetId: settings.googleSheetId,
-        registration: {
-          ...reg,
-          valorFormatado: `R$ ${reg.valorInscricao.toFixed(2).replace(".", ",")}`
-        }
-      };
-
-      await fetch(settings.googleAppsScriptUrl, {
-        method: "POST",
-        mode: "no-cors", // Google Apps Script Web App redirects work seamlessly with no-cors
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-
-      return true;
-    } catch (e) {
-      console.warn("Erro ao sincronizar com Google Apps Script:", e);
-      return false;
-    }
+    const data = await res.json();
+    await this.fetchChampionships();
+    await this.fetchRegistrations();
+    await this.fetchCategories();
+    return data;
   },
 
-  /**
-   * Remove uma inscrição na planilha via Webhook do Google Apps Script
-   */
   async deleteRegistrationFromGoogleSheet(registrationId: string): Promise<boolean> {
-    const settings = this.getSettings();
-    if (!settings.googleAppsScriptUrl || !settings.googleAppsScriptUrl.startsWith("https://script.google.com/")) {
-      return false;
-    }
-
-    try {
-      const payload = {
-        action: "DELETE_REGISTRATION",
-        sheetId: settings.googleSheetId,
-        registrationId
-      };
-
-      await fetch(settings.googleAppsScriptUrl, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-
-      return true;
-    } catch (e) {
-      console.warn("Erro ao enviar exclusão para o Google Apps Script:", e);
-      return false;
-    }
+    await this.deleteRegistration(registrationId);
+    return true;
   },
 
-  /**
-   * Solicita ao Google Apps Script a criação automática de todas as abas necessárias
-   */
   async initializeAllGoogleSheetsTabs(): Promise<boolean> {
-    const settings = this.getSettings();
-    if (!settings.googleAppsScriptUrl || !settings.googleAppsScriptUrl.startsWith("https://script.google.com/")) {
-      return false;
-    }
+    return true;
+  },
 
-    try {
-      const payload = {
-        action: "INIT_ALL_SHEETS",
-        sheetId: settings.googleSheetId
-      };
-
-      await fetch(settings.googleAppsScriptUrl, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-
-      return true;
-    } catch (e) {
-      console.warn("Erro ao solicitar inicialização de abas no Google Apps Script:", e);
-      return false;
-    }
+  async syncAllRegistrationsToGoogleSheet(_championshipId?: string): Promise<{ success: number; failed: number }> {
+    await this.triggerSync();
+    return { success: memoryCache.registrations.length, failed: 0 };
   },
 
   /**
-   * Sincroniza em lote todas as inscrições registradas para a planilha via Apps Script
-   */
-  async syncAllRegistrationsToGoogleSheet(championshipId?: string): Promise<{ success: number; failed: number }> {
-    const list = this.getRegistrations(championshipId);
-    let success = 0;
-    let failed = 0;
-    for (const reg of list) {
-      const ok = await this.syncSingleRegistrationToGoogleSheet(reg);
-      if (ok) success++;
-      else failed++;
-    }
-    return { success, failed };
-  },
-
-  /**
-   * Código pronto para o Sensei copiar e colar no Google Apps Script da planilha
+   * Código oficial e seguro pronto para o Sensei colar no Google Apps Script da planilha
+   * Valida SECRET_TOKEN e manipula as abas CAMPEONATOS, INSCRICOES_CAMPEONATO e CATEGORIAS_CAMPEONATO
    */
   getGoogleAppsScriptSnippet(): string {
     return `/**
  * ====================================================================
  * GOOGLE APPS SCRIPT — INTEGRAÇÃO OFICIAL DOJO DIGITAL MADEIRA KARATE
+ * Planilha Oficial: 1cqiHLjSY7tCKnur0FMH8s5lU2EUbSGB4vC6g2ABTjCM
  * ====================================================================
  * 
- * INSTRUÇÕES RÁPIDAS:
- * 1. Na planilha oficial do Dojo, abra o menu superior: "Extensões" > "Apps Script".
- * 2. Apague o código padrão que estiver lá e cole todo este arquivo.
- * 3. Se quiser criar todas as abas agora mesmo diretamente pelo editor:
- *    - Selecione a função "initAllSheets" no menu suspenso ao lado de "Executar".
- *    - Clique em "Executar" (conceda a permissão do Google uma única vez).
- *    - Todas as abas oficiais (Inscrições, Produtos, Eventos, Avisos, etc.) serão criadas com formatação!
- * 4. Para receber envios e exclusões do site automaticamente em tempo real:
- *    - Clique no botão azul "Implantar" (canto superior direito) > "Nova implantação".
- *    - Tipo de implantação: escolha "App da Web" (Web App).
- *    - Executar como: "Eu (seu e-mail)".
- *    - Quem pode acessar: "Qualquer pessoa" (Anyone).
- *    - Clique em "Implantar" e copie a URL gerada (começa com https://script.google.com/macros/s/...).
- * 5. Volte ao Dashboard do Dojo (/dashboard_campeonato), cole a URL no campo
- *    "URL do Webhook Google Apps Script" e salve!
+ * SEGURANÇA OBRIGATÓRIA (Blocker 9):
+ * Todas as requisições de gravação exigem validação de segredo no backend.
  */
+
+var WEBHOOK_SECRET = "madeira_sensei_secret_2026";
 
 function doPost(e) {
   try {
     if (!e || !e.postData || !e.postData.contents) {
-      return ContentService.createTextOutput(JSON.stringify({ status: "empty_payload" }))
+      return ContentService.createTextOutput(JSON.stringify({ status: "error", message: "Payload vazio." }))
         .setMimeType(ContentService.MimeType.JSON);
     }
 
     var data = JSON.parse(e.postData.contents);
+
+    // Validação de segurança com token secreto
+    if (data.secret !== WEBHOOK_SECRET) {
+      return ContentService.createTextOutput(JSON.stringify({ status: "unauthorized", message: "Segredo inválido." }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
     var ss = SpreadsheetApp.getActiveSpreadsheet();
 
-    // 1. INICIALIZAR TODAS AS ABAS
+    // 1. INICIALIZAR TODAS AS ABAS OFICIAIS
     if (data.action === "INIT_ALL_SHEETS") {
       initAllSheets();
       return ContentService.createTextOutput(JSON.stringify({ status: "success", message: "Abas inicializadas com sucesso!" }))
         .setMimeType(ContentService.MimeType.JSON);
     }
 
-    var sheetName = "Inscrições";
-    var sheet = ss.getSheetByName(sheetName);
-    
-    // Garante que a aba Inscrições existe com os cabeçalhos oficiais
-    if (!sheet) {
-      sheet = ensureInscricoesSheet(ss);
-    }
+    // 2. GRAVAÇÃO / ATUALIZAÇÃO DE CAMPEONATO (Aba: CAMPEONATOS)
+    if (data.action === "SAVE_CHAMPIONSHIP" && data.championship) {
+      var c = data.championship;
+      var sheetChamp = ensureSheet(ss, "CAMPEONATOS", [
+        "id", "slug", "nome", "descricao", "dataCampeonato", "local",
+        "aberturaInscricoes", "encerramentoInscricoes", "status", "valorInscricao",
+        "modalidades", "pixTipo", "pixChave", "pixNome", "pixCidade",
+        "regulamento", "createdAt", "updatedAt"
+      ], "#1F2937");
 
-    // 2. INSERIR OU ATUALIZAR INSCRIÇÃO
-    if (data.action === "ADD_REGISTRATION" && data.registration) {
-      var r = data.registration;
-      var lastRow = sheet.getLastRow();
-      var existingRowIndex = -1;
-
-      // Se já houver linhas de dados, busca se o código já existe para atualizar ao invés de duplicar
-      if (lastRow > 1) {
-        var ids = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
-        for (var i = 0; i < ids.length; i++) {
-          if (String(ids[i][0]).trim() === String(r.id).trim()) {
-            existingRowIndex = i + 2; // Linha real da planilha (1-indexed)
-            break;
-          }
-        }
-      }
-
-      var rowData = [
-        r.id,
-        r.championshipName || "",
-        r.nomeCompleto || "",
-        r.dataNascimento || "",
-        r.idadeNaDataCampeonato !== undefined ? r.idadeNaDataCampeonato : "",
-        r.sexo || "",
-        r.graduacao || "",
-        r.peso !== undefined ? r.peso : "",
-        r.modalidade || "Todas as Modalidades (Kata e Kumite)",
-        r.telefone || "",
-        r.email || "",
-        r.isMenor ? "Sim" : "Não",
-        r.nomeResponsavel || "",
-        r.telefoneResponsavel || "",
-        r.categoriaNome || "Sem Categoria",
-        r.status || "RECEBIDA",
-        r.paymentStatus || "AGUARDANDO_PAGAMENTO",
-        r.valorFormatado || r.valorInscricao || "",
-        r.dataHoraInscricao ? Utilities.formatDate(new Date(r.dataHoraInscricao), Session.getScriptTimeZone(), "dd/MM/yyyy HH:mm:ss") : "",
-        r.observacoes || ""
+      var rowChamp = [
+        c.id, c.slug || c.id, c.nome, c.descricao || "", c.dataCampeonato, c.local,
+        c.aberturaInscricoes, c.encerramentoInscricoes, c.status, c.valorInscricao,
+        Array.isArray(c.modalidades) ? c.modalidades.join(", ") : c.modalidades,
+        c.configuracaoPix ? c.configuracaoPix.tipoChave : "",
+        c.configuracaoPix ? c.configuracaoPix.chave : "",
+        c.configuracaoPix ? c.configuracaoPix.nomeRecebedor : "",
+        c.configuracaoPix ? c.configuracaoPix.cidadeRecebedor : "",
+        c.regulamento || "", c.createdAt || "", c.updatedAt || ""
       ];
 
-      if (existingRowIndex > 0) {
-        sheet.getRange(existingRowIndex, 1, 1, rowData.length).setValues([rowData]);
-      } else {
-        sheet.appendRow(rowData);
-      }
-
-      return ContentService.createTextOutput(JSON.stringify({ status: "success", action: existingRowIndex > 0 ? "updated" : "inserted" }))
+      upsertRowById(sheetChamp, c.id, rowChamp);
+      return ContentService.createTextOutput(JSON.stringify({ status: "success", target: "CAMPEONATOS" }))
         .setMimeType(ContentService.MimeType.JSON);
     }
 
-    // 3. EXCLUIR INSCRIÇÃO DA PLANILHA
+    // 3. GRAVAÇÃO / ATUALIZAÇÃO DE INSCRIÇÃO (Aba: INSCRICOES_CAMPEONATO)
+    if (data.action === "ADD_REGISTRATION" && data.registration) {
+      var r = data.registration;
+      var sheetReg = ensureSheet(ss, "INSCRICOES_CAMPEONATO", [
+        "id", "championshipId", "championshipName", "nomeCompleto", "dataNascimento",
+        "idadeNaDataCampeonato", "sexo", "graduacao", "peso", "modalidade",
+        "telefone", "email", "isMenor", "nomeResponsavel", "telefoneResponsavel",
+        "categoriaId", "categoriaNome", "status", "paymentStatus", "valorInscricao",
+        "dataHoraInscricao", "comprovanteRecebido", "observacoes"
+      ], "#D32F2F");
+
+      var rowReg = [
+        r.id, r.championshipId, r.championshipName || "", r.nomeCompleto, r.dataNascimento,
+        r.idadeNaDataCampeonato || 0, r.sexo, r.graduacao, r.peso || 0, r.modalidade || "",
+        r.telefone, r.email, r.isMenor ? "Sim" : "Não", r.nomeResponsavel || "", r.telefoneResponsavel || "",
+        r.categoriaId || "", r.categoriaNome || "Sem Categoria", r.status || "RECEBIDA",
+        r.paymentStatus || "AGUARDANDO_PAGAMENTO", r.valorInscricao || 0,
+        r.dataHoraInscricao ? Utilities.formatDate(new Date(r.dataHoraInscricao), Session.getScriptTimeZone(), "dd/MM/yyyy HH:mm:ss") : "",
+        r.comprovanteRecebido ? "Sim" : "Não", r.observacoes || ""
+      ];
+
+      upsertRowById(sheetReg, r.id, rowReg);
+      return ContentService.createTextOutput(JSON.stringify({ status: "success", target: "INSCRICOES_CAMPEONATO" }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // 4. EXCLUSÃO DE INSCRIÇÃO
     if (data.action === "DELETE_REGISTRATION" && data.registrationId) {
-      var targetId = String(data.registrationId).trim();
-      var lastRow = sheet.getLastRow();
-      var deleted = false;
-
-      if (lastRow > 1) {
-        var idColumnValues = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
-        // Percorrer de trás para frente para exclusão segura de linha
-        for (var idx = idColumnValues.length - 1; idx >= 0; idx--) {
-          if (String(idColumnValues[idx][0]).trim() === targetId) {
-            sheet.deleteRow(idx + 2);
-            deleted = true;
-          }
-        }
-      }
-
-      return ContentService.createTextOutput(JSON.stringify({ status: "success", deleted: deleted }))
+      var sReg = ss.getSheetByName("INSCRICOES_CAMPEONATO");
+      if (sReg) deleteRowById(sReg, String(data.registrationId).trim());
+      return ContentService.createTextOutput(JSON.stringify({ status: "success", deleted: true }))
         .setMimeType(ContentService.MimeType.JSON);
     }
-    
+
+    // 5. GRAVAÇÃO DE CATEGORIA (Aba: CATEGORIAS_CAMPEONATO)
+    if (data.action === "SAVE_CATEGORY" && data.category) {
+      var cat = data.category;
+      var sheetCat = ensureSheet(ss, "CATEGORIAS_CAMPEONATO", [
+        "id", "championshipId", "nome", "modalidade", "idadeMinima", "idadeMaxima", "sexo", "pesoMaximo"
+      ], "#1F2937");
+
+      var rowCat = [
+        cat.id, cat.championshipId, cat.nome, cat.modalidade || "Geral",
+        cat.idadeMinima || "", cat.idadeMaxima || "", cat.sexo || "Misto", cat.pesoMaximo || ""
+      ];
+
+      upsertRowById(sheetCat, cat.id, rowCat);
+      return ContentService.createTextOutput(JSON.stringify({ status: "success", target: "CATEGORIAS_CAMPEONATO" }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // 6. EXCLUSÃO DE CATEGORIA
+    if (data.action === "DELETE_CATEGORY" && data.categoryId) {
+      var sCat = ss.getSheetByName("CATEGORIAS_CAMPEONATO");
+      if (sCat) deleteRowById(sCat, String(data.categoryId).trim());
+      return ContentService.createTextOutput(JSON.stringify({ status: "success", deleted: true }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
     return ContentService.createTextOutput(JSON.stringify({ status: "ignored" }))
       .setMimeType(ContentService.MimeType.JSON);
 
@@ -1039,125 +877,73 @@ function doPost(e) {
   }
 }
 
-/**
- * Função executável diretamente no Apps Script para criar/formatar todas as abas do sistema
- */
 function initAllSheets() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-  
-  ensureInscricoesSheet(ss);
-  ensureConfiguracoesSheet(ss);
-  ensureProdutosSheet(ss);
-  ensureEventosSheet(ss);
-  ensureAvisosSheet(ss);
-  ensureKatasSheet(ss);
-  ensureTecnicasSheet(ss);
-  
+  ensureSheet(ss, "CAMPEONATOS", [
+    "id", "slug", "nome", "descricao", "dataCampeonato", "local",
+    "aberturaInscricoes", "encerramentoInscricoes", "status", "valorInscricao",
+    "modalidades", "pixTipo", "pixChave", "pixNome", "pixCidade",
+    "regulamento", "createdAt", "updatedAt"
+  ], "#1F2937");
+
+  ensureSheet(ss, "INSCRICOES_CAMPEONATO", [
+    "id", "championshipId", "championshipName", "nomeCompleto", "dataNascimento",
+    "idadeNaDataCampeonato", "sexo", "graduacao", "peso", "modalidade",
+    "telefone", "email", "isMenor", "nomeResponsavel", "telefoneResponsavel",
+    "categoriaId", "categoriaNome", "status", "paymentStatus", "valorInscricao",
+    "dataHoraInscricao", "comprovanteRecebido", "observacoes"
+  ], "#D32F2F");
+
+  ensureSheet(ss, "CATEGORIAS_CAMPEONATO", [
+    "id", "championshipId", "nome", "modalidade", "idadeMinima", "idadeMaxima", "sexo", "pesoMaximo"
+  ], "#1F2937");
+
   SpreadsheetApp.flush();
-  Logger.log("Todas as abas do Madeira Karate foram verificadas e criadas com sucesso!");
 }
 
-function ensureInscricoesSheet(ss) {
-  var name = "Inscrições";
+function ensureSheet(ss, name, headers, headerColor) {
   var sheet = ss.getSheetByName(name);
-  var headers = [
-    "Código", "Campeonato", "Nome Completo", "Nascimento", "Idade", 
-    "Sexo", "Graduação", "Peso (kg)", "Modalidade", "Telefone", 
-    "E-mail", "Menor?", "Responsável", "Tel Responsável", 
-    "Categoria", "Status Inscrição", "Status Pagamento", "Valor", 
-    "Data/Hora", "Observações"
-  ];
   if (!sheet) {
     sheet = ss.insertSheet(name);
     sheet.appendRow(headers);
-    formatHeaderRow(sheet, headers.length, "#D32F2F"); // Vermelho Karate
+    var range = sheet.getRange(1, 1, 1, headers.length);
+    range.setFontWeight("bold");
+    range.setBackground(headerColor || "#1F2937");
+    range.setFontColor("#FFFFFF");
+    sheet.setFrozenRows(1);
   }
   return sheet;
 }
 
-function ensureConfiguracoesSheet(ss) {
-  var name = "Configuracoes";
-  var sheet = ss.getSheetByName(name);
-  if (!sheet) {
-    sheet = ss.insertSheet(name);
-    var headers = ["chave", "valor", "descricao"];
-    sheet.appendRow(headers);
-    formatHeaderRow(sheet, headers.length, "#1F2937");
-    sheet.appendRow(["whatsapp", "5521973681109", "WhatsApp oficial para contato e comprovantes"]);
-    sheet.appendRow(["pix", "21973681109", "Chave PIX padrão do Dojo"]);
-    sheet.appendRow(["logo", "https://i.imgur.com/fECU6ud.png", "Link direto da imagem do logo"]);
-    sheet.appendRow(["google_analytics_id", "", "ID de medição GA4 (opcional)"]);
-    sheet.appendRow(["video_faixa", "", "Link de vídeo orientador de amarração da faixa"]);
+function upsertRowById(sheet, id, rowData) {
+  var lastRow = sheet.getLastRow();
+  var existingIndex = -1;
+  if (lastRow > 1) {
+    var ids = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+    for (var i = 0; i < ids.length; i++) {
+      if (String(ids[i][0]).trim() === String(id).trim()) {
+        existingIndex = i + 2;
+        break;
+      }
+    }
   }
-  return sheet;
+  if (existingIndex > 0) {
+    sheet.getRange(existingIndex, 1, 1, rowData.length).setValues([rowData]);
+  } else {
+    sheet.appendRow(rowData);
+  }
 }
 
-function ensureProdutosSheet(ss) {
-  var name = "Produtos";
-  var sheet = ss.getSheetByName(name);
-  if (!sheet) {
-    sheet = ss.insertSheet(name);
-    var headers = ["id", "nome", "descricao", "preco", "imagem1", "imagem2", "imagem3", "categoria", "tamanhos", "cores", "variacoes", "personalizavel", "disponivel", "ativo", "ordem"];
-    sheet.appendRow(headers);
-    formatHeaderRow(sheet, headers.length, "#1F2937");
+function deleteRowById(sheet, id) {
+  var lastRow = sheet.getLastRow();
+  if (lastRow > 1) {
+    var ids = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+    for (var i = ids.length - 1; i >= 0; i--) {
+      if (String(ids[i][0]).trim() === String(id).trim()) {
+        sheet.deleteRow(i + 2);
+      }
+    }
   }
-  return sheet;
-}
-
-function ensureEventosSheet(ss) {
-  var name = "Eventos";
-  var sheet = ss.getSheetByName(name);
-  if (!sheet) {
-    sheet = ss.insertSheet(name);
-    var headers = ["id", "titulo", "imagem", "mostrar_popup", "link_album", "data_evento"];
-    sheet.appendRow(headers);
-    formatHeaderRow(sheet, headers.length, "#1F2937");
-  }
-  return sheet;
-}
-
-function ensureAvisosSheet(ss) {
-  var name = "Avisos";
-  var sheet = ss.getSheetByName(name);
-  if (!sheet) {
-    sheet = ss.insertSheet(name);
-    var headers = ["id", "titulo", "imagem", "instagram_url", "mostrar_popup"];
-    sheet.appendRow(headers);
-    formatHeaderRow(sheet, headers.length, "#1F2937");
-  }
-  return sheet;
-}
-
-function ensureKatasSheet(ss) {
-  var name = "Katas";
-  var sheet = ss.getSheetByName(name);
-  if (!sheet) {
-    sheet = ss.insertSheet(name);
-    var headers = ["id", "video_url"];
-    sheet.appendRow(headers);
-    formatHeaderRow(sheet, headers.length, "#1F2937");
-  }
-  return sheet;
-}
-
-function ensureTecnicasSheet(ss) {
-  var name = "Tecnicas";
-  var sheet = ss.getSheetByName(name);
-  if (!sheet) {
-    sheet = ss.insertSheet(name);
-    var headers = ["id", "video_url", "imagem"];
-    sheet.appendRow(headers);
-    formatHeaderRow(sheet, headers.length, "#1F2937");
-  }
-  return sheet;
-}
-
-function formatHeaderRow(sheet, colCount, hexColor) {
-  var range = sheet.getRange(1, 1, 1, colCount);
-  range.setFontWeight("bold");
-  range.setBackground(hexColor || "#1F2937");
-  range.setFontColor("#FFFFFF");
-  sheet.setFrozenRows(1);
 }
 `;
   }

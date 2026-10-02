@@ -33,6 +33,7 @@ import {
 } from "../services/championshipService";
 import { Championship, AthleteRegistration } from "../types/championship";
 import { generatePixCopiaECola, generatePixQrCodeDataUrl } from "../lib/pixUtils";
+import { formatModalidadesList } from "../lib/utils";
 import { useAppData } from "../contexts/AppDataContext";
 
 const BELT_OPTIONS = [
@@ -80,23 +81,27 @@ export function ChampionshipDetail() {
   const [showRegulamentoModal, setShowRegulamentoModal] = useState(false);
   const [receiptMarked, setReceiptMarked] = useState(false);
 
-  // Carregar dados do campeonato
+  // Carregar dados do campeonato centralmente
   useEffect(() => {
     setLoading(true);
-    const champs = championshipService.getChampionships();
-    if (!slug) {
-      if (champs.length > 0) {
-        setChampionship(champs[0]);
+    championshipService.fetchChampionships().then((champs) => {
+      let targetChamp: Championship | null = null;
+      if (!slug) {
+        if (champs.length > 0) {
+          targetChamp = champs[0];
+        }
+      } else {
+        const found = champs.find(c => c.slug.toLowerCase() === slug.toLowerCase() || c.id === slug);
+        if (found) {
+          targetChamp = found;
+        } else if (champs.length > 0) {
+          targetChamp = champs[0];
+        }
       }
-    } else {
-      const found = championshipService.getChampionshipBySlug(slug);
-      if (found) {
-        setChampionship(found);
-      } else if (champs.length > 0) {
-        setChampionship(champs[0]);
-      }
-    }
-    setLoading(false);
+      setChampionship(targetChamp);
+    }).finally(() => {
+      setLoading(false);
+    });
   }, [slug]);
 
   // Cálculo da idade na data do campeonato
@@ -183,13 +188,16 @@ export function ChampionshipDetail() {
         throw new Error("É obrigatório concordar com o Regulamento Oficial do Campeonato para prosseguir.");
       }
 
+      // Regra da SPEC 08: Inscrição única válida para todas as modalidades do evento
+      const modalidadesDoEvento = formatModalidadesList(championship.modalidades);
+
       const reg = await championshipService.createRegistration(championship, {
         nomeCompleto,
         dataNascimento,
         sexo,
         graduacao,
         peso: numericWeight,
-        modalidade: "Todas as Modalidades (Kata e Kumite)",
+        modalidade: modalidadesDoEvento,
         telefone,
         email,
         nomeResponsavel: isMenor ? nomeResponsavel : undefined,
@@ -198,12 +206,12 @@ export function ChampionshipDetail() {
         aceiteRegulamento
       });
 
-      // Confirmado em storage com sucesso!
+      // Confirmado na fonte central com sucesso!
       setCompletedRegistration(reg);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err: any) {
       console.error("Erro na inscrição:", err);
-      const msg = err.message || "Erro ao processar inscrição. Verifique os dados e tente novamente.";
+      const msg = err.message || "Inscrição não concluída. Tente novamente.";
       setSubmitError(msg);
       // Rola a tela até o erro para o usuário ver imediatamente
       window.scrollTo({ top: 350, behavior: "smooth" });
@@ -213,26 +221,33 @@ export function ChampionshipDetail() {
   };
 
   // Link para envio de WhatsApp reutilizando config.whatsapp do AppDataContext
+  // Padrão limpo sem emojis (evita corrupção de caracteres no WhatsApp Web e Android)
   const generateWhatsAppReceiptUrl = () => {
-    if (!completedRegistration) return "#";
+    if (!completedRegistration || !championship) return "#";
     const rawNumber = config.whatsapp || "5521973681109";
     const cleanNumber = rawNumber.replace(/\D/g, "");
+    const modalidadesEvento = formatModalidadesList(championship.modalidades);
 
-    const message = `Olá! Estou enviando o comprovante da inscrição do campeonato.\n\n` +
-      `🥋 *Inscrição:* ${completedRegistration.id}\n` +
-      `👤 *Atleta:* ${completedRegistration.nomeCompleto}\n` +
-      `⚔️ *Participação:* Todas as Modalidades (Kata e Kumite)\n` +
-      `💰 *Valor:* R$ ${completedRegistration.valorInscricao.toFixed(2).replace(".", ",")}\n\n` +
-      `_Segue em anexo o comprovante de pagamento PIX para conferência._`;
+    const message = "Olá! Estou enviando o comprovante da inscrição do campeonato.\n\n" +
+      `Inscrição: ${completedRegistration.id}\n` +
+      `Atleta: ${completedRegistration.nomeCompleto}\n` +
+      "Participação: Todas as modalidades do campeonato\n" +
+      `Modalidades do evento: ${modalidadesEvento}\n` +
+      `Valor: R$ ${completedRegistration.valorInscricao.toFixed(2).replace(".", ",")}\n\n` +
+      "Segue em anexo o comprovante de pagamento PIX para conferência.";
 
     return `https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`;
   };
 
-  const handleMarkReceiptSent = () => {
+  const handleMarkReceiptSent = async () => {
     if (!completedRegistration) return;
-    const updated = championshipService.markReceiptSentByAthlete(completedRegistration.id);
-    setCompletedRegistration(updated);
-    setReceiptMarked(true);
+    try {
+      const updated = await championshipService.markReceiptSentByAthlete(completedRegistration.id);
+      setCompletedRegistration(updated);
+      setReceiptMarked(true);
+    } catch (err) {
+      console.error("Erro ao marcar envio de comprovante:", err);
+    }
   };
 
   if (loading) {
@@ -438,7 +453,8 @@ export function ChampionshipDetail() {
             <h4 className="font-bold text-neutral-800 text-sm mb-2">Resumo da Inscrição Cadastrada:</h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-neutral-50 p-4 rounded-xl">
               <p><strong>Atleta:</strong> {completedRegistration.nomeCompleto}</p>
-              <p><strong>Modalidade:</strong> {completedRegistration.modalidade}</p>
+              <p><strong>Participação:</strong> Todas as modalidades do campeonato</p>
+              <p><strong>Modalidades do evento:</strong> {formatModalidadesList(championship.modalidades)}</p>
               <p><strong>Graduação:</strong> {completedRegistration.graduacao}</p>
               <p><strong>Peso:</strong> {completedRegistration.peso} kg</p>
               <p><strong>Idade no Campeonato:</strong> {completedRegistration.idadeNaDataCampeonato} anos {completedRegistration.isMenor ? "(Menor)" : ""}</p>
@@ -559,11 +575,14 @@ export function ChampionshipDetail() {
             </div>
           </div>
 
-          {/* Participação Integral Oficial */}
+          {/* Participação Integral Oficial Conforme Configuração do Evento */}
           <div className="pt-2 flex flex-wrap items-center gap-2 text-xs">
             <span className="text-neutral-400 font-semibold">Participação:</span>
             <span className="bg-karate-gold/20 text-karate-gold border border-karate-gold/40 px-2.5 py-1 rounded-lg font-bold">
-              Integral: Todas as Modalidades (Kata e Kumite)
+              Todas as modalidades do campeonato
+            </span>
+            <span className="bg-neutral-800 text-neutral-300 border border-neutral-700 px-2.5 py-1 rounded-lg font-medium">
+              Modalidades do evento: {formatModalidadesList(championship.modalidades)}
             </span>
             {championship.permiteMenores && (
               <span className="bg-purple-900/40 text-purple-300 border border-purple-800/60 px-2.5 py-1 rounded-lg font-medium">
@@ -734,14 +753,19 @@ export function ChampionshipDetail() {
                 />
               </div>
 
-              {/* Informação sobre Participação Integral (Todos fazem Kata e Kumite) */}
-              <div className="sm:col-span-2 bg-neutral-50 border border-neutral-200/90 p-3.5 rounded-xl flex items-start gap-2.5 text-xs text-neutral-700">
-                <Trophy className="w-4 h-4 text-karate-gold shrink-0 mt-0.5" />
-                <div>
-                  <strong className="text-neutral-900 block font-semibold">Participação Integral (Kata + Kumite):</strong>
-                  <span className="text-[11px] text-neutral-600 leading-relaxed">
-                    Todos os atletas inscritos competem em todas as modalidades do campeonato. O chaveamento será organizado pela comissão técnica por categoria de idade, sexo e graduação.
+              {/* Informação Institucional de Participação e Modalidades do Evento */}
+              <div className="sm:col-span-2 bg-neutral-50 border border-neutral-200 p-4 rounded-2xl space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <Trophy className="w-4 h-4 text-karate-red shrink-0" />
+                  <span className="text-xs font-bold text-neutral-900">
+                    Participação: Todas as modalidades do campeonato
                   </span>
+                </div>
+                <div className="text-xs text-neutral-700 pl-6">
+                  <strong>Modalidades do evento:</strong> {formatModalidadesList(championship.modalidades)}
+                </div>
+                <div className="text-[11px] text-neutral-500 pl-6 leading-relaxed">
+                  A inscrição é única e o atleta compete em todas as modalidades oficiais configuradas para este evento de acordo com sua categoria etária e graduação.
                 </div>
               </div>
             </div>

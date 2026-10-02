@@ -22,6 +22,7 @@ import {
 import { championshipService, getEnrollmentPeriodState } from "../services/championshipService";
 import { AthleteRegistration, Championship } from "../types/championship";
 import { generatePixCopiaECola, generatePixQrCodeDataUrl } from "../lib/pixUtils";
+import { formatModalidadesList } from "../lib/utils";
 import { useAppData } from "../contexts/AppDataContext";
 
 export function ChampionshipLookup() {
@@ -77,7 +78,7 @@ export function ChampionshipLookup() {
     }
   }, [registration, championship]);
 
-  const handleLookup = (e: React.FormEvent) => {
+  const handleLookup = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
     setSaveSuccess(false);
@@ -87,26 +88,31 @@ export function ChampionshipLookup() {
       return;
     }
 
-    const reg = championshipService.lookupRegistration(code.trim(), validationKey.trim());
-    if (!reg) {
-      setErrorMsg("Nenhuma inscrição encontrada com este código e dados de validação. Verifique seu código, e-mail ou data de nascimento digitados.");
-      setRegistration(null);
-      return;
+    try {
+      const reg = await championshipService.lookupRegistration(code.trim(), validationKey.trim());
+      if (!reg) {
+        setErrorMsg("Nenhuma inscrição encontrada com este código e dados de validação. Verifique seu código, e-mail ou data de nascimento digitados.");
+        setRegistration(null);
+        return;
+      }
+
+      setRegistration(reg);
+      const champs = await championshipService.fetchChampionships();
+      const champ = champs.find(c => c.id === reg.championshipId) || championshipService.getChampionshipById(reg.championshipId);
+      if (champ) setChampionship(champ);
+
+      // Carregar dados de edição
+      setEditPeso(String(reg.peso));
+      setEditTelefone(reg.telefone);
+      setEditEmail(reg.email);
+      setEditNomeResp(reg.nomeResponsavel || "");
+      setEditTelResp(reg.telefoneResponsavel || "");
+    } catch (err: any) {
+      setErrorMsg(err.message || "Erro ao consultar inscrição no sistema oficial.");
     }
-
-    setRegistration(reg);
-    const champ = championshipService.getChampionshipById(reg.championshipId);
-    if (champ) setChampionship(champ);
-
-    // Carregar dados de edição
-    setEditPeso(String(reg.peso));
-    setEditTelefone(reg.telefone);
-    setEditEmail(reg.email);
-    setEditNomeResp(reg.nomeResponsavel || "");
-    setEditTelResp(reg.telefoneResponsavel || "");
   };
 
-  const handleSaveEdit = (e: React.FormEvent) => {
+  const handleSaveEdit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!registration || !championship) return;
 
@@ -116,7 +122,7 @@ export function ChampionshipLookup() {
         throw new Error("Peso corporal inválido.");
       }
 
-      const updated = championshipService.updateRegistrationByAthlete(
+      const updated = await championshipService.updateRegistrationByAthlete(
         registration.id,
         championship,
         {
@@ -144,24 +150,32 @@ export function ChampionshipLookup() {
     setTimeout(() => setCopiedPix(false), 3000);
   };
 
-  const handleMarkReceiptSent = () => {
+  const handleMarkReceiptSent = async () => {
     if (!registration) return;
-    const updated = championshipService.markReceiptSentByAthlete(registration.id);
-    setRegistration(updated);
-    setReceiptMarked(true);
+    try {
+      const updated = await championshipService.markReceiptSentByAthlete(registration.id);
+      setRegistration(updated);
+      setReceiptMarked(true);
+    } catch (err: any) {
+      setErrorMsg(err.message || "Erro ao registrar envio de comprovante.");
+    }
   };
 
   const generateWhatsAppReceiptUrl = () => {
     if (!registration) return "#";
     const rawNumber = config.whatsapp || "5521973681109";
     const cleanNumber = rawNumber.replace(/\D/g, "");
+    const modalidadesEvento = championship?.modalidades && championship.modalidades.length > 0
+      ? formatModalidadesList(championship.modalidades)
+      : (registration.modalidade || "Kata e Kumite");
 
-    const message = `Olá! Estou enviando o comprovante da inscrição do campeonato.\n\n` +
-      `🥋 *Inscrição:* ${registration.id}\n` +
-      `👤 *Atleta:* ${registration.nomeCompleto}\n` +
-      `⚔️ *Modalidade:* ${registration.modalidade}\n` +
-      `💰 *Valor:* R$ ${registration.valorInscricao.toFixed(2).replace(".", ",")}\n\n` +
-      `_Segue em anexo o comprovante de pagamento PIX para conferência._`;
+    const message = "Olá! Estou enviando o comprovante da inscrição do campeonato.\n\n" +
+      `Inscrição: ${registration.id}\n` +
+      `Atleta: ${registration.nomeCompleto}\n` +
+      "Participação: Todas as modalidades do campeonato\n" +
+      `Modalidades do evento: ${modalidadesEvento}\n` +
+      `Valor: R$ ${registration.valorInscricao.toFixed(2).replace(".", ",")}\n\n` +
+      "Segue em anexo o comprovante de pagamento PIX para conferência.";
 
     return `https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`;
   };
@@ -299,7 +313,8 @@ export function ChampionshipLookup() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-neutral-50 p-4 rounded-2xl border border-neutral-100">
                 <p><strong>Nome Completo:</strong> {registration.nomeCompleto}</p>
-                <p><strong>Participação:</strong> <span className="text-karate-red font-bold">{registration.modalidade || "Todas as Modalidades (Kata e Kumite)"}</span></p>
+                <p><strong>Participação:</strong> <span className="text-karate-red font-bold">Todas as modalidades do campeonato</span></p>
+                <p><strong>Modalidades do evento:</strong> <span className="font-semibold text-neutral-800">{championship?.modalidades && championship.modalidades.length > 0 ? formatModalidadesList(championship.modalidades) : (registration.modalidade || "Kata e Kumite")}</span></p>
                 <p><strong>Graduação:</strong> {registration.graduacao}</p>
                 <p><strong>Peso Informado:</strong> {registration.peso} kg</p>
                 <p><strong>Idade no Campeonato:</strong> {registration.idadeNaDataCampeonato} anos {registration.isMenor ? "(Menor)" : ""}</p>
@@ -394,8 +409,9 @@ export function ChampionshipLookup() {
                   </>
                 )}
 
-                <div className="sm:col-span-2 bg-neutral-100 p-2.5 rounded-xl text-neutral-600 text-[11px]">
-                  <strong>Participação Integral:</strong> O atleta está inscrito em todas as modalidades do campeonato (Kata e Kumite).
+                <div className="sm:col-span-2 bg-neutral-100 p-3 rounded-xl text-neutral-600 text-[11px] space-y-0.5">
+                  <div><strong>Participação:</strong> Todas as modalidades do campeonato</div>
+                  <div><strong>Modalidades do evento:</strong> {championship?.modalidades && championship.modalidades.length > 0 ? formatModalidadesList(championship.modalidades) : (registration.modalidade || "Kata e Kumite")}</div>
                 </div>
               </div>
 
