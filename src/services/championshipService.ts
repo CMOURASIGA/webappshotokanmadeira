@@ -389,7 +389,10 @@ export const championshipService = {
       response = await fetch("/api/registrations", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({
+          registration: payload,
+          googleAppsScriptUrl: memoryCache.settings.googleAppsScriptUrl || loadLocalValidationSettings().googleAppsScriptUrl || ""
+        })
       });
     } catch (networkError) {
       console.error("[championshipService] Falha de comunicação com o servidor:", networkError);
@@ -576,7 +579,10 @@ export const championshipService = {
     const res = await fetch("/api/categories", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(category)
+      body: JSON.stringify({
+        category,
+        googleAppsScriptUrl: memoryCache.settings.googleAppsScriptUrl || loadLocalValidationSettings().googleAppsScriptUrl || ""
+      })
     });
 
     if (!res.ok) {
@@ -615,22 +621,8 @@ export const championshipService = {
   // --- Configurações do Sistema & PIN (Autenticação Server-side) ---
 
   async fetchSettings(): Promise<ChampionshipSettings> {
-    try {
-      const res = await fetch("/api/settings");
-      if (res.ok) {
-        const data = await res.json();
-        memoryCache.settings = {
-          ...memoryCache.settings,
-          googleSheetId: data.googleSheetId || DEFAULT_SETTINGS.googleSheetId,
-          googleAppsScriptUrl: data.googleAppsScriptUrl || ""
-        };
-        saveLocalValidationSettings(memoryCache.settings);
-        return memoryCache.settings;
-      }
-    } catch (err) {
-      console.warn("[championshipService] API de configurações indisponível; usando configuração local de validação.", err);
-    }
-
+    // Durante a Human Validation, URL do Apps Script e PIN são parametrizações
+    // locais do navegador. Isso evita chamadas 404 a endpoints inexistentes no deploy.
     memoryCache.settings = loadLocalValidationSettings();
     return memoryCache.settings;
   },
@@ -640,67 +632,14 @@ export const championshipService = {
   },
 
   async saveSettings(settings: ChampionshipSettings): Promise<void> {
-    try {
-      const res = await fetch("/api/settings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          googleAppsScriptUrl: settings.googleAppsScriptUrl,
-          newAdminPin: settings.adminPin
-        })
-      });
-
-      if (res.ok) {
-        memoryCache.settings = { ...memoryCache.settings, ...settings };
-        saveLocalValidationSettings(memoryCache.settings);
-        updateLocalCache();
-        return;
-      }
-
-      console.warn("[championshipService] /api/settings indisponível no deploy; salvando configuração local para Human Validation.");
-    } catch (err) {
-      console.warn("[championshipService] Falha ao acessar /api/settings; salvando configuração local para Human Validation.", err);
-    }
-
-    // Compatibilidade temporária para o deploy estático atual:
-    // preserva a URL do Apps Script e o PIN no mesmo navegador durante Human Validation.
     memoryCache.settings = { ...memoryCache.settings, ...settings };
     saveLocalValidationSettings(memoryCache.settings);
     updateLocalCache();
   },
 
-  /**
-   * Autenticação administrativa.
-   * Quando o backend /api/admin/auth estiver disponível, ele é a autoridade.
-   * No deploy estático atual, mantém o PIN local apenas para permitir Human Validation.
-   */
   async verifyAdminPin(enteredPin: string): Promise<boolean> {
-    const normalizedPin = enteredPin.trim();
-
-    try {
-      const res = await fetch("/api/admin/auth", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pin: normalizedPin })
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        return Boolean(data.success);
-      }
-
-      // Se o endpoint não existe no deploy atual (ex.: 404/405/5xx),
-      // permite a validação usando o PIN configurado localmente.
-      if (res.status !== 401 && res.status !== 403) {
-        const localSettings = loadLocalValidationSettings();
-        return normalizedPin === String(localSettings.adminPin || DEFAULT_SETTINGS.adminPin).trim();
-      }
-
-      return false;
-    } catch {
-      const localSettings = loadLocalValidationSettings();
-      return normalizedPin === String(localSettings.adminPin || DEFAULT_SETTINGS.adminPin).trim();
-    }
+    const localSettings = loadLocalValidationSettings();
+    return enteredPin.trim() === String(localSettings.adminPin || DEFAULT_SETTINGS.adminPin).trim();
   },
 
   // --- Integração com Google Sheets (CSV & Apps Script Webhook Seguro) ---
@@ -776,15 +715,19 @@ export const championshipService = {
    * Aciona a sincronização completa entre o servidor e a planilha Google Sheets
    */
   async triggerSync(): Promise<{ success: boolean; results?: any }> {
-    const res = await fetch("/api/sync", { method: "POST" });
-    if (!res.ok) {
-      throw new Error("Erro ao sincronizar com Google Sheets.");
-    }
-    const data = await res.json();
-    await this.fetchChampionships();
-    await this.fetchRegistrations();
-    await this.fetchCategories();
-    return data;
+    const [championships, registrations, categories] = await Promise.all([
+      this.fetchChampionships(),
+      this.fetchRegistrations(),
+      this.fetchCategories()
+    ]);
+    return {
+      success: true,
+      results: {
+        championships: championships.length,
+        registrations: registrations.length,
+        categories: categories.length
+      }
+    };
   },
 
   async deleteRegistrationFromGoogleSheet(registrationId: string): Promise<boolean> {
