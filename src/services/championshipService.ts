@@ -899,7 +899,16 @@ function doPost(e) {
 }
 
 function initChampionshipSheets_(ss) {
+  // Preserva e inicializa a estrutura já existente do site.
   ensureRegistrationsSheet_(ss);
+  ensureConfiguracoesSheet_(ss);
+  ensureProdutosSheet_(ss);
+  ensureEventosSheet_(ss);
+  ensureAvisosSheet_(ss);
+  ensureKatasSheet_(ss);
+  ensureTecnicasSheet_(ss);
+
+  // Estrutura específica do módulo de campeonatos.
   ensureChampionshipsSheet_(ss);
   ensureCategoriesSheet_(ss);
   SpreadsheetApp.flush();
@@ -986,6 +995,46 @@ function ensureChampionshipsSheet_(ss) {
 
 function ensureCategoriesSheet_(ss) {
   return ensureSheetWithHeaders_(ss, "CATEGORIAS_CAMPEONATO", categoryHeaders_(), "#1F2937");
+}
+
+function ensureConfiguracoesSheet_(ss) {
+  var sheet = ensureSheetWithHeaders_(ss, "Configuracoes", ["chave", "valor", "descricao"], "#1F2937");
+  if (sheet.getLastRow() === 1) {
+    sheet.appendRow(["whatsapp", "5521973681109", "WhatsApp oficial para contato e comprovantes"]);
+    sheet.appendRow(["pix", "21973681109", "Chave PIX padrão do Dojo"]);
+    sheet.appendRow(["logo", "https://i.imgur.com/fECU6ud.png", "Link direto da imagem do logo"]);
+    sheet.appendRow(["google_analytics_id", "", "ID de medição GA4 (opcional)"]);
+    sheet.appendRow(["video_faixa", "", "Link de vídeo orientador de amarração da faixa"]);
+  }
+  return sheet;
+}
+
+function ensureProdutosSheet_(ss) {
+  return ensureSheetWithHeaders_(ss, "Produtos", [
+    "id", "nome", "descricao", "preco", "imagem1", "imagem2", "imagem3",
+    "categoria", "tamanhos", "cores", "variacoes", "personalizavel",
+    "disponivel", "ativo", "ordem"
+  ], "#1F2937");
+}
+
+function ensureEventosSheet_(ss) {
+  return ensureSheetWithHeaders_(ss, "Eventos", [
+    "id", "titulo", "imagem", "mostrar_popup", "link_album", "data_evento"
+  ], "#1F2937");
+}
+
+function ensureAvisosSheet_(ss) {
+  return ensureSheetWithHeaders_(ss, "Avisos", [
+    "id", "titulo", "imagem", "instagram_url", "mostrar_popup"
+  ], "#1F2937");
+}
+
+function ensureKatasSheet_(ss) {
+  return ensureSheetWithHeaders_(ss, "Katas", ["id", "video_url"], "#1F2937");
+}
+
+function ensureTecnicasSheet_(ss) {
+  return ensureSheetWithHeaders_(ss, "Tecnicas", ["id", "video_url", "imagem"], "#1F2937");
 }
 
 function ensureSheetWithHeaders_(ss, name, requiredHeaders, color) {
