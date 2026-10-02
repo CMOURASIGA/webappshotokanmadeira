@@ -1,5 +1,5 @@
 import Papa from "papaparse";
-import { callAppsScript } from "./_sheetConfig";
+import { callAppsScript } from "./_sheetConfig.js";
 
 const GOOGLE_SHEET_ID = "1cqiHLjSY7tCKnur0FMH8s5lU2EUbSGB4vC6g2ABTjCM";
 function toArray(value: unknown): string[] {
