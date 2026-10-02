@@ -180,7 +180,10 @@ export const championshipService = {
   async saveChampionship(championship: Championship): Promise<Championship> {
     const res = await fetch("/api/championships", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "x-apps-script-url": memoryCache.settings.googleAppsScriptUrl || ""
+      },
       body: JSON.stringify(championship)
     });
 
