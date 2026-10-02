@@ -210,7 +210,11 @@ export const championshipService = {
 
   async deleteChampionship(id: string): Promise<void> {
     const res = await fetch(`/api/championships/${encodeURIComponent(id)}`, {
-      method: "DELETE"
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        googleAppsScriptUrl: memoryCache.settings.googleAppsScriptUrl || loadLocalValidationSettings().googleAppsScriptUrl || ""
+      })
     });
 
     if (!res.ok) {
@@ -356,8 +360,10 @@ export const championshipService = {
       throw new Error("É obrigatório ler e aceitar o regulamento do campeonato.");
     }
 
-    // Modalidade configurável
-    const resolvedModality = input.modalidade?.trim() || (champ.modalidades && champ.modalidades[0]) || "Kata";
+    // A inscrição é única: o atleta participa de todas as modalidades configuradas no campeonato.
+    const resolvedModality =
+      (champ.modalidades || []).map(m => m.trim()).filter(Boolean).join(", ") ||
+      "Todas as modalidades do campeonato";
 
     const payload = {
       championshipId: champ.id,
@@ -447,7 +453,10 @@ export const championshipService = {
     const res = await fetch(`/api/registrations/${encodeURIComponent(id)}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+      body: JSON.stringify({
+        updates: payload,
+        googleAppsScriptUrl: memoryCache.settings.googleAppsScriptUrl || loadLocalValidationSettings().googleAppsScriptUrl || ""
+      })
     });
 
     if (!res.ok) {
@@ -466,8 +475,13 @@ export const championshipService = {
    * Notificação de envio de comprovante pelo atleta
    */
   async markReceiptSentByAthlete(id: string): Promise<AthleteRegistration> {
-    const res = await fetch(`/api/registrations/${encodeURIComponent(id)}/receipt`, {
-      method: "PATCH"
+    const res = await fetch(`/api/registrations/${encodeURIComponent(id)}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        updates: { markReceiptSent: true },
+        googleAppsScriptUrl: memoryCache.settings.googleAppsScriptUrl || loadLocalValidationSettings().googleAppsScriptUrl || ""
+      })
     });
 
     if (!res.ok) {
@@ -497,16 +511,19 @@ export const championshipService = {
       adminName?: string;
     }
   ): Promise<AthleteRegistration> {
-    const res = await fetch(`/api/registrations/${encodeURIComponent(id)}/payment`, {
+    const res = await fetch(`/api/registrations/${encodeURIComponent(id)}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        paymentStatus: updates.paymentStatus,
-        status: updates.status,
-        categoriaId: updates.categoriaId,
-        categoriaNome: updates.categoriaNome,
-        notes: updates.motivo,
-        adminName: updates.adminName
+        updates: {
+          paymentStatus: updates.paymentStatus,
+          status: updates.status,
+          categoriaId: updates.categoriaId,
+          categoriaNome: updates.categoriaNome,
+          motivoRejeicaoOuCancelamento: updates.motivo,
+          adminName: updates.adminName
+        },
+        googleAppsScriptUrl: memoryCache.settings.googleAppsScriptUrl || loadLocalValidationSettings().googleAppsScriptUrl || ""
       })
     });
 
@@ -524,7 +541,11 @@ export const championshipService = {
 
   async deleteRegistration(id: string): Promise<void> {
     const res = await fetch(`/api/registrations/${encodeURIComponent(id)}`, {
-      method: "DELETE"
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        googleAppsScriptUrl: memoryCache.settings.googleAppsScriptUrl || loadLocalValidationSettings().googleAppsScriptUrl || ""
+      })
     });
 
     if (!res.ok) {
@@ -606,7 +627,11 @@ export const championshipService = {
 
   async deleteCategory(id: string): Promise<void> {
     const res = await fetch(`/api/categories/${encodeURIComponent(id)}`, {
-      method: "DELETE"
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        googleAppsScriptUrl: memoryCache.settings.googleAppsScriptUrl || loadLocalValidationSettings().googleAppsScriptUrl || ""
+      })
     });
 
     if (!res.ok) {
@@ -735,6 +760,21 @@ export const championshipService = {
   },
 
   async initializeAllGoogleSheetsTabs(): Promise<boolean> {
+    const res = await fetch("/api/championship-init", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        googleAppsScriptUrl: memoryCache.settings.googleAppsScriptUrl || loadLocalValidationSettings().googleAppsScriptUrl || ""
+      })
+    });
+    if (!res.ok) {
+      let message = "Erro ao inicializar a estrutura de campeonatos na planilha.";
+      try {
+        const data = await res.json();
+        if (data.error) message = data.error;
+      } catch {}
+      throw new Error(message);
+    }
     return true;
   },
 
