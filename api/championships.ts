@@ -60,13 +60,18 @@ export default async function handler(req: any, res: any) {
 
   if (req.method === "POST") {
     try {
-      const championship = req.body;
+      const body = req.body || {};
+      const championship = body.championship || body;
+
       if (!championship?.nome) {
         return res.status(400).json({ error: "Nome do campeonato é obrigatório." });
       }
 
       const appsScriptUrl = String(
-        req.headers["x-apps-script-url"] || process.env.GOOGLE_APPS_SCRIPT_URL || ""
+        body.googleAppsScriptUrl ||
+        req.headers["x-apps-script-url"] ||
+        process.env.GOOGLE_APPS_SCRIPT_URL ||
+        ""
       ).trim();
 
       if (!appsScriptUrl.startsWith("https://script.google.com/")) {
