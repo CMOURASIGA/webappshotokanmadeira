@@ -1,8 +1,6 @@
 import Papa from "papaparse";
 
 const GOOGLE_SHEET_ID = "1cqiHLjSY7tCKnur0FMH8s5lU2EUbSGB4vC6g2ABTjCM";
-const WEBHOOK_SECRET = process.env.APPS_SCRIPT_SECRET || "madeira_sensei_secret_2026";
-
 function toArray(value: unknown): string[] {
   return String(value || "")
     .split(/[,;]/)
@@ -43,11 +41,11 @@ export default async function handler(req: any, res: any) {
             chave: String(row.pixChave || "").trim(),
             nomeRecebedor: String(row.pixNome || "").trim(),
             cidadeRecebedor: String(row.pixCidade || "").trim(),
-            incluirValorNoQrCode: true,
+            incluirValorNoQrCode: String(row.pixIncluirValor || "Sim").trim().toLowerCase() !== "não",
             instrucoesAdicionais: ""
           },
           regulamento: String(row.regulamento || "").trim(),
-          permiteMenores: true,
+          permiteMenores: String(row.permiteMenores || "Sim").trim().toLowerCase() !== "não",
           createdAt: String(row.createdAt || "").trim(),
           updatedAt: String(row.updatedAt || "").trim()
         }));
@@ -84,7 +82,6 @@ export default async function handler(req: any, res: any) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          secret: WEBHOOK_SECRET,
           action: "SAVE_CHAMPIONSHIP",
           championship
         })
