@@ -108,6 +108,12 @@ export function ChampionshipDashboard() {
   const [filterPayment, setFilterPayment] = useState<string>("ALL");
   const [filterCategoryOnlyWithout, setFilterCategoryOnlyWithout] = useState(false);
 
+  // Category / bracket distribution filters
+  const [categorySearchTerm, setCategorySearchTerm] = useState("");
+  const [categoryAgeFilter, setCategoryAgeFilter] = useState<string>("ALL");
+  const [categoryBeltFilter, setCategoryBeltFilter] = useState<string>("ALL");
+  const [categoryOnlyUnassigned, setCategoryOnlyUnassigned] = useState(false);
+
   // Detailed Modal / Drawer
   const [selectedRegistration, setSelectedRegistration] = useState<AthleteRegistration | null>(null);
   const [rejectionReason, setRejectionReason] = useState("");
@@ -492,6 +498,103 @@ export function ChampionshipDashboard() {
     });
   }, [registrations, searchTerm, filterStatus, filterPayment, filterCategoryOnlyWithout]);
 
+  // Distribuição operacional das chaves: Idade + Faixa + Categoria (quando vinculada)
+  const categoryDistribution = useMemo(() => {
+    const active = registrations.filter(r => r.status !== "CANCELADA");
+    const ages = Array.from(new Set(active.map(r => r.idadeNaDataCampeonato))).sort((a, b) => a - b);
+    const belts = Array.from(new Set(active.map(r => r.graduacao.split("(")[0].trim()))).sort((a, b) => {
+      const ai = BELT_ORDER.indexOf(a);
+      const bi = BELT_ORDER.indexOf(b);
+      if (ai === -1 && bi === -1) return a.localeCompare(b, "pt-BR");
+      if (ai === -1) return 1;
+      if (bi === -1) return -1;
+      return ai - bi;
+    });
+
+    const filtered = active.filter(r => {
+      const belt = r.graduacao.split("(")[0].trim();
+      const matchesSearch =
+        !categorySearchTerm.trim() ||
+        r.nomeCompleto.toLowerCase().includes(categorySearchTerm.toLowerCase()) ||
+        r.id.toLowerCase().includes(categorySearchTerm.toLowerCase());
+      const matchesAge = categoryAgeFilter === "ALL" || String(r.idadeNaDataCampeonato) === categoryAgeFilter;
+      const matchesBelt = categoryBeltFilter === "ALL" || belt === categoryBeltFilter;
+      const matchesUnassigned = !categoryOnlyUnassigned || !r.categoriaId;
+      return matchesSearch && matchesAge && matchesBelt && matchesUnassigned;
+    });
+
+    const groupsMap = new Map<string, {
+      age: number;
+      belt: string;
+      athletes: AthleteRegistration[];
+    }>();
+
+    filtered.forEach(r => {
+      const belt = r.graduacao.split("(")[0].trim();
+      const key = `${r.idadeNaDataCampeonato}||${belt}`;
+      const current = groupsMap.get(key) || {
+        age: r.idadeNaDataCampeonato,
+        belt,
+        athletes: []
+      };
+      current.athletes.push(r);
+      groupsMap.set(key, current);
+    });
+
+    const groups = Array.from(groupsMap.values())
+      .map(group => {
+        const categoryMap = new Map<string, {
+          id: string;
+          name: string;
+          athletes: AthleteRegistration[];
+        }>();
+
+        group.athletes.forEach(r => {
+          const category = categories.find(cat => cat.id === r.categoriaId);
+          const id = category?.id || "";
+          const name = category?.nome || r.categoriaNome || "Sem categoria definida";
+          const key = id || "__SEM_CATEGORIA__";
+          const current = categoryMap.get(key) || { id, name, athletes: [] };
+          current.athletes.push(r);
+          categoryMap.set(key, current);
+        });
+
+        return {
+          ...group,
+          categories: Array.from(categoryMap.values()).sort((a, b) => {
+            if (!a.id && b.id) return 1;
+            if (a.id && !b.id) return -1;
+            return a.name.localeCompare(b.name, "pt-BR");
+          })
+        };
+      })
+      .sort((a, b) => {
+        if (a.age !== b.age) return a.age - b.age;
+        const ai = BELT_ORDER.indexOf(a.belt);
+        const bi = BELT_ORDER.indexOf(b.belt);
+        if (ai === -1 && bi === -1) return a.belt.localeCompare(b.belt, "pt-BR");
+        if (ai === -1) return 1;
+        if (bi === -1) return -1;
+        return ai - bi;
+      });
+
+    return {
+      active,
+      ages,
+      belts,
+      groups,
+      assignedCount: active.filter(r => Boolean(r.categoriaId)).length,
+      unassignedCount: active.filter(r => !r.categoriaId).length
+    };
+  }, [
+    registrations,
+    categories,
+    categorySearchTerm,
+    categoryAgeFilter,
+    categoryBeltFilter,
+    categoryOnlyUnassigned
+  ]);
+
   // Ações de Pagamento e Status
   const handleConfirmPayment = async (regId: string) => {
     try {
@@ -568,8 +671,10 @@ export function ChampionshipDashboard() {
 
   const handleAssignCategory = async (regId: string, catId: string) => {
     try {
+      const selectedCategory = categories.find(c => c.id === catId);
       const updated = await championshipService.adminUpdateStatus(regId, {
         categoriaId: catId,
+        categoriaNome: selectedCategory?.nome || "Sem Categoria",
         adminName: "Sensei Madeira"
       });
       await loadAllData();
@@ -625,17 +730,6 @@ export function ChampionshipDashboard() {
       showToast(`Erro ao criar abas: ${e.message}`);
     } finally {
       setIsSyncing(false);
-    }
-  };
-
-  const handleResetCategories = () => {
-    if (!confirm("Deseja restaurar as categorias oficiais unificadas (todas as modalidades Kata + Kumite organizadas por faixa etária)?")) return;
-    try {
-      championshipService.resetToDefaultCategories(selectedChampionship?.id);
-      loadAllData();
-      showToast("Categorias oficiais unificadas restauradas com sucesso!");
-    } catch (err: any) {
-      showToast(`Erro ao restaurar categorias: ${err.message}`);
     }
   };
 
@@ -1761,99 +1855,258 @@ export function ChampionshipDashboard() {
       )}
 
       {/* ======================================================== */}
-      {/* ABA 4: CATEGORIAS (SPEC 08 item 8 - Chaves de Competição) */}
+      {/* ABA 4: CATEGORIAS / CHAVES — IDADE + FAIXA + CATEGORIA    */}
       {/* ======================================================== */}
       {activeTab === "categories" && (
         <div className="space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-neutral-200 gap-3">
-            <div>
-              <h2 className="text-lg font-bold font-jp text-neutral-900">Chaves e Categorias Oficiais</h2>
-              <p className="text-xs text-neutral-500">
-                Como todos os atletas participam de todas as modalidades configuradas ({formatModalidadesList(selectedChampionship?.modalidades)}), as categorias organizam as chaves oficiais de disputa por faixa etária, sexo, graduação e peso.
+          <div className="flex flex-col lg:flex-row lg:items-start justify-between pb-4 border-b border-neutral-200 gap-4">
+            <div className="max-w-3xl">
+              <h2 className="text-lg font-bold font-jp text-neutral-900">Distribuição de Atletas por Idade e Faixa</h2>
+              <p className="text-xs text-neutral-500 leading-relaxed mt-1">
+                A distribuição nasce automaticamente das inscrições. O agrupamento-base é por idade e faixa.
+                Quando uma categoria é cadastrada e vinculada ao atleta, ela passa a compor a organização da chave,
+                sem alterar a participação em todas as modalidades do campeonato.
               </p>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2">
-              <button
-                type="button"
-                onClick={handleResetCategories}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 rounded-xl text-xs font-semibold transition-colors cursor-pointer"
-                title="Restaura a lista oficial de chaves unificadas (sem Kata/Kumite separados)"
-              >
-                <RotateCcw className="w-3.5 h-3.5" /> Restaurar Chaves Oficiais
-              </button>
+            <button
+              onClick={() => {
+                setEditingCategory(null);
+                setCatNome("");
+                setCatIdadeMin("");
+                setCatIdadeMax("");
+                setCatPesoMax("");
+                setShowCategoryModal(true);
+              }}
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-karate-red hover:bg-red-700 text-white rounded-xl text-xs font-bold transition-colors cursor-pointer shadow-sm shrink-0"
+            >
+              <Plus className="w-4 h-4" /> Nova Categoria
+            </button>
+          </div>
 
-              <button
-                onClick={() => {
-                  setEditingCategory(null);
-                  setCatNome("");
-                  setCatIdadeMin("");
-                  setCatIdadeMax("");
-                  setCatPesoMax("");
-                  setShowCategoryModal(true);
-                }}
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-karate-red hover:bg-red-700 text-white rounded-xl text-xs font-bold transition-colors cursor-pointer shadow-sm"
-              >
-                <Plus className="w-4 h-4" /> Nova Categoria
-              </button>
+          {/* Resumo operacional */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="bg-white p-4 rounded-2xl border border-neutral-200 shadow-sm">
+              <span className="text-[11px] uppercase tracking-wider text-neutral-500 font-semibold">Atletas ativos</span>
+              <p className="text-2xl font-extrabold font-mono text-neutral-900 mt-1">{categoryDistribution.active.length}</p>
+            </div>
+            <div className="bg-white p-4 rounded-2xl border border-neutral-200 shadow-sm">
+              <span className="text-[11px] uppercase tracking-wider text-neutral-500 font-semibold">Grupos idade/faixa</span>
+              <p className="text-2xl font-extrabold font-mono text-neutral-900 mt-1">{categoryDistribution.groups.length}</p>
+            </div>
+            <div className="bg-white p-4 rounded-2xl border border-emerald-200 shadow-sm">
+              <span className="text-[11px] uppercase tracking-wider text-emerald-700 font-semibold">Com categoria</span>
+              <p className="text-2xl font-extrabold font-mono text-emerald-700 mt-1">{categoryDistribution.assignedCount}</p>
+            </div>
+            <div className="bg-white p-4 rounded-2xl border border-amber-200 shadow-sm">
+              <span className="text-[11px] uppercase tracking-wider text-amber-700 font-semibold">Sem categoria</span>
+              <p className="text-2xl font-extrabold font-mono text-amber-700 mt-1">{categoryDistribution.unassignedCount}</p>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {categories.map((c) => {
-              const countAthletes = registrations.filter(r => r.categoriaId === c.id && r.status !== "CANCELADA").length;
-              return (
-                <div key={c.id} className="bg-white p-5 rounded-2xl border border-neutral-200 shadow-sm space-y-3 relative group">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full uppercase tracking-wider">
-                        Chave Geral • Kata + Kumite
-                      </span>
-                      <h3 className="font-bold text-neutral-900 text-sm mt-1">{c.nome}</h3>
-                    </div>
+          {/* Filtros da distribuição */}
+          <div className="bg-white border border-neutral-200 rounded-2xl p-4 shadow-sm grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="relative">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
+              <input
+                value={categorySearchTerm}
+                onChange={(e) => setCategorySearchTerm(e.target.value)}
+                placeholder="Buscar atleta ou código"
+                className="w-full pl-9 pr-3 py-2.5 text-xs border border-neutral-300 rounded-xl bg-white"
+              />
+            </div>
 
-                    <div className="flex items-center gap-1">
-                      <button
-                        onClick={() => {
-                          setEditingCategory(c);
-                          setCatNome(c.nome);
-                          setCatSexo(c.sexo || "Misto");
-                          setCatIdadeMin(c.idadeMinima ? String(c.idadeMinima) : "");
-                          setCatIdadeMax(c.idadeMaxima ? String(c.idadeMaxima) : "");
-                          setCatPesoMax(c.pesoMaximo ? String(c.pesoMaximo) : "");
-                          setShowCategoryModal(true);
-                        }}
-                        className="p-1 text-neutral-400 hover:text-neutral-800 transition-colors"
-                        title="Editar"
-                      >
-                        <Edit2 className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteCategory(c.id)}
-                        className="p-1 text-neutral-400 hover:text-red-600 transition-colors"
-                        title="Excluir"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
+            <select
+              value={categoryAgeFilter}
+              onChange={(e) => setCategoryAgeFilter(e.target.value)}
+              className="w-full px-3 py-2.5 text-xs border border-neutral-300 rounded-xl bg-white"
+            >
+              <option value="ALL">Todas as idades</option>
+              {categoryDistribution.ages.map(age => (
+                <option key={age} value={String(age)}>{age} anos</option>
+              ))}
+            </select>
 
-                  <div className="text-xs text-neutral-600 space-y-1 bg-neutral-50 p-2.5 rounded-xl border border-neutral-100">
-                    <p><strong>Sexo:</strong> {c.sexo || "Misto"}</p>
-                    <p><strong>Faixa Etária:</strong> {c.idadeMinima ? `${c.idadeMinima} anos` : "Livre"} até {c.idadeMaxima ? `${c.idadeMaxima} anos` : "Livre"}</p>
-                    {c.pesoMaximo && <p><strong>Peso Máximo:</strong> até {c.pesoMaximo} kg</p>}
-                  </div>
+            <select
+              value={categoryBeltFilter}
+              onChange={(e) => setCategoryBeltFilter(e.target.value)}
+              className="w-full px-3 py-2.5 text-xs border border-neutral-300 rounded-xl bg-white"
+            >
+              <option value="ALL">Todas as faixas</option>
+              {categoryDistribution.belts.map(belt => (
+                <option key={belt} value={belt}>{belt}</option>
+              ))}
+            </select>
 
-                  <div className="flex items-center justify-between pt-1 text-xs">
-                    <span className="text-neutral-500">Inscritos vinculados:</span>
-                    <span className="font-mono font-bold text-neutral-900 bg-neutral-100 px-2.5 py-0.5 rounded-full">
-                      {countAthletes} atletas
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
+            <label className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-neutral-300 bg-neutral-50 text-xs font-semibold text-neutral-700 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={categoryOnlyUnassigned}
+                onChange={(e) => setCategoryOnlyUnassigned(e.target.checked)}
+                className="accent-karate-red"
+              />
+              Apenas sem categoria
+            </label>
           </div>
+
+          {/* Distribuição automática por Idade + Faixa */}
+          <section className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-extrabold text-neutral-900">Chaves em formação</h3>
+                <p className="text-[11px] text-neutral-500">
+                  Cada bloco representa uma combinação real de idade e faixa encontrada nas inscrições.
+                </p>
+              </div>
+            </div>
+
+            {categoryDistribution.groups.length === 0 ? (
+              <div className="bg-white border border-dashed border-neutral-300 rounded-2xl p-8 text-center">
+                <Users className="w-8 h-8 mx-auto text-neutral-300 mb-2" />
+                <p className="font-bold text-neutral-700 text-sm">
+                  {registrations.length === 0 ? "Ainda não existem inscrições para distribuir." : "Nenhum atleta encontrado com os filtros selecionados."}
+                </p>
+                <p className="text-xs text-neutral-500 mt-1">
+                  Assim que houver inscrições, os grupos por idade e faixa aparecerão automaticamente aqui.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {categoryDistribution.groups.map(group => (
+                  <details
+                    key={`${group.age}-${group.belt}`}
+                    open
+                    className="group bg-white border border-neutral-200 rounded-2xl shadow-sm overflow-hidden"
+                  >
+                    <summary className="list-none cursor-pointer px-5 py-4 flex items-center justify-between gap-3 hover:bg-neutral-50">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-extrabold text-neutral-900">{group.age} anos</span>
+                        <span className="text-neutral-300">•</span>
+                        <span className="font-bold text-neutral-800">{group.belt}</span>
+                        <span className="px-2.5 py-0.5 rounded-full bg-neutral-100 text-neutral-700 text-[11px] font-bold">
+                          {group.athletes.length} {group.athletes.length === 1 ? "atleta" : "atletas"}
+                        </span>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-neutral-400 transition-transform group-open:rotate-90 shrink-0" />
+                    </summary>
+
+                    <div className="border-t border-neutral-100 p-4 space-y-4">
+                      {group.categories.map(categoryGroup => (
+                        <div
+                          key={categoryGroup.id || "__SEM_CATEGORIA__"}
+                          className={`rounded-xl border p-3 ${categoryGroup.id ? "border-emerald-200 bg-emerald-50/30" : "border-amber-200 bg-amber-50/40"}`}
+                        >
+                          <div className="flex items-center justify-between gap-2 mb-2">
+                            <div>
+                              <span className={`text-[10px] font-bold uppercase tracking-wider ${categoryGroup.id ? "text-emerald-700" : "text-amber-700"}`}>
+                                {categoryGroup.id ? "Categoria vinculada" : "Sem categoria"}
+                              </span>
+                              <p className="text-sm font-bold text-neutral-900">{categoryGroup.name}</p>
+                            </div>
+                            <span className="text-[11px] font-mono font-bold text-neutral-600">
+                              {categoryGroup.athletes.length} {categoryGroup.athletes.length === 1 ? "atleta" : "atletas"}
+                            </span>
+                          </div>
+
+                          <div className="divide-y divide-neutral-200/70">
+                            {categoryGroup.athletes.map(r => (
+                              <div key={r.id} className="py-2.5 flex flex-col md:flex-row md:items-center justify-between gap-2">
+                                <div className="min-w-0">
+                                  <div className="flex flex-wrap items-center gap-2">
+                                    <strong className="text-xs text-neutral-900">{r.nomeCompleto}</strong>
+                                    <span className="text-[10px] font-mono text-neutral-400">{r.id}</span>
+                                  </div>
+                                  <p className="text-[11px] text-neutral-500">
+                                    {r.idadeNaDataCampeonato} anos • {r.graduacao.split("(")[0].trim()}
+                                  </p>
+                                </div>
+
+                                <select
+                                  value={r.categoriaId || ""}
+                                  onChange={(e) => handleAssignCategory(r.id, e.target.value)}
+                                  className="w-full md:w-[240px] text-xs p-2 bg-white border border-neutral-300 rounded-lg font-medium text-neutral-700"
+                                >
+                                  <option value="">Sem categoria definida</option>
+                                  {categories.map(cat => (
+                                    <option key={cat.id} value={cat.id}>{cat.nome}</option>
+                                  ))}
+                                </select>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </details>
+                ))}
+              </div>
+            )}
+          </section>
+
+          {/* CRUD de categorias */}
+          <section className="space-y-3 pt-2">
+            <div className="border-t border-neutral-200 pt-5">
+              <h3 className="text-sm font-extrabold text-neutral-900">Cadastro de Categorias</h3>
+              <p className="text-[11px] text-neutral-500 mt-1">
+                Categorias são opcionais e criadas pelo administrador. Elas complementam a distribuição por idade e faixa; não substituem esse agrupamento.
+              </p>
+            </div>
+
+            {categories.length === 0 ? (
+              <div className="bg-white border border-dashed border-neutral-300 rounded-2xl p-6 text-center">
+                <Tag className="w-7 h-7 mx-auto text-neutral-300 mb-2" />
+                <p className="text-sm font-bold text-neutral-700">Nenhuma categoria cadastrada.</p>
+                <p className="text-xs text-neutral-500 mt-1">A distribuição por idade e faixa continua funcionando normalmente.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {categories.map((cat) => {
+                  const countAthletes = registrations.filter(r => r.categoriaId === cat.id && r.status !== "CANCELADA").length;
+                  return (
+                    <div key={cat.id} className="bg-white p-5 rounded-2xl border border-neutral-200 shadow-sm space-y-3 relative group/card">
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider">Categoria administrativa</span>
+                          <h4 className="font-bold text-neutral-900 text-sm mt-1">{cat.nome}</h4>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => {
+                              setEditingCategory(cat);
+                              setCatNome(cat.nome);
+                              setCatSexo(cat.sexo || "Misto");
+                              setCatIdadeMin(cat.idadeMinima ? String(cat.idadeMinima) : "");
+                              setCatIdadeMax(cat.idadeMaxima ? String(cat.idadeMaxima) : "");
+                              setCatPesoMax(cat.pesoMaximo ? String(cat.pesoMaximo) : "");
+                              setShowCategoryModal(true);
+                            }}
+                            className="p-1 text-neutral-400 hover:text-neutral-800 transition-colors"
+                            title="Editar categoria"
+                          >
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteCategory(cat.id)}
+                            className="p-1 text-neutral-400 hover:text-red-600 transition-colors"
+                            title="Excluir categoria"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-2 border-t border-neutral-100 text-xs">
+                        <span className="text-neutral-500">Atletas vinculados</span>
+                        <span className="font-mono font-bold text-neutral-900 bg-neutral-100 px-2.5 py-0.5 rounded-full">
+                          {countAthletes}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </section>
         </div>
       )}
 
