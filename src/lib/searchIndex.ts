@@ -10,7 +10,8 @@ export type SearchCategory =
   | "history" 
   | "notice" 
   | "event"
-  | "student";
+  | "student"
+  | "championship";
 
 export interface SearchResultItem {
   id: string;
@@ -331,6 +332,50 @@ export function searchAllData(
         description: sp.desc,
         path: sp.path,
         badgeClass: "bg-purple-50 text-purple-700 border-purple-200"
+      });
+    }
+  }
+
+  // 10. Módulo de Campeonatos e Inscrições (SPEC 08)
+  const championshipPages = [
+    {
+      id: "champ-module",
+      title: "Campeonatos & Inscrições Esportivas",
+      subtitle: "Inscrição online e regulamento",
+      desc: "Módulo oficial de campeonatos do Madeira Karate com inscrição online, cálculo de idade na data do evento e pagamento via PIX.",
+      path: "/campeonatos",
+      keywords: "campeonato campeonatos torneio competicao inscricao atletas kata kumite pix esporte"
+    },
+    {
+      id: "champ-lookup",
+      title: "Consultar Inscrição no Campeonato",
+      subtitle: "Acompanhamento e atualização",
+      desc: "Consulte o status da sua inscrição, envie o comprovante pelo WhatsApp ou altere seus dados cadastrais.",
+      path: "/campeonatos/campeonato-interno-2026/consulta",
+      keywords: "consultar inscricao codigo cam comprovante alterar dados peso modalidade"
+    },
+    {
+      id: "champ-dashboard",
+      title: "Painel de Gestão de Campeonatos (Admin)",
+      subtitle: "Área do Sensei e comissão organizadora",
+      desc: "Gestão completa de inscritos, conferência manual de PIX, chaves/categorias e sincronização de dados.",
+      path: "/dashboard_campeonato",
+      keywords: "dashboard painel admin campeonato sensei categorias conferir pix inscricoes"
+    }
+  ];
+
+  for (const cp of championshipPages) {
+    const hay = normalizeText(`${cp.title} ${cp.subtitle} ${cp.desc} ${cp.keywords}`);
+    if (hay.includes(q)) {
+      results.push({
+        id: cp.id,
+        category: "championship",
+        categoryLabel: "Campeonatos",
+        title: cp.title,
+        subtitle: cp.subtitle,
+        description: cp.desc,
+        path: cp.path,
+        badgeClass: "bg-amber-50 text-amber-800 border-amber-300"
       });
     }
   }

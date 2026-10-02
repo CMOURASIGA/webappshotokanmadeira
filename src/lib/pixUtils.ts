@@ -1,0 +1,152 @@
+import QRCode from "qrcode";
+import { PixConfig } from "../types/championship";
+
+/**
+ * Remove acentos e caracteres especiais para compatibilidade com o padrão EMV/Pix
+ */
+function normalizeString(str: string, maxLength: number): string {
+  const normalized = str
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9 ]/g, "")
+    .toUpperCase()
+    .trim();
+  return normalized.substring(0, maxLength);
+}
+
+/**
+ * Formata um campo no padrão EMV (ID + Tamanho com 2 dígitos + Valor)
+ */
+function formatEmvField(id: string, value: string): string {
+  const len = value.length.toString().padStart(2, "0");
+  return `${id}${len}${value}`;
+}
+
+/**
+ * Cálculo oficial do CRC16-CCITT para o padrão Pix (Polinômio 0x1021, Init 0xFFFF)
+ */
+function calculateCrc16(payload: string): string {
+  let crc = 0xffff;
+  const polynomial = 0x1021;
+
+  for (let i = 0; i < payload.length; i++) {
+    crc ^= payload.charCodeAt(i) << 8;
+    for (let bitwise = 0; bitwise < 8; bitwise++) {
+      if ((crc & 0x8000) !== 0) {
+        crc = (crc << 1) ^ polynomial;
+      } else {
+        crc = crc << 1;
+      }
+      crc &= 0xffff;
+    }
+  }
+
+  return crc.toString(16).toUpperCase().padStart(4, "0");
+}
+
+export interface GeneratePixPayloadParams {
+  config: PixConfig;
+  amount?: number;
+  txid?: string; // ex: código da inscrição sem traço
+}
+
+/**
+ * Gera a string Pix Copia e Cola conforme especificações do Banco Central do Brasil
+ */
+export function generatePixCopiaECola({
+  config,
+  amount,
+  txid = "***"
+}: GeneratePixPayloadParams): string {
+  if (!config || !config.chave || !config.chave.trim()) {
+    return "";
+  }
+
+  // Limpeza da chave Pix conforme o tipo
+  let cleanedKey = config.chave.trim();
+  if (config.tipoChave === "TELEFONE") {
+    // Formato E.164 exigido pelo Banco Central: +55 (país) + DDD (2 dígitos) + 8 ou 9 dígitos
+    let digitsOnly = cleanedKey.replace(/\D/g, "");
+    // Remove zero à esquerda se o usuário digitou (ex: 0219... -> 219...)
+    if (digitsOnly.startsWith("0") && digitsOnly.length > 11) {
+      digitsOnly = digitsOnly.substring(1);
+    }
+    // Se o usuário já incluiu o código do país 55 (12 ou 13 dígitos)
+    if (digitsOnly.length >= 12 && digitsOnly.startsWith("55")) {
+      cleanedKey = `+${digitsOnly}`;
+    } else if (digitsOnly.length === 10 || digitsOnly.length === 11) {
+      // 10 dígitos (DDD + fixo) ou 11 dígitos (DDD + celular): sempre prefixa com +55
+      cleanedKey = `+55${digitsOnly}`;
+    } else {
+      cleanedKey = digitsOnly.startsWith("55") ? `+${digitsOnly}` : `+55${digitsOnly}`;
+    }
+  } else if (config.tipoChave === "CPF" || config.tipoChave === "CNPJ") {
+    cleanedKey = cleanedKey.replace(/\D/g, "");
+  } else if (config.tipoChave === "EMAIL") {
+    cleanedKey = cleanedKey.toLowerCase().trim();
+  } else if (config.tipoChave === "ALEATORIA") {
+    cleanedKey = cleanedKey.trim();
+  }
+
+  // 00: Payload Format Indicator
+  let payload = formatEmvField("00", "01");
+
+  // 26: Merchant Account Information
+  const gui = formatEmvField("00", "br.gov.bcb.pix");
+  const keyField = formatEmvField("01", cleanedKey);
+  payload += formatEmvField("26", `${gui}${keyField}`);
+
+  // 52: Merchant Category Code (0000 = padrão)
+  payload += formatEmvField("52", "0000");
+
+  // 53: Transaction Currency (986 = BRL)
+  payload += formatEmvField("53", "986");
+
+  // 54: Transaction Amount (opcional conforme configuração)
+  if (config.incluirValorNoQrCode && amount && amount > 0) {
+    const formattedAmount = amount.toFixed(2);
+    payload += formatEmvField("54", formattedAmount);
+  }
+
+  // 58: Country Code
+  payload += formatEmvField("58", "BR");
+
+  // 59: Merchant Name (máx 25 chars)
+  const merchantName = normalizeString(config.nomeRecebedor || "DOJO MADEIRA", 25);
+  payload += formatEmvField("59", merchantName);
+
+  // 60: Merchant City (máx 15 chars)
+  const merchantCity = normalizeString(config.cidadeRecebedor || "RIO DE JANEIRO", 15);
+  payload += formatEmvField("60", merchantCity);
+
+  // 62: Additional Data Field Template (TxID / Referência)
+  const cleanTxId = (txid || "***").replace(/[^a-zA-Z0-9]/g, "").substring(0, 25) || "***";
+  const txidField = formatEmvField("05", cleanTxId);
+  payload += formatEmvField("62", txidField);
+
+  // 63: CRC16
+  const payloadToCrc = `${payload}6304`;
+  const crc = calculateCrc16(payloadToCrc);
+
+  return `${payloadToCrc}${crc}`;
+}
+
+/**
+ * Gera DataURL do QRCode para renderização visual direta em <img src="...">
+ */
+export async function generatePixQrCodeDataUrl(payload: string): Promise<string> {
+  try {
+    return await QRCode.toDataURL(payload, {
+      errorCorrectionLevel: "M",
+      margin: 2,
+      width: 320,
+      color: {
+        dark: "#111111",
+        light: "#FFFFFF"
+      }
+    });
+  } catch (error) {
+    console.error("Erro ao gerar QRCode do Pix:", error);
+    throw error;
+  }
+}

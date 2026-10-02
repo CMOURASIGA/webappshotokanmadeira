@@ -15,7 +15,9 @@
 - **Encerramento**: UX Evolution V2 (*Concluída e aprovada em Human Validation em 21/09/2026*).
 
 
-## Governança Pós-UX Evolution V2 — Referências JKA
+## Governança Pós-UX Evolution V2 — Referências JKA & Módulos Esportivos
 - **SPEC 06 — Alinhamento Oficial de Graduações Kyu/Dan com JKA Brasil**: *Aprovada em Human Validation em 23/09/2026*.
 - **SPEC 07 — Referências JKA, Regras Administrativas de Exame e Base de Competição**: *Implementada — Aguardando Human Validation em 23/09/2026*.
+- **SPEC 08 — Gestão de Campeonatos, Inscrições e Pagamentos**: *Implementada — Aguardando Human Validation em 30/09/2026*.
 - A SPEC 07 deve preservar a separação entre programa técnico de graduação, regras administrativas de exame e regras de competição.
+- A SPEC 08 deve preservar a separação entre status de inscrição e status de pagamento, com conferência manual de PIX e rota exclusiva `/dashboard_campeonato`.

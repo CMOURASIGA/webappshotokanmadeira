@@ -33,6 +33,9 @@ const Maintenance = lazy(() => import("./views/Maintenance").then(m => ({ defaul
 const Mural = lazy(() => import("./views/Mural").then(m => ({ default: m.Mural })));
 const Events = lazy(() => import("./views/Events").then(m => ({ default: m.Events })));
 const StudentArea = lazy(() => import("./views/StudentArea").then(m => ({ default: m.StudentArea })));
+const ChampionshipDetail = lazy(() => import("./views/ChampionshipDetail").then(m => ({ default: m.ChampionshipDetail })));
+const ChampionshipLookup = lazy(() => import("./views/ChampionshipLookup").then(m => ({ default: m.ChampionshipLookup })));
+const ChampionshipDashboard = lazy(() => import("./views/ChampionshipDashboard").then(m => ({ default: m.ChampionshipDashboard })));
 
 function RouteLoadingFallback() {
   return (
@@ -64,6 +67,10 @@ export default function App() {
                   <Route path="/area-do-aluno" element={<StudentArea />} />
                   <Route path="/mural" element={<Mural />} />
                   <Route path="/events" element={<Events />} />
+                  <Route path="/campeonatos" element={<ChampionshipDetail />} />
+                  <Route path="/campeonatos/:slug" element={<ChampionshipDetail />} />
+                  <Route path="/campeonatos/:slug/consulta" element={<ChampionshipLookup />} />
+                  <Route path="/dashboard_campeonato" element={<ChampionshipDashboard />} />
                   <Route path="/store" element={<Store />} />
                   <Route path="/schedule" element={<Schedule />} />
                   <Route path="/katas" element={<KatasList />} />

@@ -19,6 +19,7 @@ import { useNavigate } from "react-router-dom";
 import { useAppData } from "../contexts/AppDataContext";
 import { useCart } from "../contexts/CartContext";
 import { ProductCardV2 } from "../components/store/ProductCardV2";
+import { ChampionshipPromoBanner } from "../components/championship/ChampionshipPromoBanner";
 
 export function Store() {
   const navigate = useNavigate();
@@ -125,6 +126,9 @@ export function Store() {
           </button>
         </div>
       )}
+
+      {/* Divulgação do Campeonato Esportivo Oficial (SPEC 08 item 4) */}
+      <ChampionshipPromoBanner variant="store" />
 
       {/* Label e Guia do Fluxo Oficial de Pedido - Posicionado ACIMA em qualquer gadget */}
       <div className="bg-neutral-900 text-white rounded-2xl p-4 sm:p-5 shadow-sm space-y-3.5 border border-neutral-800">

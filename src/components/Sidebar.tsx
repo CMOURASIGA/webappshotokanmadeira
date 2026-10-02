@@ -14,7 +14,8 @@ import {
   HelpCircle, 
   ScrollText, 
   History,
-  GraduationCap
+  GraduationCap,
+  Trophy
 } from "lucide-react";
 import { useAppData } from "../contexts/AppDataContext";
 import { useCart } from "../contexts/CartContext";
@@ -43,6 +44,7 @@ export function Sidebar() {
         { name: "Início", path: "/", icon: Home },
         { name: "Mural", path: "/mural", icon: Megaphone },
         { name: "Eventos", path: "/events", icon: Camera },
+        { name: "Campeonatos", path: "/campeonatos", icon: Trophy },
         { name: "Grade de Horários", path: "/schedule", icon: Calendar },
         { name: "Loja", path: "/store", icon: ShoppingBag },
       ]
@@ -140,8 +142,14 @@ export function Sidebar() {
       </div>
 
       {/* Rodapé da Sidebar */}
-      <div className="p-3 border-t border-[#2B2B2B] shrink-0 text-center">
-        <span className="text-[10px] font-jp text-neutral-400 tracking-widest">
+      <div className="p-3 border-t border-[#2B2B2B] shrink-0 text-center space-y-1">
+        <Link 
+          to="/dashboard_campeonato"
+          className="text-[10px] text-neutral-400 hover:text-karate-gold transition-colors font-medium block"
+        >
+          ⚙️ Painel de Campeonatos (Admin)
+        </Link>
+        <span className="text-[10px] font-jp text-neutral-500 tracking-widest block">
           空手道 • JKA SHOTOKAN
         </span>
       </div>

@@ -18,7 +18,8 @@ import {
   X, 
   ChevronRight,
   Search,
-  GraduationCap
+  GraduationCap,
+  Trophy
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAppData } from "../contexts/AppDataContext";
@@ -74,6 +75,7 @@ export function MobileNav({ onOpenSearch }: { onOpenSearch?: () => void }) {
         { name: "Início", path: "/", icon: Home },
         { name: "Mural", path: "/mural", icon: Megaphone },
         { name: "Eventos", path: "/events", icon: Camera },
+        { name: "Campeonatos", path: "/campeonatos", icon: Trophy },
         { name: "Grade de Horários", path: "/schedule", icon: Calendar },
         { name: "Loja", path: "/store", icon: ShoppingBag },
       ]
@@ -249,8 +251,15 @@ export function MobileNav({ onOpenSearch }: { onOpenSearch?: () => void }) {
         </div>
 
         {/* Rodapé do Menu */}
-        <div className="p-3 border-t border-neutral-800 text-center bg-neutral-950/60">
-          <p className="text-[10px] text-neutral-400 font-jp tracking-wider">
+        <div className="p-3 border-t border-neutral-800 text-center bg-neutral-950/60 space-y-1">
+          <Link
+            to="/dashboard_campeonato"
+            onClick={() => setMenuOpen(false)}
+            className="text-[10px] text-neutral-400 hover:text-karate-gold transition-colors font-medium block"
+          >
+            ⚙️ Painel de Campeonatos (Admin)
+          </Link>
+          <p className="text-[10px] text-neutral-500 font-jp tracking-wider">
             空手道 • SHOTOKAN JKA
           </p>
         </div>

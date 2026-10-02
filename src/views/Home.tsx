@@ -8,6 +8,7 @@ import { FundamentalKatasShowcase } from "../components/home/FundamentalKatasSho
 import { DojoAnnouncementsSection } from "../components/home/DojoAnnouncementsSection";
 import { DojoKunSection } from "../components/home/DojoKunSection";
 import { NoticeModal } from "../components/NoticeModal";
+import { ChampionshipPromoBanner } from "../components/championship/ChampionshipPromoBanner";
 
 export function Home() {
   const { notices, events, loading, eventsError } = useAppData();
@@ -48,6 +49,9 @@ export function Home() {
 
       {/* 2. Área do Aluno & Continuar Estudando */}
       <StudentQuickResumeSection />
+
+      {/* Destaque do Campeonato Oficial (SPEC 08) */}
+      <ChampionshipPromoBanner variant="home" />
 
       {/* 3. Trilha Visual de Graduação (Escala de Faixas) */}
       <BeltProgressionTrack belts={belts} />
