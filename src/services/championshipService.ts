@@ -181,10 +181,12 @@ export const championshipService = {
     const res = await fetch("/api/championships", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-        "x-apps-script-url": memoryCache.settings.googleAppsScriptUrl || ""
+        "Content-Type": "application/json"
       },
-      body: JSON.stringify(championship)
+      body: JSON.stringify({
+        championship,
+        googleAppsScriptUrl: memoryCache.settings.googleAppsScriptUrl || loadLocalValidationSettings().googleAppsScriptUrl || ""
+      })
     });
 
     if (!res.ok) {
