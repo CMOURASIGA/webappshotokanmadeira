@@ -645,9 +645,23 @@ export const championshipService = {
   // --- Configurações do Sistema & PIN (Autenticação Server-side) ---
 
   async fetchSettings(): Promise<ChampionshipSettings> {
-    // Durante a Human Validation, URL do Apps Script e PIN são parametrizações
-    // locais do navegador. Isso evita chamadas 404 a endpoints inexistentes no deploy.
-    memoryCache.settings = loadLocalValidationSettings();
+    const local = loadLocalValidationSettings();
+    try {
+      const res = await fetch("/api/settings");
+      if (res.ok) {
+        const data = await res.json();
+        memoryCache.settings = {
+          ...local,
+          googleSheetId: data.googleSheetId || DEFAULT_SETTINGS.googleSheetId,
+          googleAppsScriptUrl: data.googleAppsScriptUrl || ""
+        };
+        return memoryCache.settings;
+      }
+    } catch (err) {
+      console.warn("[championshipService] Não foi possível carregar Configuracoes da planilha:", err);
+    }
+
+    memoryCache.settings = local;
     return memoryCache.settings;
   },
 
