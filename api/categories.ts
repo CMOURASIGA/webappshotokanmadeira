@@ -1,4 +1,5 @@
 import Papa from "papaparse";
+import { callAppsScript } from "./_sheetConfig";
 
 const SHEET_ID = "1cqiHLjSY7tCKnur0FMH8s5lU2EUbSGB4vC6g2ABTjCM";
 
@@ -9,19 +10,6 @@ async function readRows() {
   return Papa.parse(await r.text(), { header: true, skipEmptyLines: true }).data as any[];
 }
 
-async function callAppsScript(url: string, action: string, payload: any) {
-  if (!url.startsWith("https://script.google.com/")) throw new Error("URL do Google Apps Script não configurada.");
-  const r = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ action, ...payload })
-  });
-  const text = await r.text();
-  let data: any = null;
-  try { data = JSON.parse(text); } catch {}
-  if (!r.ok || !data || data.status !== "success") throw new Error(data?.message || data?.error || "A planilha não confirmou a operação.");
-  return data;
-}
 
 export default async function handler(req: any, res: any) {
   if (req.method === "GET") {
@@ -51,11 +39,10 @@ export default async function handler(req: any, res: any) {
     try {
       const body = req.body || {};
       const category = body.category || {};
-      const appsScriptUrl = String(body.googleAppsScriptUrl || "").trim();
       if (!category?.id || !category?.nome || !category?.championshipId) {
         return res.status(400).json({ error: "Categoria inválida." });
       }
-      const result = await callAppsScript(appsScriptUrl, "SAVE_CATEGORY", { category });
+      const result = await callAppsScript("SAVE_CATEGORY", { category });
       return res.status(201).json({
         ...category,
         ...(result.category || {}),
