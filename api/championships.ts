@@ -1,4 +1,5 @@
 import Papa from "papaparse";
+import { callAppsScript } from "./_sheetConfig";
 
 const GOOGLE_SHEET_ID = "1cqiHLjSY7tCKnur0FMH8s5lU2EUbSGB4vC6g2ABTjCM";
 function toArray(value: unknown): string[] {
@@ -65,41 +66,7 @@ export default async function handler(req: any, res: any) {
         return res.status(400).json({ error: "Nome do campeonato é obrigatório." });
       }
 
-      const appsScriptUrl = String(
-        body.googleAppsScriptUrl ||
-        req.headers["x-apps-script-url"] ||
-        process.env.GOOGLE_APPS_SCRIPT_URL ||
-        ""
-      ).trim();
-
-      if (!appsScriptUrl.startsWith("https://script.google.com/")) {
-        return res.status(400).json({
-          error: "Configure a URL do Webhook Google Apps Script em Planilha & PIN antes de criar o campeonato."
-        });
-      }
-
-      const response = await fetch(appsScriptUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "SAVE_CHAMPIONSHIP",
-          championship
-        })
-      });
-
-      const text = await response.text();
-      let result: any = null;
-      try {
-        result = JSON.parse(text);
-      } catch {
-        result = null;
-      }
-
-      if (!response.ok || !result || result.status !== "success") {
-        return res.status(502).json({
-          error: result?.message || result?.error || "A planilha não confirmou a gravação do campeonato."
-        });
-      }
+      await callAppsScript("SAVE_CHAMPIONSHIP", { championship });
 
       return res.status(201).json(championship);
     } catch (error: any) {
