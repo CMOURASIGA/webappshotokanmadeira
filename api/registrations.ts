@@ -1,4 +1,5 @@
 import Papa from "papaparse";
+import { callAppsScript } from "./_sheetConfig";
 
 const SHEET_ID = "1cqiHLjSY7tCKnur0FMH8s5lU2EUbSGB4vC6g2ABTjCM";
 
@@ -50,26 +51,6 @@ function mapRegistration(r: any) {
   };
 }
 
-async function callAppsScript(url: string, action: string, payload: any) {
-  if (!url.startsWith("https://script.google.com/")) {
-    throw new Error("URL do Google Apps Script não configurada.");
-  }
-
-  const r = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ action, ...payload })
-  });
-
-  const text = await r.text();
-  let data: any = null;
-  try { data = JSON.parse(text); } catch {}
-
-  if (!r.ok || !data || data.status !== "success") {
-    throw new Error(data?.message || data?.error || "A planilha não confirmou a operação.");
-  }
-  return data;
-}
 
 export default async function handler(req: any, res: any) {
   if (req.method === "GET") {
@@ -90,7 +71,6 @@ export default async function handler(req: any, res: any) {
     try {
       const body = req.body || {};
       const input = body.registration || {};
-      const appsScriptUrl = String(body.googleAppsScriptUrl || "").trim();
 
       if (!input.championshipId || !input.nomeCompleto || !input.dataNascimento || !input.telefone) {
         return res.status(400).json({ error: "Dados obrigatórios da inscrição não informados." });
@@ -116,7 +96,7 @@ export default async function handler(req: any, res: any) {
         categoriaNome: input.categoriaNome || "Sem Categoria"
       };
 
-      const result = await callAppsScript(appsScriptUrl, "ADD_REGISTRATION", { registration });
+      const result = await callAppsScript("ADD_REGISTRATION", { registration });
       if (!result.registration?.id) {
         return res.status(502).json({ error: "A planilha gravou a inscrição, mas não devolveu o código gerado." });
       }
