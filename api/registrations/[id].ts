@@ -1,4 +1,5 @@
 import Papa from "papaparse";
+import { callAppsScript } from "../_sheetConfig";
 
 const SHEET_ID = "1cqiHLjSY7tCKnur0FMH8s5lU2EUbSGB4vC6g2ABTjCM";
 
@@ -50,19 +51,6 @@ function mapRegistration(r: any) {
   };
 }
 
-async function callAppsScript(url: string, action: string, payload: any) {
-  if (!url.startsWith("https://script.google.com/")) throw new Error("URL do Google Apps Script não configurada.");
-  const r = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ action, ...payload })
-  });
-  const text = await r.text();
-  let data: any = null;
-  try { data = JSON.parse(text); } catch {}
-  if (!r.ok || !data || data.status !== "success") throw new Error(data?.message || data?.error || "A planilha não confirmou a operação.");
-  return data;
-}
 
 export default async function handler(req: any, res: any) {
   const id = String(req.query?.id || "").trim();
@@ -78,10 +66,8 @@ export default async function handler(req: any, res: any) {
     }
 
     const body = req.body || {};
-    const appsScriptUrl = String(body.googleAppsScriptUrl || "").trim();
-
     if (req.method === "DELETE") {
-      await callAppsScript(appsScriptUrl, "DELETE_REGISTRATION", { registrationId: id });
+      await callAppsScript("DELETE_REGISTRATION", { registrationId: id });
       return res.status(200).json({ success: true });
     }
 
@@ -105,7 +91,7 @@ export default async function handler(req: any, res: any) {
         merged.conferidoPor = updates.adminName || merged.conferidoPor || "Sensei / Comissão";
       }
 
-      const result = await callAppsScript(appsScriptUrl, "ADD_REGISTRATION", { registration: merged });
+      const result = await callAppsScript("ADD_REGISTRATION", { registration: merged });
       return res.status(200).json({ ...merged, ...(result.registration || {}), auditLogs: [] });
     }
 
