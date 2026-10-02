@@ -65,21 +65,44 @@ export function generatePixCopiaECola({
   // Limpeza da chave Pix conforme o tipo
   let cleanedKey = config.chave.trim();
   if (config.tipoChave === "TELEFONE") {
-    // Formato E.164 exigido pelo Banco Central: +55 (país) + DDD (2 dígitos) + 8 ou 9 dígitos
+    // Chave Pix telefone deve estar exatamente no padrão E.164 do DICT:
+    // +55 + DDD (2 dígitos) + celular (9 dígitos). Ex.: +5521973681109
+    //
+    // Aceitamos na configuração:
+    // 21973681109
+    // 5521973681109
+    // +5521973681109
+    // (21) 97368-1109
+    // e normalizamos sempre para o mesmo valor canônico.
     let digitsOnly = cleanedKey.replace(/\D/g, "");
-    // Remove zero à esquerda se o usuário digitou (ex: 0219... -> 219...)
-    if (digitsOnly.startsWith("0") && digitsOnly.length > 11) {
-      digitsOnly = digitsOnly.substring(1);
+
+    // Alguns usuários digitam 0 antes do DDD: 021973681109.
+    if (digitsOnly.length === 12 && digitsOnly.startsWith("0")) {
+      digitsOnly = digitsOnly.slice(1);
     }
-    // Se o usuário já incluiu o código do país 55 (12 ou 13 dígitos)
-    if (digitsOnly.length >= 12 && digitsOnly.startsWith("55")) {
-      cleanedKey = `+${digitsOnly}`;
-    } else if (digitsOnly.length === 10 || digitsOnly.length === 11) {
-      // 10 dígitos (DDD + fixo) ou 11 dígitos (DDD + celular): sempre prefixa com +55
-      cleanedKey = `+55${digitsOnly}`;
-    } else {
-      cleanedKey = digitsOnly.startsWith("55") ? `+${digitsOnly}` : `+55${digitsOnly}`;
+
+    // Se já veio com o DDI 55, removemos temporariamente para validar o número nacional.
+    let nationalNumber = digitsOnly;
+    if (digitsOnly.startsWith("55") && digitsOnly.length === 13) {
+      nationalNumber = digitsOnly.slice(2);
     }
+
+    // O DICT usa telefone CELULAR em E.164. No Brasil isso corresponde a
+    // DDD (2) + número móvel (9) = 11 dígitos nacionais.
+    if (!/^\d{11}$/.test(nationalNumber)) {
+      throw new Error(
+        "Chave Pix de telefone inválida. Informe DDD + celular com 11 dígitos, por exemplo 21973681109."
+      );
+    }
+
+    // Celulares brasileiros possuem 9 como primeiro dígito após o DDD.
+    if (nationalNumber.charAt(2) !== "9") {
+      throw new Error(
+        "A chave Pix por telefone deve ser um número de celular válido com DDD."
+      );
+    }
+
+    cleanedKey = `+55${nationalNumber}`;
   } else if (config.tipoChave === "CPF" || config.tipoChave === "CNPJ") {
     cleanedKey = cleanedKey.replace(/\D/g, "");
   } else if (config.tipoChave === "EMAIL") {
