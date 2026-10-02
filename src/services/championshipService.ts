@@ -647,7 +647,12 @@ export const championshipService = {
   async fetchSettings(): Promise<ChampionshipSettings> {
     const local = loadLocalValidationSettings();
     try {
-      const res = await fetch("/api/settings");
+      const res = await fetch(`/api/settings?ts=${Date.now()}`, {
+        cache: "no-store",
+        headers: {
+          "Cache-Control": "no-cache"
+        }
+      });
       if (res.ok) {
         const data = await res.json();
         memoryCache.settings = {
