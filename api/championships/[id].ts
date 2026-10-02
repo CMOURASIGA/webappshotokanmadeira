@@ -1,4 +1,4 @@
-import { callAppsScript } from "../_sheetConfig";
+import { callAppsScript } from "../_sheetConfig.js";
 
 export default async function handler(req: any, res: any) {
   if (req.method !== "DELETE") {
