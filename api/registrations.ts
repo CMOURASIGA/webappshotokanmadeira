@@ -10,7 +10,10 @@ async function readSheet(sheet: string) {
 }
 
 function toNumber(value: unknown): number {
-  return Number(String(value ?? "0").replace(".", "").replace(",", ".")) || 0;
+  const raw = String(value ?? "0").trim();
+  if (!raw) return 0;
+  const normalized = raw.includes(",") ? raw.replace(/\./g, "").replace(",", ".") : raw;
+  return Number(normalized) || 0;
 }
 
 function mapRegistration(r: any) {
