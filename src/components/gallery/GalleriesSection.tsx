@@ -19,7 +19,10 @@ export function GalleriesSection() {
 
   useEffect(() => {
     let active = true;
-    fetch("/api/galleries")
+    fetch(`/api/galleries?ts=${Date.now()}`, {
+      cache: "no-store",
+      headers: { "Cache-Control": "no-cache" }
+    })
       .then(async res => {
         if (!res.ok) throw new Error("Falha ao carregar galerias");
         return res.json();
