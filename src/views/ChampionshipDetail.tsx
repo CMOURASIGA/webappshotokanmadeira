@@ -111,6 +111,12 @@ export function ChampionshipDetail() {
   }, [dataNascimento, championship?.dataCampeonato]);
 
   const isMenor = idadeNaDataCampeonato !== null && idadeNaDataCampeonato < 18;
+  const idadeForaDaFaixa = useMemo(() => {
+    if (!championship || idadeNaDataCampeonato === null) return false;
+    const min = championship.idadeMinima ?? 0;
+    const max = championship.idadeMaxima ?? 120;
+    return idadeNaDataCampeonato < min || idadeNaDataCampeonato > max;
+  }, [championship, idadeNaDataCampeonato]);
 
   // Status do período de inscrição
   const periodState = useMemo(() => {
@@ -157,6 +163,14 @@ export function ChampionshipDetail() {
 
       if (!dataNascimento) {
         throw new Error("Por favor, informe a Data de Nascimento do Atleta.");
+      }
+
+      if (idadeForaDaFaixa) {
+        const min = championship.idadeMinima ?? 0;
+        const max = championship.idadeMaxima ?? 120;
+        throw new Error(
+          `Este campeonato aceita atletas de ${min} a ${max} anos, considerando a idade na data do evento.`
+        );
       }
 
       const numericWeight = parseFloat(peso.replace(",", "."));
@@ -666,16 +680,24 @@ export function ChampionshipDetail() {
                   className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-300 rounded-xl text-sm text-neutral-900 focus:outline-none focus:ring-2 focus:ring-karate-red"
                 />
                 {idadeNaDataCampeonato !== null && (
-                  <p className="text-xs mt-1.5 font-medium flex items-center gap-1.5 text-neutral-700">
-                    <Sparkles className="w-3.5 h-3.5 text-karate-gold" />
-                    Idade no dia da competição: 
-                    <span className="font-bold text-neutral-900"> {idadeNaDataCampeonato} anos</span>
-                    {isMenor && (
-                      <span className="bg-purple-100 text-purple-800 text-[10px] font-bold px-1.5 py-0.5 rounded-full ml-1">
-                        Menor de Idade
-                      </span>
+                  <div className="mt-1.5 space-y-1">
+                    <p className="text-xs font-medium flex items-center gap-1.5 text-neutral-700">
+                      <Sparkles className="w-3.5 h-3.5 text-karate-gold" />
+                      Idade no dia da competição:
+                      <span className="font-bold text-neutral-900"> {idadeNaDataCampeonato} anos</span>
+                      {isMenor && (
+                        <span className="bg-purple-100 text-purple-800 text-[10px] font-bold px-1.5 py-0.5 rounded-full ml-1">
+                          Menor de Idade
+                        </span>
+                      )}
+                    </p>
+                    {championship && (
+                      <p className={`text-[11px] font-semibold ${idadeForaDaFaixa ? "text-red-600" : "text-emerald-700"}`}>
+                        Faixa etária permitida: {championship.idadeMinima ?? 0} a {championship.idadeMaxima ?? 120} anos
+                        {idadeForaDaFaixa ? " — idade fora da faixa permitida." : ""}
+                      </p>
                     )}
-                  </p>
+                  </div>
                 )}
               </div>
 
