@@ -70,6 +70,40 @@ export default async function handler(req: any, res: any) {
 
       await callAppsScript("SAVE_CHAMPIONSHIP", { championship });
 
+      // Confirma que a versão publicada do Apps Script realmente gravou
+      // os campos novos. Evita exibir "salvo com sucesso" quando o Web App
+      // ainda está usando uma versão antiga do script.
+      if (championship.idadeMinima !== undefined || championship.idadeMaxima !== undefined) {
+        const verifyUrl = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/gviz/tq?tqx=out:csv&sheet=CAMPEONATOS&ts=${Date.now()}`;
+        const verifyResponse = await fetch(verifyUrl, { headers: { "Cache-Control": "no-cache" } });
+
+        if (!verifyResponse.ok) {
+          return res.status(502).json({ error: "Campeonato enviado, mas não foi possível confirmar a gravação na planilha." });
+        }
+
+        const verifyCsv = await verifyResponse.text();
+        const verifyParsed = Papa.parse(verifyCsv, { header: true, skipEmptyLines: true });
+        const savedRow = (verifyParsed.data as any[]).find(
+          row => String(row?.id || "").trim() === String(championship.id || "").trim()
+        );
+
+        const savedMin = savedRow && String(savedRow.idadeMinima ?? "").trim() !== ""
+          ? Number(savedRow.idadeMinima)
+          : null;
+        const savedMax = savedRow && String(savedRow.idadeMaxima ?? "").trim() !== ""
+          ? Number(savedRow.idadeMaxima)
+          : null;
+
+        if (
+          savedMin !== Number(championship.idadeMinima ?? 0) ||
+          savedMax !== Number(championship.idadeMaxima ?? 120)
+        ) {
+          return res.status(502).json({
+            error: "A faixa etária não foi gravada na planilha. Atualize e publique novamente o Google Apps Script pelo painel antes de salvar."
+          });
+        }
+      }
+
       return res.status(201).json(championship);
     } catch (error: any) {
       return res.status(500).json({ error: error?.message || "Erro ao criar campeonato." });
