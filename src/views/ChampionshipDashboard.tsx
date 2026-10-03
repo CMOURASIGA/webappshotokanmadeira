@@ -146,6 +146,8 @@ export function ChampionshipDashboard() {
   const [champEditModalidades, setChampEditModalidades] = useState<string>("");
   const [champEditRegulamento, setChampEditRegulamento] = useState("");
   const [champEditPermiteMenores, setChampEditPermiteMenores] = useState(true);
+  const [champEditIdadeMinima, setChampEditIdadeMinima] = useState<string>("");
+  const [champEditIdadeMaxima, setChampEditIdadeMaxima] = useState<string>("");
   const [editingChampId, setEditingChampId] = useState<string | null>(null);
 
   // Pix Edit State
@@ -176,6 +178,8 @@ export function ChampionshipDashboard() {
   const [newChampValor, setNewChampValor] = useState("");
   const [newChampDesc, setNewChampDesc] = useState("");
   const [newChampModalidades, setNewChampModalidades] = useState("Kata, Kumite");
+  const [newChampIdadeMinima, setNewChampIdadeMinima] = useState("4");
+  const [newChampIdadeMaxima, setNewChampIdadeMaxima] = useState("15");
   const [newChampPixTipo, setNewChampPixTipo] = useState<PixKeyType>("TELEFONE");
   const [newChampPixChave, setNewChampPixChave] = useState("21973681109");
   const [isCheckingPin, setIsCheckingPin] = useState(false);
@@ -227,6 +231,8 @@ export function ChampionshipDashboard() {
           setChampEditModalidades(currentChamp.modalidades ? currentChamp.modalidades.join(", ") : "");
           setChampEditRegulamento(currentChamp.regulamento || "");
           setChampEditPermiteMenores(currentChamp.permiteMenores);
+          setChampEditIdadeMinima(currentChamp.idadeMinima !== undefined ? String(currentChamp.idadeMinima) : "");
+          setChampEditIdadeMaxima(currentChamp.idadeMaxima !== undefined ? String(currentChamp.idadeMaxima) : "");
 
           setPixTipo(currentChamp.configuracaoPix.tipoChave);
           setPixChave(currentChamp.configuracaoPix.chave);
@@ -786,6 +792,13 @@ export function ChampionshipDashboard() {
         throw new Error("Valor de inscrição inválido.");
       }
 
+      const idadeMin = champEditIdadeMinima === "" ? 0 : parseInt(champEditIdadeMinima, 10);
+      const idadeMax = champEditIdadeMaxima === "" ? 120 : parseInt(champEditIdadeMaxima, 10);
+
+      if (!Number.isFinite(idadeMin) || !Number.isFinite(idadeMax) || idadeMin < 0 || idadeMax < idadeMin) {
+        throw new Error("Faixa etária inválida. Confira a idade mínima e máxima.");
+      }
+
       const updated: Championship = {
         ...targetChamp,
         nome: champEditNome.trim(),
@@ -800,6 +813,8 @@ export function ChampionshipDashboard() {
         modalidades: mods,
         regulamento: champEditRegulamento,
         permiteMenores: champEditPermiteMenores,
+        idadeMinima: idadeMin,
+        idadeMaxima: idadeMax,
         configuracaoPix: {
           tipoChave: pixTipo,
           chave: pixChave.trim(),
@@ -839,6 +854,8 @@ export function ChampionshipDashboard() {
     setChampEditModalidades(target.modalidades ? target.modalidades.join(", ") : "");
     setChampEditRegulamento(target.regulamento || "");
     setChampEditPermiteMenores(target.permiteMenores);
+    setChampEditIdadeMinima(target.idadeMinima !== undefined ? String(target.idadeMinima) : "");
+    setChampEditIdadeMaxima(target.idadeMaxima !== undefined ? String(target.idadeMaxima) : "");
 
     setPixTipo(target.configuracaoPix.tipoChave);
     setPixChave(target.configuracaoPix.chave);
@@ -988,6 +1005,8 @@ export function ChampionshipDashboard() {
       configuracaoPix: basePix,
       regulamento: "Regras oficiais de competição baseadas nos critérios da JKA Brasil.",
       permiteMenores: true,
+      idadeMinima: parseInt(newChampIdadeMinima, 10) || 4,
+      idadeMaxima: parseInt(newChampIdadeMaxima, 10) || 15,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
@@ -2687,6 +2706,41 @@ export function ChampionshipDashboard() {
                   </div>
 
                   <div>
+                    <label className="block text-xs font-semibold text-neutral-700 mb-2">
+                      Faixa etária permitida
+                    </label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-[11px] text-neutral-500 mb-1">Idade mínima</label>
+                        <input
+                          type="number"
+                          min="0"
+                          max="120"
+                          required
+                          value={newChampIdadeMinima}
+                          onChange={(e) => setNewChampIdadeMinima(e.target.value)}
+                          className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-300 rounded-xl text-xs"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] text-neutral-500 mb-1">Idade máxima</label>
+                        <input
+                          type="number"
+                          min="0"
+                          max="120"
+                          required
+                          value={newChampIdadeMaxima}
+                          onChange={(e) => setNewChampIdadeMaxima(e.target.value)}
+                          className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-300 rounded-xl text-xs"
+                        />
+                      </div>
+                    </div>
+                    <span className="text-[10px] text-neutral-400 mt-1 block">
+                      Padrão inicial: 4 a 15 anos. A idade é calculada na data do evento.
+                    </span>
+                  </div>
+
+                  <div>
                     <label className="block text-xs font-semibold text-neutral-700 mb-1">
                       Breve Descrição Institucional
                     </label>
@@ -3171,7 +3225,44 @@ export function ChampionshipDashboard() {
                   />
                 </div>
 
-                <div>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-neutral-700 mb-2">
+                      Faixa etária permitida no campeonato
+                    </label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-[11px] text-neutral-500 mb-1">Idade mínima</label>
+                        <input
+                          type="number"
+                          min="0"
+                          max="120"
+                          required
+                          value={champEditIdadeMinima}
+                          onChange={(e) => setChampEditIdadeMinima(e.target.value)}
+                          className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-300 rounded-xl text-xs"
+                          placeholder="Ex: 4"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] text-neutral-500 mb-1">Idade máxima</label>
+                        <input
+                          type="number"
+                          min="0"
+                          max="120"
+                          required
+                          value={champEditIdadeMaxima}
+                          onChange={(e) => setChampEditIdadeMaxima(e.target.value)}
+                          className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-300 rounded-xl text-xs"
+                          placeholder="Ex: 15"
+                        />
+                      </div>
+                    </div>
+                    <p className="text-[10px] text-neutral-500 mt-1.5">
+                      A idade é calculada considerando a data do campeonato.
+                    </p>
+                  </div>
+
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="checkbox"
@@ -3180,7 +3271,7 @@ export function ChampionshipDashboard() {
                       className="rounded text-karate-red focus:ring-karate-red w-4 h-4 cursor-pointer"
                     />
                     <span className="text-xs font-semibold text-neutral-800">
-                      Permitir atletas menores de 18 anos (com termo de autorização dos pais)
+                      Exigir responsável e autorização para atletas menores de 18 anos
                     </span>
                   </label>
                 </div>
