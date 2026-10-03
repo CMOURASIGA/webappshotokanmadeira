@@ -976,6 +976,14 @@ export function ChampionshipDashboard() {
       .replace(/^-+|-+$/g, "") || `torneio-${Date.now()}`;
 
     const numVal = parseFloat(newChampValor.replace(",", ".")) || 0;
+    const idadeMinNova = parseInt(newChampIdadeMinima, 10);
+    const idadeMaxNova = parseInt(newChampIdadeMaxima, 10);
+
+    if (!Number.isFinite(idadeMinNova) || !Number.isFinite(idadeMaxNova) || idadeMinNova < 0 || idadeMaxNova < idadeMinNova) {
+      showToast("Faixa etária inválida. Confira a idade mínima e máxima.");
+      return;
+    }
+
     const parsedMods = newChampModalidades
       .split(/[,;]/)
       .map(s => s.trim())
@@ -1005,8 +1013,8 @@ export function ChampionshipDashboard() {
       configuracaoPix: basePix,
       regulamento: "Regras oficiais de competição baseadas nos critérios da JKA Brasil.",
       permiteMenores: true,
-      idadeMinima: parseInt(newChampIdadeMinima, 10) || 4,
-      idadeMaxima: parseInt(newChampIdadeMaxima, 10) || 15,
+      idadeMinima: idadeMinNova,
+      idadeMaxima: idadeMaxNova,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
@@ -1020,6 +1028,8 @@ export function ChampionshipDashboard() {
       setNewChampLocal("");
       setNewChampValor("");
       setNewChampDesc("");
+      setNewChampIdadeMinima("4");
+      setNewChampIdadeMaxima("15");
       showToast(`Campeonato "${newChamp.nome}" cadastrado com sucesso!`);
     } catch (err: any) {
       showToast(`Erro ao criar campeonato: ${err.message}`);
