@@ -9,6 +9,26 @@
  * CAMPEONATOS, CATEGORIAS_CAMPEONATO
  */
 
+function TEST_GALLERY_DRIVE_ACCESS() {
+  var folderId = "1Ox53ko8Rh2P7hXlr9WRjjwM4ztug_XUB";
+  var folder = DriveApp.getFolderById(folderId);
+  var files = folder.getFiles();
+  var imageCount = 0;
+
+  while (files.hasNext()) {
+    var file = files.next();
+    if (String(file.getMimeType() || "").indexOf("image/") === 0) {
+      imageCount++;
+    }
+  }
+
+  Logger.log("Acesso ao Drive autorizado.");
+  Logger.log("Pasta: " + folder.getName());
+  Logger.log("Imagens encontradas: " + imageCount);
+
+  return "OK - " + imageCount + " imagens encontradas em " + folder.getName();
+}
+
 function doPost(e) {
   try {
     if (!e || !e.postData || !e.postData.contents) {
