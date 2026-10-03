@@ -10,6 +10,7 @@ type GallerySummary = {
   destaque?: boolean;
   coverUrl?: string;
   photoCount?: number;
+  tipo?: "geral" | "evento";
 };
 
 export function GalleriesSection() {
@@ -42,8 +43,63 @@ export function GalleriesSection() {
     };
   }, []);
 
+  const generalGalleries = galleries.filter(g => (g.tipo || "geral") === "geral");
+  const eventGalleries = galleries.filter(g => g.tipo === "evento");
+
+  const renderGalleryGrid = (items: GallerySummary[]) => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      {items.map(gallery => (
+        <Link
+          key={gallery.id}
+          to={`/galerias/${encodeURIComponent(gallery.id)}`}
+          className="group bg-white rounded-2xl overflow-hidden border border-neutral-200 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all"
+        >
+          <div className="aspect-[16/10] bg-neutral-900 relative overflow-hidden">
+            {gallery.coverUrl ? (
+              <img
+                src={gallery.coverUrl}
+                alt={gallery.titulo}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                loading="lazy"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-neutral-500">
+                <FolderOpen className="w-12 h-12" />
+              </div>
+            )}
+            {gallery.destaque && (
+              <span className="absolute top-3 left-3 bg-karate-red text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">
+                Destaque
+              </span>
+            )}
+            <span className="absolute bottom-3 right-3 bg-black/70 text-white text-[10px] font-semibold px-2.5 py-1 rounded-full flex items-center gap-1">
+              <Images className="w-3 h-3" />
+              {gallery.photoCount ?? 0} fotos
+            </span>
+          </div>
+
+          <div className="p-4">
+            <h4 className="font-black text-neutral-900 group-hover:text-karate-red transition-colors">
+              {gallery.titulo}
+            </h4>
+            {gallery.data && (
+              <p className="text-[11px] font-semibold text-karate-red mt-1">
+                {gallery.data}
+              </p>
+            )}
+            {gallery.descricao && (
+              <p className="text-xs text-neutral-500 mt-1.5 line-clamp-2">
+                {gallery.descricao}
+              </p>
+            )}
+          </div>
+        </Link>
+      ))}
+    </div>
+  );
+
   return (
-    <section className="space-y-4">
+    <section className="space-y-8">
       <div className="flex items-end justify-between gap-4">
         <div>
           <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-karate-red">
@@ -53,7 +109,7 @@ export function GalleriesSection() {
             Álbuns de Fotos
           </h3>
           <p className="text-sm text-neutral-500 mt-1">
-            Escolha uma pasta para visualizar as fotos diretamente no site.
+            Escolha uma galeria para visualizar as fotos diretamente no site.
           </p>
         </div>
       </div>
@@ -74,49 +130,30 @@ export function GalleriesSection() {
           <p className="text-sm">Nenhuma galeria publicada no momento.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {galleries.map(gallery => (
-            <Link
-              key={gallery.id}
-              to={`/galerias/${encodeURIComponent(gallery.id)}`}
-              className="group bg-white rounded-2xl overflow-hidden border border-neutral-200 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all"
-            >
-              <div className="aspect-[16/10] bg-neutral-900 relative overflow-hidden">
-                {gallery.coverUrl ? (
-                  <img
-                    src={gallery.coverUrl}
-                    alt={gallery.titulo}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    loading="lazy"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-neutral-500">
-                    <FolderOpen className="w-12 h-12" />
-                  </div>
-                )}
-                {gallery.destaque && (
-                  <span className="absolute top-3 left-3 bg-karate-red text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">
-                    Destaque
-                  </span>
-                )}
-                <span className="absolute bottom-3 right-3 bg-black/70 text-white text-[10px] font-semibold px-2.5 py-1 rounded-full flex items-center gap-1">
-                  <Images className="w-3 h-3" />
-                  {gallery.photoCount ?? 0} fotos
-                </span>
+        <div className="space-y-10">
+          {generalGalleries.length > 0 && (
+            <div className="space-y-4">
+              <div>
+                <h4 className="text-lg font-black text-neutral-900">Momentos do Dojo</h4>
+                <p className="text-sm text-neutral-500 mt-1">
+                  Fotos gerais, treinos e momentos do dia a dia da Madeira Karate.
+                </p>
               </div>
+              {renderGalleryGrid(generalGalleries)}
+            </div>
+          )}
 
-              <div className="p-4">
-                <h4 className="font-black text-neutral-900 group-hover:text-karate-red transition-colors">
-                  {gallery.titulo}
-                </h4>
-                {gallery.descricao && (
-                  <p className="text-xs text-neutral-500 mt-1.5 line-clamp-2">
-                    {gallery.descricao}
-                  </p>
-                )}
+          {eventGalleries.length > 0 && (
+            <div className="space-y-4 pt-2 border-t border-neutral-200">
+              <div>
+                <h4 className="text-lg font-black text-neutral-900">Galerias de Eventos</h4>
+                <p className="text-sm text-neutral-500 mt-1">
+                  Campeonatos, festivais, exames, seminários e outros eventos do dojo.
+                </p>
               </div>
-            </Link>
-          ))}
+              {renderGalleryGrid(eventGalleries)}
+            </div>
+          )}
         </div>
       )}
     </section>
