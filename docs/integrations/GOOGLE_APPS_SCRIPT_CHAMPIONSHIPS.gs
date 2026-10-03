@@ -23,6 +23,48 @@ function doPost(e) {
       return jsonResponse_({ status: "success", message: "Estrutura de campeonatos inicializada." });
     }
 
+    if (data.action === "LIST_GALLERY_PHOTOS" && data.folderId) {
+      var folder = DriveApp.getFolderById(String(data.folderId).trim());
+      var files = folder.getFiles();
+      var photos = [];
+      var total = 0;
+      var requestedLimit = Number(data.limit || 300);
+      if (!requestedLimit || requestedLimit < 1) requestedLimit = 300;
+      requestedLimit = Math.min(requestedLimit, 300);
+
+      while (files.hasNext()) {
+        var file = files.next();
+        var mimeType = String(file.getMimeType() || "");
+        if (mimeType.indexOf("image/") !== 0) continue;
+
+        total++;
+        if (photos.length >= requestedLimit) continue;
+
+        var fileId = file.getId();
+        photos.push({
+          id: fileId,
+          name: file.getName(),
+          mimeType: mimeType,
+          thumbnailUrl: "https://drive.google.com/thumbnail?id=" + encodeURIComponent(fileId) + "&sz=w1200",
+          url: "https://drive.google.com/thumbnail?id=" + encodeURIComponent(fileId) + "&sz=w2400",
+          viewUrl: "https://drive.google.com/file/d/" + encodeURIComponent(fileId) + "/view",
+          updatedAt: file.getLastUpdated().toISOString()
+        });
+      }
+
+      photos.sort(function(a, b) {
+        return String(b.updatedAt).localeCompare(String(a.updatedAt));
+      });
+
+      return jsonResponse_({
+        status: "success",
+        folderId: String(data.folderId).trim(),
+        folderName: folder.getName(),
+        total: total,
+        photos: photos
+      });
+    }
+
     if (data.action === "SAVE_CHAMPIONSHIP" && data.championship) {
       var championship = normalizeChampionship_(data.championship);
       var championshipSheet = ensureChampionshipsSheet_(ss);
@@ -117,6 +159,7 @@ function initChampionshipSheets_(ss) {
   ensureAvisosSheet_(ss);
   ensureKatasSheet_(ss);
   ensureTecnicasSheet_(ss);
+  ensureGalleriesSheet_(ss);
 
   // Estrutura específica do módulo de campeonatos.
   ensureChampionshipsSheet_(ss);
@@ -195,6 +238,12 @@ function categoryHeaders_() {
     "createdAt",
     "updatedAt"
   ];
+}
+
+function ensureGalleriesSheet_(ss) {
+  return ensureSheetWithHeaders_(ss, "Galerias", [
+    "id", "titulo", "drive_folder_id", "descricao", "data", "ativo", "destaque", "ordem"
+  ], "#1F2937");
 }
 
 function ensureRegistrationsSheet_(ss) {
