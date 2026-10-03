@@ -32,6 +32,7 @@ const Schedule = lazy(() => import("./views/Schedule").then(m => ({ default: m.S
 const Maintenance = lazy(() => import("./views/Maintenance").then(m => ({ default: m.Maintenance })));
 const Mural = lazy(() => import("./views/Mural").then(m => ({ default: m.Mural })));
 const Events = lazy(() => import("./views/Events").then(m => ({ default: m.Events })));
+const GalleryDetail = lazy(() => import("./views/GalleryDetail").then(m => ({ default: m.GalleryDetail })));
 const StudentArea = lazy(() => import("./views/StudentArea").then(m => ({ default: m.StudentArea })));
 const ChampionshipDetail = lazy(() => import("./views/ChampionshipDetail").then(m => ({ default: m.ChampionshipDetail })));
 const ChampionshipLookup = lazy(() => import("./views/ChampionshipLookup").then(m => ({ default: m.ChampionshipLookup })));
@@ -67,6 +68,7 @@ export default function App() {
                   <Route path="/area-do-aluno" element={<StudentArea />} />
                   <Route path="/mural" element={<Mural />} />
                   <Route path="/events" element={<Events />} />
+                  <Route path="/galerias/:id" element={<GalleryDetail />} />
                   <Route path="/campeonatos" element={<ChampionshipDetail />} />
                   <Route path="/campeonatos/:slug" element={<ChampionshipDetail />} />
                   <Route path="/campeonatos/:slug/consulta" element={<ChampionshipLookup />} />
