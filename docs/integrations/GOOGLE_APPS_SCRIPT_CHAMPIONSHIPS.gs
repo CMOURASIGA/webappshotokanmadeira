@@ -175,6 +175,8 @@ function championshipHeaders_() {
     "pixIncluirValor",
     "regulamento",
     "permiteMenores",
+    "idadeMinima",
+    "idadeMaxima",
     "createdAt",
     "updatedAt"
   ];
@@ -297,6 +299,8 @@ function normalizeChampionship_(c) {
     pixIncluirValor: c.configuracaoPix && c.configuracaoPix.incluirValorNoQrCode === false ? "Não" : "Sim",
     regulamento: String(c.regulamento || "").trim(),
     permiteMenores: c.permiteMenores === false ? "Não" : "Sim",
+    idadeMinima: c.idadeMinima !== undefined && c.idadeMinima !== null ? Number(c.idadeMinima) : 0,
+    idadeMaxima: c.idadeMaxima !== undefined && c.idadeMaxima !== null ? Number(c.idadeMaxima) : 120,
     createdAt: String(c.createdAt || now),
     updatedAt: now
   };
