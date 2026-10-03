@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { useAppData } from "../contexts/AppDataContext";
 import { Image as ImageIcon, Camera, Instagram, Calendar, AlertCircle, CheckCircle2 } from "lucide-react";
 import { NoticeModal } from "../components/NoticeModal";
+import { GalleriesSection } from "../components/gallery/GalleriesSection";
 
 // Helper to parse YYYY-MM-DD or DD/MM/YYYY
 function parseDateToTimestamp(dateStr?: string): number | null {
@@ -81,6 +82,15 @@ export function Events() {
             <h2 className="text-2xl font-black uppercase tracking-tight">Eventos & Fotos</h2>
             <p className="text-neutral-500 text-sm">Confira as galerias de fotos dos nossos eventos.</p>
           </div>
+        </div>
+
+        <GalleriesSection />
+
+        <div className="pt-4 border-t border-neutral-200">
+          <h3 className="text-lg sm:text-xl font-black text-neutral-900">Eventos Publicados</h3>
+          <p className="text-sm text-neutral-500 mt-1">
+            Cards institucionais e links de eventos cadastrados na planilha oficial.
+          </p>
         </div>
 
         {/* 1. Estado de Carregamento */}
