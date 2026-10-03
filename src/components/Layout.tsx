@@ -144,11 +144,35 @@ export function Layout({ children }: { children: ReactNode }) {
           </div>
         </main>
 
-        {/* Footer Institucional Desktop */}
-        <footer className="h-12 bg-[#111111] items-center justify-center shrink-0 hidden lg:flex px-4 border-t border-neutral-800">
-          <p className="text-[10px] text-neutral-400 tracking-[0.25em] uppercase text-center">
-            O conteúdo educativo não substitui a orientação presencial de um sensei qualificado.
-          </p>
+        {/* Footer Institucional + Crédito de Desenvolvimento */}
+        <footer className="bg-[#111111] shrink-0 px-4 py-4 lg:py-3 border-t border-neutral-800 mb-[64px] lg:mb-0">
+          <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-3">
+            <p className="text-[9px] sm:text-[10px] text-neutral-400 tracking-[0.18em] lg:tracking-[0.25em] uppercase text-center lg:text-left">
+              O conteúdo educativo não substitui a orientação presencial de um sensei qualificado.
+            </p>
+
+            <a
+              href="https://consultservices.com.br"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 opacity-75 hover:opacity-100 transition-opacity"
+              title="Desenvolvido por Consult Services"
+              aria-label="Consult Services - Desenvolvimento"
+            >
+              <img
+                src="https://i.imgur.com/gxXnYsA.png"
+                alt="Consult Services"
+                className="h-5 sm:h-6 w-auto object-contain max-w-[90px]"
+                loading="lazy"
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                }}
+              />
+              <span className="text-[9px] sm:text-[10px] text-neutral-400 whitespace-nowrap">
+                Desenvolvido por <strong className="font-semibold text-neutral-300">Consult Services</strong>
+              </span>
+            </a>
+          </div>
         </footer>
       </div>
 
