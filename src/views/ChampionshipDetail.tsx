@@ -598,9 +598,12 @@ export function ChampionshipDetail() {
             <span className="bg-neutral-800 text-neutral-300 border border-neutral-700 px-2.5 py-1 rounded-lg font-medium">
               Modalidades do evento: {formatModalidadesList(championship.modalidades)}
             </span>
+            <span className="bg-purple-900/40 text-purple-300 border border-purple-800/60 px-2.5 py-1 rounded-lg font-medium">
+              Faixa etária: {championship.idadeMinima ?? 0} a {championship.idadeMaxima ?? 120} anos
+            </span>
             {championship.permiteMenores && (
-              <span className="bg-purple-900/40 text-purple-300 border border-purple-800/60 px-2.5 py-1 rounded-lg font-medium">
-                Aberto a Menores (com autorização)
+              <span className="bg-neutral-800 text-neutral-300 border border-neutral-700 px-2.5 py-1 rounded-lg font-medium">
+                Menores exigem responsável e autorização
               </span>
             )}
           </div>
