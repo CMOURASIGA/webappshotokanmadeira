@@ -46,6 +46,8 @@ export interface Championship {
   configuracaoPix: PixConfig;
   regulamento?: string;
   permiteMenores: boolean;
+  idadeMinima?: number;
+  idadeMaxima?: number;
   bannerUrl?: string;
   createdAt: string;
   updatedAt: string;
