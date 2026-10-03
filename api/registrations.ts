@@ -17,6 +17,16 @@ function toNumber(value: unknown): number {
   return Number(normalized) || 0;
 }
 
+function calculateAgeOnDate(birthDate: string, eventDate: string): number {
+  const [by, bm, bd] = String(birthDate || "").slice(0, 10).split("-").map(Number);
+  const [ey, em, ed] = String(eventDate || "").slice(0, 10).split("-").map(Number);
+  if (!by || !bm || !bd || !ey || !em || !ed) return -1;
+
+  let age = ey - by;
+  if (em < bm || (em === bm && ed < bd)) age--;
+  return age;
+}
+
 function mapRegistration(r: any) {
   return {
     id: String(r["Código"] || "").trim(),
@@ -82,10 +92,26 @@ export default async function handler(req: any, res: any) {
         return res.status(404).json({ error: "Campeonato não encontrado na planilha oficial." });
       }
 
+      const idadeNaData = calculateAgeOnDate(input.dataNascimento, String(champ.dataCampeonato || ""));
+      if (idadeNaData < 0) {
+        return res.status(400).json({ error: "Não foi possível calcular a idade na data do campeonato." });
+      }
+
+      const idadeMinima = String(champ.idadeMinima ?? "").trim() === "" ? 0 : Number(champ.idadeMinima);
+      const idadeMaxima = String(champ.idadeMaxima ?? "").trim() === "" ? 120 : Number(champ.idadeMaxima);
+
+      if (idadeNaData < idadeMinima || idadeNaData > idadeMaxima) {
+        return res.status(400).json({
+          error: `Este campeonato aceita atletas de ${idadeMinima} a ${idadeMaxima} anos, considerando a idade na data do evento.`
+        });
+      }
+
       const registration = {
         ...input,
         id: "",
         championshipName: String(champ.nome || input.championshipName || "").trim(),
+        idadeNaDataCampeonato: idadeNaData,
+        isMenor: idadeNaData < 18,
         modalidade: String(champ.modalidades || "").trim() || "Todas as modalidades do campeonato",
         status: "RECEBIDA",
         paymentStatus: "AGUARDANDO_PAGAMENTO",
