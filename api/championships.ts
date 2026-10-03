@@ -47,6 +47,8 @@ export default async function handler(req: any, res: any) {
           },
           regulamento: String(row.regulamento || "").trim(),
           permiteMenores: String(row.permiteMenores || "Sim").trim().toLowerCase() !== "não",
+          idadeMinima: row.idadeMinima !== undefined && String(row.idadeMinima).trim() !== "" ? Number(row.idadeMinima) : 0,
+          idadeMaxima: row.idadeMaxima !== undefined && String(row.idadeMaxima).trim() !== "" ? Number(row.idadeMaxima) : 120,
           createdAt: String(row.createdAt || "").trim(),
           updatedAt: String(row.updatedAt || "").trim()
         }));
