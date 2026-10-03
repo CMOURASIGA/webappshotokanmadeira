@@ -28,7 +28,8 @@ export default async function handler(req: any, res: any) {
         descricao: String(row.descricao || "").trim(),
         data: String(row.data || "").trim(),
         destaque: parseBool(row.destaque, false),
-        ordem: parseOrder(row.ordem)
+        ordem: parseOrder(row.ordem),
+        tipo: String(row.tipo || "geral").trim().toLowerCase() === "evento" ? "evento" : "geral"
       }))
       .filter(g => g.folderId)
       .sort((a, b) => a.ordem - b.ordem);
