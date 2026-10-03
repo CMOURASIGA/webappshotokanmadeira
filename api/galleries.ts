@@ -56,7 +56,9 @@ export default async function handler(req: any, res: any) {
       })
     );
 
-    res.setHeader("Cache-Control", "public, max-age=0, s-maxage=120, stale-while-revalidate=300");
+    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
     return res.status(200).json(enriched);
   } catch (e: any) {
     return res.status(500).json({ error: e?.message || "Erro ao carregar galerias." });
