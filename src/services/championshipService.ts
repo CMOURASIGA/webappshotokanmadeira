@@ -1081,7 +1081,7 @@ function categoryHeaders_() {
 
 function ensureGalleriesSheet_(ss) {
   return ensureSheetWithHeaders_(ss, "Galerias", [
-    "id", "titulo", "drive_folder_id", "descricao", "data", "ativo", "destaque", "ordem"
+    "id", "titulo", "drive_folder_id", "descricao", "data", "ativo", "destaque", "ordem", "tipo"
   ], "#1F2937");
 }
 
