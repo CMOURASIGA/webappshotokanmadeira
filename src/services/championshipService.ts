@@ -346,6 +346,16 @@ export const championshipService = {
     const idade = calculateAgeOnDate(input.dataNascimento, champ.dataCampeonato);
     const isMenor = idade < 18;
 
+    // 2.1 Faixa etária permitida para o campeonato
+    const idadeMinima = Number.isFinite(champ.idadeMinima) ? Number(champ.idadeMinima) : 0;
+    const idadeMaxima = Number.isFinite(champ.idadeMaxima) ? Number(champ.idadeMaxima) : 120;
+
+    if (idade < idadeMinima || idade > idadeMaxima) {
+      throw new Error(
+        `Este campeonato aceita atletas de ${idadeMinima} a ${idadeMaxima} anos, considerando a idade na data do evento.`
+      );
+    }
+
     // 3. Verificação de menor
     if (isMenor) {
       if (!champ.permiteMenores) {
