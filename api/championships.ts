@@ -53,6 +53,10 @@ export default async function handler(req: any, res: any) {
           updatedAt: String(row.updatedAt || "").trim()
         }));
 
+      res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+      res.setHeader("Pragma", "no-cache");
+      res.setHeader("Expires", "0");
+      res.setHeader("Surrogate-Control", "no-store");
       return res.status(200).json(championships);
     } catch (error: any) {
       return res.status(500).json({ error: error?.message || "Erro ao carregar campeonatos." });
