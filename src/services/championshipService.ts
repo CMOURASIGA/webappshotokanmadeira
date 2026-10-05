@@ -144,7 +144,10 @@ export const championshipService = {
   
   async fetchChampionships(): Promise<Championship[]> {
     try {
-      const res = await fetch("/api/championships");
+      const res = await fetch(`/api/championships?ts=${Date.now()}`, {
+        cache: "no-store",
+        headers: { "Cache-Control": "no-cache" }
+      });
       if (res.ok) {
         const data = await res.json();
         memoryCache.championships = Array.isArray(data) ? data : [];
