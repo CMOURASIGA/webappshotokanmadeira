@@ -39,6 +39,8 @@ export function InstagramEmbed({ url, title, compact = false }: InstagramEmbedPr
   if (!isInstagram && !url) return null;
 
   const targetUrl = url.trim();
+  const embedUrl = getInstagramEmbedUrl(targetUrl);
+  const [loaded, setLoaded] = useState(false);
 
   if (compact) {
     return (
@@ -62,9 +64,6 @@ export function InstagramEmbed({ url, title, compact = false }: InstagramEmbedPr
       </a>
     );
   }
-
-  const embedUrl = getInstagramEmbedUrl(targetUrl);
-  const [loaded, setLoaded] = useState(false);
 
   if (!embedUrl) {
     return (
