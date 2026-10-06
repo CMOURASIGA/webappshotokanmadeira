@@ -1,4 +1,5 @@
-import { Instagram, ExternalLink, ShieldCheck } from "lucide-react";
+import { useState } from "react";
+import { Instagram, ExternalLink, Loader2 } from "lucide-react";
 
 type InstagramEmbedProps = {
   url: string;
@@ -62,48 +63,60 @@ export function InstagramEmbed({ url, title, compact = false }: InstagramEmbedPr
     );
   }
 
-  return (
-    <div className="w-full h-full min-h-[320px] sm:min-h-[420px] flex flex-col items-center justify-center p-6 bg-gradient-to-b from-neutral-900 to-neutral-950 text-white select-text">
-      <div className="max-w-md w-full bg-neutral-900/90 border border-neutral-800 rounded-2xl p-6 sm:p-8 flex flex-col items-center text-center shadow-xl backdrop-blur-sm">
-        {/* Instagram Gradient Icon */}
-        <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 flex items-center justify-center shadow-lg shadow-rose-950/40 mb-4 ring-4 ring-neutral-800">
-          <Instagram className="w-8 h-8 text-white" />
-        </div>
+  const embedUrl = getInstagramEmbedUrl(targetUrl);
+  const [loaded, setLoaded] = useState(false);
 
-        {/* Header Badges */}
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-neutral-800 border border-neutral-700 text-neutral-300 text-xs font-medium mb-3">
-          <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
-          <span>Instagram Oficial</span>
-          <span className="text-neutral-500">•</span>
-          <span className="font-mono text-[11px] text-neutral-300">@madeirakarateshotokan</span>
-        </div>
-
-        {/* Title */}
-        <h3 className="text-lg sm:text-xl font-bold text-white mb-2 leading-snug">
-          {title || "Comunicado Oficial no Instagram"}
-        </h3>
-
-        {/* Notice description */}
-        <p className="text-sm text-neutral-300 mb-6 max-w-sm leading-relaxed">
-          Para garantir velocidade de navegação e privacidade de dados, esta publicação é aberta diretamente no aplicativo ou web oficial do Instagram.
+  if (!embedUrl) {
+    return (
+      <div className="w-full min-h-[320px] flex flex-col items-center justify-center p-6 bg-neutral-950 text-white">
+        <Instagram className="w-10 h-10 mb-3 text-rose-500" />
+        <p className="text-sm text-neutral-300 text-center mb-4">
+          Não foi possível preparar a visualização incorporada desta publicação.
         </p>
-
-        {/* CTA Button */}
         <a
           href={targetUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-semibold text-sm transition-all shadow-lg shadow-red-950/40 hover:shadow-red-900/60 active:scale-98 cursor-pointer focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2 focus:ring-offset-neutral-900"
+          className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-karate-red text-white font-semibold text-sm"
         >
-          <span>Abrir Publicação Oficial</span>
+          Abrir no Instagram
           <ExternalLink className="w-4 h-4" />
         </a>
+      </div>
+    );
+  }
 
-        {/* Security / Privacy guarantee */}
-        <div className="flex items-center gap-1.5 text-[11px] text-neutral-400 mt-5">
-          <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-          <span>Link seguro e verificado • Madeira Karate</span>
-        </div>
+  return (
+    <div className="w-full bg-neutral-950 text-white flex flex-col items-center">
+      <div className="relative w-full bg-white min-h-[520px] sm:min-h-[620px]">
+        {!loaded && (
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-neutral-950 text-neutral-300 gap-3">
+            <Loader2 className="w-7 h-7 animate-spin text-karate-red" />
+            <span className="text-xs">Carregando publicação do Instagram...</span>
+          </div>
+        )}
+
+        <iframe
+          src={embedUrl}
+          title={title || "Publicação do Instagram"}
+          className="w-full h-[620px] sm:h-[720px] bg-white border-0"
+          loading="lazy"
+          allow="encrypted-media; picture-in-picture"
+          referrerPolicy="strict-origin-when-cross-origin"
+          onLoad={() => setLoaded(true)}
+        />
+      </div>
+
+      <div className="w-full p-3 bg-neutral-900 border-t border-neutral-800 flex justify-center">
+        <a
+          href={targetUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-karate-red hover:bg-red-700 text-white font-semibold text-xs sm:text-sm transition-colors"
+        >
+          Abrir publicação no Instagram
+          <ExternalLink className="w-4 h-4" />
+        </a>
       </div>
     </div>
   );
