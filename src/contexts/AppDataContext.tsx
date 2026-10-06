@@ -224,7 +224,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
                 return {
                   id: row.id,
                   title: row.titulo || row.title || "",
-                  image: instagramUrl ? "" : extractCleanUrl(rawImage),
+                  image: rawImage ? extractCleanUrl(rawImage) : "",
                   instagramUrl: isInstagramPublicationUrl(instagramUrl) ? instagramUrl : undefined,
                   showPopup: (row.mostrar_popup || "").toLowerCase().trim() === "sim",
                   type: 'aviso' as const
