@@ -273,7 +273,7 @@ export function NoticeModal({
                 rel="noopener noreferrer"
                 className="w-full max-w-sm bg-karate-red hover:bg-red-700 active:scale-[0.99] text-white font-bold py-2.5 px-4 rounded-xl transition-all text-center shadow-md flex items-center justify-center gap-2 text-sm sm:text-base"
               >
-                <span>Ver Álbum Completo</span>
+                <span>{currentNotice.type === "aviso" ? "Abrir link" : "Ver Álbum Completo"}</span>
                 <ExternalLink size={16} />
               </a>
             )}
