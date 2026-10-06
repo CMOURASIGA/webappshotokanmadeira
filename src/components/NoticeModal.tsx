@@ -62,12 +62,6 @@ export function NoticeModal({
     setImageLoading(true);
     setOrientation("unknown");
 
-    // Para avisos de Instagram, não alteramos o comportamento existente
-    if (currentNotice.instagramUrl) {
-      setImageLoading(false);
-      return;
-    }
-
     const imageUrl = currentNotice.image;
     if (!imageUrl) {
       setImageLoading(false);
@@ -106,16 +100,15 @@ export function NoticeModal({
   if (!isOpen || notices.length === 0 || !currentNotice) return null;
 
   const isInstagramNotice = Boolean(currentNotice.instagramUrl);
+  const hasNoticeImage = Boolean(currentNotice.image);
 
   // Definição da largura máxima do container conforme a classificação
   let containerMaxWidthClass = "max-w-md";
-  if (isInstagramNotice) {
-    containerMaxWidthClass = "max-w-md";
-  } else if (orientation === "landscape") {
+  if (hasNoticeImage && orientation === "landscape") {
     containerMaxWidthClass = "max-w-5xl";
-  } else if (orientation === "square") {
+  } else if (hasNoticeImage && orientation === "square") {
     containerMaxWidthClass = "max-w-2xl";
-  } else if (orientation === "portrait") {
+  } else if (hasNoticeImage && orientation === "portrait") {
     containerMaxWidthClass = "max-w-md";
   } else {
     containerMaxWidthClass = "max-w-lg";
@@ -143,27 +136,7 @@ export function NoticeModal({
 
         {/* Área Central / Conteúdo */}
         <div className="relative flex-1 min-h-0 w-full flex items-center justify-center bg-neutral-950 overflow-hidden select-none">
-          {isInstagramNotice ? (
-            /* Comportamento já existente para Instagram sem alterações */
-            <div className="min-h-0 flex-1 w-full overflow-y-auto bg-white">
-              <InstagramEmbed
-                url={currentNotice.instagramUrl!}
-                title={currentNotice.title}
-              />
-            </div>
-          ) : imageError ? (
-            /* Fallback de erro elegante */
-            <div className="w-full py-16 px-6 flex flex-col items-center justify-center text-neutral-400 gap-3 min-h-[240px]">
-              <div className="w-14 h-14 rounded-full bg-neutral-800/80 border border-neutral-700 flex items-center justify-center text-neutral-400 shadow-inner">
-                <ImageOff className="w-7 h-7 text-neutral-400" />
-              </div>
-              <div className="space-y-1 text-center">
-                <p className="text-white font-medium text-base">Imagem temporariamente indisponível</p>
-                <p className="text-xs text-neutral-300">Não foi possível carregar a arte deste aviso</p>
-              </div>
-            </div>
-          ) : currentNotice.image ? (
-            /* Imagem comum: não força aspect-[4/5] e usa object-contain */
+          {hasNoticeImage && !imageError ? (
             <div className="w-full h-full flex items-center justify-center relative p-1 sm:p-2">
               {imageLoading && (
                 <div className="absolute inset-0 flex items-center justify-center bg-neutral-950/50">
@@ -197,6 +170,24 @@ export function NoticeModal({
                 } w-auto h-auto object-contain block mx-auto transition-opacity duration-200 select-none ${
                   imageLoading ? "opacity-0" : "opacity-100"
                 }`}
+              />
+            </div>
+          ) : imageError && !isInstagramNotice ? (
+            /* Fallback de erro elegante */
+            <div className="w-full py-16 px-6 flex flex-col items-center justify-center text-neutral-400 gap-3 min-h-[240px]">
+              <div className="w-14 h-14 rounded-full bg-neutral-800/80 border border-neutral-700 flex items-center justify-center text-neutral-400 shadow-inner">
+                <ImageOff className="w-7 h-7 text-neutral-400" />
+              </div>
+              <div className="space-y-1 text-center">
+                <p className="text-white font-medium text-base">Imagem temporariamente indisponível</p>
+                <p className="text-xs text-neutral-300">Não foi possível carregar a arte deste aviso</p>
+              </div>
+            </div>
+          ) : isInstagramNotice ? (
+            <div className="min-h-0 flex-1 w-full overflow-y-auto bg-white">
+              <InstagramEmbed
+                url={currentNotice.instagramUrl!}
+                title={currentNotice.title}
               />
             </div>
           ) : (
@@ -263,6 +254,18 @@ export function NoticeModal({
               </h3>
             )}
             
+            {currentNotice.instagramUrl && (
+              <a
+                href={currentNotice.instagramUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full max-w-sm bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 active:scale-[0.99] text-white font-bold py-2.5 px-4 rounded-xl transition-all text-center shadow-md flex items-center justify-center gap-2 text-sm sm:text-base"
+              >
+                <span>Abrir no Instagram</span>
+                <ExternalLink size={16} />
+              </a>
+            )}
+
             {currentNotice.link && (
               <a 
                 href={currentNotice.link}
