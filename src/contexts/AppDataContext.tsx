@@ -214,18 +214,25 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
               .filter(row => row.id)
               .map(row => {
                 const rawImage = (row.imagem || row.image || "").trim();
-                const explicitInstagramUrl = (
+                const buttonLink = String(
+                  row.link_botao || row.link || row.url || ""
+                ).trim();
+
+                const explicitInstagramUrl = String(
                   row.instagram || row.instagram_url || row.link_instagram || ""
                 ).trim();
-                const instagramUrl = explicitInstagramUrl || (
-                  isInstagramPublicationUrl(rawImage) ? rawImage : ""
-                );
+
+                const instagramUrl =
+                  explicitInstagramUrl ||
+                  (isInstagramPublicationUrl(buttonLink) ? buttonLink : "") ||
+                  (isInstagramPublicationUrl(rawImage) ? rawImage : "");
 
                 return {
                   id: row.id,
                   title: row.titulo || row.title || "",
-                  image: rawImage ? extractCleanUrl(rawImage) : "",
+                  image: rawImage && !isInstagramPublicationUrl(rawImage) ? extractCleanUrl(rawImage) : "",
                   instagramUrl: isInstagramPublicationUrl(instagramUrl) ? instagramUrl : undefined,
+                  link: buttonLink && !isInstagramPublicationUrl(buttonLink) ? buttonLink : undefined,
                   showPopup: (row.mostrar_popup || "").toLowerCase().trim() === "sim",
                   type: 'aviso' as const
                 };
