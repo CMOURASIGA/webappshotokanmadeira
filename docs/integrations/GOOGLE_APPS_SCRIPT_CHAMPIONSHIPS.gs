@@ -1,12 +1,11 @@
 /**
  * GOOGLE APPS SCRIPT — DOJO DIGITAL MADEIRA KARATE
- * A planilha e a fonte oficial do modulo de campeonatos.
+ * Script oficial unificado: Campeonatos, Galerias e MadeiraStore
  *
- * Abas preservadas:
- * Produtos, Inscrições, Configuracoes, Katas, Tecnicas, Avisos, Eventos
- *
- * Abas adicionadas pelo modulo:
- * CAMPEONATOS, CATEGORIAS_CAMPEONATO
+ * Abas gerenciadas:
+ * - Produtos, Inscrições, Configuracoes, Katas, Tecnicas, Avisos, Eventos, Galerias
+ * - CAMPEONATOS, CATEGORIAS_CAMPEONATO
+ * - PEDIDOS_LOJA, ITENS_PEDIDO_LOJA
  */
 
 function TEST_GALLERY_DRIVE_ACCESS() {
@@ -71,23 +70,69 @@ function doPost(e) {
 
         var totalCalculated = 0;
         var processedItems = [];
+        var productsSheet = ensureProdutosSheet_(ss);
+
+        if (!rawItems.length) {
+          return jsonResponse_({ status: "error", message: "O pedido deve conter pelo menos um item." });
+        }
 
         for (var i = 0; i < rawItems.length; i++) {
-          var it = rawItems[i];
+          var it = rawItems[i] || {};
+          var productId = String(it.produtoId || "").trim();
+          var product = findProductById_(productsSheet, productId);
+          if (!product) {
+            return jsonResponse_({ status: "error", message: "Produto não localizado: " + productId });
+          }
+
+          var active = parseSheetBool_(product.ativo, true);
+          var available = parseSheetBool_(product.disponivel, true);
+          var channel = String(product.canal || "").trim().toLowerCase() || "store";
+          if (!active || !available) {
+            return jsonResponse_({ status: "error", message: "Produto indisponível: " + String(product.nome || productId) });
+          }
+          if (channel !== "madeirastore" && channel !== "ambos") {
+            return jsonResponse_({ status: "error", message: "Produto não habilitado para a MadeiraStore: " + String(product.nome || productId) });
+          }
+
           var qty = Number(it.quantidade || 1);
-          var price = Number(it.valorUnitario || it.preco || 0);
-          var sub = qty * price;
+          if (!isFinite(qty) || Math.floor(qty) !== qty || qty < 1 || qty > 99) {
+            return jsonResponse_({ status: "error", message: "Quantidade inválida para " + String(product.nome || productId) });
+          }
+
+          var size = String(it.tamanho || "").trim();
+          var color = String(it.cor || "").trim();
+          var variation = String(it.variacao || "").trim();
+          var allowedSizes = parseSheetList_(product.tamanhos);
+          var allowedColors = parseSheetList_(product.cores);
+          var allowedVariations = parseSheetList_(product.variacoes);
+
+          if (allowedSizes.length && allowedSizes.indexOf(size) === -1) {
+            return jsonResponse_({ status: "error", message: "Tamanho inválido para " + String(product.nome || productId) });
+          }
+          if (allowedColors.length && allowedColors.indexOf(color) === -1) {
+            return jsonResponse_({ status: "error", message: "Cor inválida para " + String(product.nome || productId) });
+          }
+          if (allowedVariations.length && allowedVariations.indexOf(variation) === -1) {
+            return jsonResponse_({ status: "error", message: "Variação inválida para " + String(product.nome || productId) });
+          }
+
+          var price = parseSheetNumber_(product.preco);
+          if (!(price > 0)) {
+            return jsonResponse_({ status: "error", message: "Preço oficial inválido para " + String(product.nome || productId) });
+          }
+
+          var sub = Math.round((qty * price) * 100) / 100;
           totalCalculated += sub;
 
           var itemRow = {
             pedidoId: orderCode,
-            produtoId: String(it.produtoId || "").trim(),
-            produtoNome: String(it.produtoNome || it.name || "").trim(),
-            categoria: String(it.categoria || "").trim(),
+            produtoId: productId,
+            produtoNome: String(product.nome || productId).trim(),
+            categoria: String(product.categoria || "").trim(),
             quantidade: qty,
-            tamanho: String(it.tamanho || "").trim(),
-            cor: String(it.cor || "").trim(),
-            variacao: String(it.variacao || "").trim(),
+            tamanho: size,
+            cor: color,
+            variacao: variation,
             personalizacao: String(it.personalizacao || "").trim(),
             valorUnitario: price,
             subtotal: sub
@@ -103,7 +148,7 @@ function doPost(e) {
           nomeCliente: String(rawOrder.nomeCliente || "").trim(),
           telefone: String(rawOrder.telefone || "").trim(),
           email: String(rawOrder.email || "").trim(),
-          valorTotal: Number(rawOrder.valorTotal || totalCalculated),
+          valorTotal: Math.round(totalCalculated * 100) / 100,
           statusPedido: String(rawOrder.statusPedido || "RECEBIDO").trim(),
           statusPagamento: String(rawOrder.statusPagamento || "AGUARDANDO_PAGAMENTO").trim(),
           dataCriacao: String(rawOrder.dataCriacao || nowIso).trim(),
@@ -428,7 +473,7 @@ function ensureProdutosSheet_(ss) {
   return ensureSheetWithHeaders_(ss, "Produtos", [
     "id", "nome", "descricao", "preco", "imagem1", "imagem2", "imagem3",
     "categoria", "tamanhos", "cores", "variacoes", "personalizavel",
-    "disponivel", "ativo", "ordem"
+    "disponivel", "ativo", "ordem", "canal"
   ], "#1F2937");
 }
 
@@ -696,6 +741,46 @@ function jsonResponse_(payload) {
     .setMimeType(ContentService.MimeType.JSON);
 }
 
+function parseSheetBool_(value, defaultValue) {
+  var raw = String(value === undefined || value === null ? "" : value).trim().toLowerCase();
+  if (!raw) return defaultValue === true;
+  return ["1", "true", "sim", "yes", "ativo", "disponivel", "disponível"].indexOf(raw) >= 0;
+}
+
+function parseSheetList_(value) {
+  return String(value || "")
+    .split(/[,;|]/)
+    .map(function(v) { return String(v).trim(); })
+    .filter(function(v) { return !!v; });
+}
+
+function parseSheetNumber_(value) {
+  var raw = String(value === undefined || value === null ? "0" : value).trim();
+  if (!raw) return 0;
+  if (raw.indexOf(",") >= 0) raw = raw.replace(/\./g, "").replace(",", ".");
+  var n = Number(raw);
+  return isFinite(n) ? n : 0;
+}
+
+function findProductById_(sheet, productId) {
+  if (!productId || sheet.getLastRow() <= 1) return null;
+  var map = headerMap_(sheet);
+  var idCol = map["id"];
+  if (!idCol) return null;
+
+  var values = sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn()).getValues();
+  for (var i = 0; i < values.length; i++) {
+    if (String(values[i][idCol - 1] || "").trim() === String(productId).trim()) {
+      var obj = {};
+      Object.keys(map).forEach(function(header) {
+        obj[header] = values[i][map[header] - 1];
+      });
+      return obj;
+    }
+  }
+  return null;
+}
+
 // ----------------------------------------------------
 // MadeiraStore Sheet Helpers (SPEC 09)
 // ----------------------------------------------------
@@ -813,3 +898,41 @@ function getObjectsByKeyValue_(sheet, keyHeader, keyValue, headers) {
   return result;
 }
 
+function appendObjectRow_(sheet, headers, obj) {
+  var map = headerMap_(sheet);
+  var row = [];
+  for (var i = 0; i < headers.length; i++) {
+    var val = obj[headers[i]];
+    row.push(val !== undefined && val !== null ? val : "");
+  }
+  sheet.appendRow(row);
+}
+
+function getOrCreateSheetWithHeaders_(ss, name, requiredHeaders, color) {
+  var sheet = ss.getSheetByName(name);
+  if (!sheet) {
+    sheet = ss.insertSheet(name);
+  }
+
+  var lastColumn = Math.max(sheet.getLastColumn(), 0);
+  var existingHeaders = lastColumn > 0
+    ? sheet.getRange(1, 1, 1, lastColumn).getValues()[0].map(function(v) { return String(v).trim(); })
+    : [];
+
+  requiredHeaders.forEach(function(header) {
+    if (existingHeaders.indexOf(header) === -1) {
+      existingHeaders.push(header);
+      sheet.getRange(1, existingHeaders.length).setValue(header);
+    }
+  });
+
+  if (existingHeaders.length > 0) {
+    var headerRange = sheet.getRange(1, 1, 1, existingHeaders.length);
+    headerRange.setFontWeight("bold");
+    headerRange.setBackground(color || "#1F2937");
+    headerRange.setFontColor("#FFFFFF");
+    sheet.setFrozenRows(1);
+  }
+
+  return sheet;
+}
