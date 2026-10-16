@@ -22,6 +22,9 @@ export type Product = {
   variations?: string[];
   customizable?: boolean;
   available?: boolean;
+  stockControlled?: boolean;
+  stockQuantity?: number;
+  stockByVariant?: Record<string, number>;
   order?: number;
   canal?: "store" | "madeirastore" | "ambos";
   active?: boolean;
@@ -170,6 +173,22 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
 
                 const rawOrder = row.ordem ?? row.order;
                 const order = rawOrder ? parseInt(String(rawOrder), 10) : undefined;
+                const stockControlled = parseBool(row.estoqueControlado ?? row.stockControlled) === true;
+                const stockQuantityRaw = Number(row.estoqueAtual ?? row.stockQuantity ?? 0);
+                let stockByVariant: Record<string, number> | undefined;
+                try {
+                  const rawStock = String(row.estoqueVariacoes ?? row.stockByVariant ?? "").trim();
+                  if (rawStock) {
+                    const parsedStock = JSON.parse(rawStock);
+                    if (parsedStock && typeof parsedStock === "object" && !Array.isArray(parsedStock)) {
+                      stockByVariant = Object.fromEntries(
+                        Object.entries(parsedStock).map(([key, value]) => [key, Math.max(0, Number(value) || 0)])
+                      );
+                    }
+                  }
+                } catch {
+                  stockByVariant = undefined;
+                }
 
                 return {
                   id: String(row.id).trim(),
@@ -185,6 +204,9 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
                   variations: parseList(row.variacoes || row.variations || row.variacao),
                   customizable: parseBool(row.personalizado || row.personalizavel || row.customizable),
                   available,
+                  stockControlled,
+                  stockQuantity: stockControlled ? Math.max(0, stockQuantityRaw || 0) : undefined,
+                  stockByVariant: stockControlled ? stockByVariant : undefined,
                   order: isNaN(Number(order)) ? undefined : order,
                   canal: ((): "store" | "madeirastore" | "ambos" => {
                     const rawCanal = String(row.canal || row.channel || "").toLowerCase().trim();
