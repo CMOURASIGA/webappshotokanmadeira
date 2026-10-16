@@ -23,7 +23,8 @@ const emptyProduct = (): StoreProductAdmin => ({
   imagem1: "", imagem2: "", imagem3: "",
   imagem1FileId: "", imagem2FileId: "", imagem3FileId: "",
   categoriaId: "", categoria: "", tamanhos: "", cores: "", variacoes: "",
-  personalizavel: false, disponivel: true, ativo: true, ordem: 0
+  personalizavel: false, disponivel: true, ativo: true,
+  estoqueControlado: true, estoqueAtual: 0, estoqueVariacoes: {}, ordem: 0
 });
 
 export function StoreDashboard() {
@@ -95,6 +96,32 @@ export function StoreDashboard() {
 
   const activeCategory = categories.find(c => c.id === productForm.categoriaId);
 
+  const splitValues = (value?: string) =>
+    String(value || "").split(/[,;|]/).map(v => v.trim()).filter(Boolean);
+
+  const stockVariants = useMemo(() => {
+    const sizes = activeCategory?.usaTamanho ? splitValues(productForm.tamanhos) : [];
+    const colors = activeCategory?.usaCor ? splitValues(productForm.cores) : [];
+    const variations = activeCategory?.usaVariacao ? splitValues(productForm.variacoes) : [];
+    const sizeValues = sizes.length ? sizes : [""];
+    const colorValues = colors.length ? colors : [""];
+    const variationValues = variations.length ? variations : [""];
+    const hasVariantStock = sizes.length > 0 || colors.length > 0 || variations.length > 0;
+    if (!hasVariantStock) return [];
+
+    const result: Array<{ key: string; label: string }> = [];
+    sizeValues.forEach(size => colorValues.forEach(color => variationValues.forEach(variation => {
+      const key = [size, color, variation].map(v => v.trim().toLowerCase()).join("||");
+      const label = [
+        size ? `Tam. ${size}` : "",
+        color ? `Cor ${color}` : "",
+        variation || ""
+      ].filter(Boolean).join(" • ");
+      result.push({ key, label });
+    })));
+    return result;
+  }, [activeCategory, productForm.tamanhos, productForm.cores, productForm.variacoes]);
+
   const handleSaveCategory = async () => {
     if (!categoryForm.nome.trim()) return alert("Informe o nome da categoria.");
     setActionLoading(true);
@@ -123,7 +150,12 @@ export function StoreDashboard() {
         personalizavel: !!cat?.permitePersonalizacao && productForm.personalizavel,
         tamanhos: cat?.usaTamanho ? productForm.tamanhos : "",
         cores: cat?.usaCor ? productForm.cores : "",
-        variacoes: cat?.usaVariacao ? productForm.variacoes : ""
+        variacoes: cat?.usaVariacao ? productForm.variacoes : "",
+        estoqueControlado: productForm.estoqueControlado !== false,
+        estoqueAtual: stockVariants.length > 0 ? 0 : Math.max(0, Math.floor(Number(productForm.estoqueAtual) || 0)),
+        estoqueVariacoes: stockVariants.length > 0
+          ? Object.fromEntries(stockVariants.map(item => [item.key, Math.max(0, Math.floor(Number(productForm.estoqueVariacoes?.[item.key]) || 0))]))
+          : {}
       }, adminPin);
       setProductForm(emptyProduct());
       setShowProductForm(false);
@@ -348,6 +380,64 @@ export function StoreDashboard() {
             {activeCategory?.usaTamanho && <input value={productForm.tamanhos||""} onChange={e=>setProductForm({...productForm,tamanhos:e.target.value})} placeholder="Tamanhos: P, M, G, GG" className="w-full p-2.5 rounded-xl border text-xs"/>}
             {activeCategory?.usaCor && <input value={productForm.cores||""} onChange={e=>setProductForm({...productForm,cores:e.target.value})} placeholder="Cores separadas por vírgula" className="w-full p-2.5 rounded-xl border text-xs"/>}
             {activeCategory?.usaVariacao && <input value={productForm.variacoes||""} onChange={e=>setProductForm({...productForm,variacoes:e.target.value})} placeholder="Variações separadas por vírgula" className="w-full p-2.5 rounded-xl border text-xs"/>}
+
+            <div className="border rounded-2xl p-3 space-y-3">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <div className="text-xs font-bold">Controle de estoque</div>
+                  <p className="text-[10px] text-neutral-500">Bloqueia vendas quando a quantidade disponível chegar a zero.</p>
+                </div>
+                <label className="flex items-center gap-2 text-xs font-bold">
+                  <input
+                    type="checkbox"
+                    checked={productForm.estoqueControlado !== false}
+                    onChange={e=>setProductForm({...productForm,estoqueControlado:e.target.checked})}
+                  />
+                  Controlar
+                </label>
+              </div>
+
+              {productForm.estoqueControlado !== false && (
+                stockVariants.length > 0 ? (
+                  <div className="space-y-2">
+                    <p className="text-[10px] text-neutral-500">Informe a quantidade disponível para cada combinação.</p>
+                    <div className="grid sm:grid-cols-2 gap-2">
+                      {stockVariants.map(item => (
+                        <label key={item.key} className="p-2 rounded-xl border bg-neutral-50 text-[10px]">
+                          <span className="font-bold block mb-1">{item.label}</span>
+                          <input
+                            type="number"
+                            min="0"
+                            step="1"
+                            value={productForm.estoqueVariacoes?.[item.key] ?? 0}
+                            onChange={e=>setProductForm(prev=>({
+                              ...prev,
+                              estoqueVariacoes: {
+                                ...(prev.estoqueVariacoes || {}),
+                                [item.key]: Math.max(0, Math.floor(Number(e.target.value) || 0))
+                              }
+                            }))}
+                            className="w-full p-2 rounded-lg border bg-white text-xs"
+                          />
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <label className="text-xs">
+                    <span className="font-bold block mb-1">Quantidade disponível</span>
+                    <input
+                      type="number"
+                      min="0"
+                      step="1"
+                      value={productForm.estoqueAtual ?? 0}
+                      onChange={e=>setProductForm({...productForm,estoqueAtual:Math.max(0,Math.floor(Number(e.target.value)||0))})}
+                      className="w-full p-2.5 rounded-xl border text-xs"
+                    />
+                  </label>
+                )
+              )}
+            </div>
 
             <div className="border rounded-2xl p-3 space-y-3">
               <div className="flex items-center gap-2 text-xs font-bold"><ImagePlus className="w-4 h-4"/> Imagem principal</div>
