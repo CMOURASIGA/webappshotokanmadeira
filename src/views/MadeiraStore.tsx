@@ -20,16 +20,14 @@ import { MadeiraStoreCartDrawer } from "../components/store/MadeiraStoreCartDraw
 
 export function MadeiraStore() {
   const navigate = useNavigate();
-  const { products, loading, productsError } = useAppData();
+  const { madeiraStoreProducts, loading, madeiraStoreProductsError } = useAppData();
   const { totalItems, totalAmount, setIsCartDrawerOpen } = useMadeiraStoreCart();
 
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Filtrar apenas produtos com canal 'madeirastore' ou 'ambos' (SPEC 09 item 1)
-  const storeProducts = useMemo(() => {
-    return products.filter((p) => p.canal === "madeirastore" || p.canal === "ambos");
-  }, [products]);
+  // Catálogo exclusivo da MadeiraStore vindo da aba Produtos_MadeiraStore
+  const storeProducts = useMemo(() => madeiraStoreProducts, [madeiraStoreProducts]);
 
   // Extrair categorias reais existentes dos produtos da MadeiraStore
   const availableCategories = useMemo(() => {
