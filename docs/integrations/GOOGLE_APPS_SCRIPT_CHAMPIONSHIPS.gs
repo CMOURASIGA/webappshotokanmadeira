@@ -151,7 +151,10 @@ function doPost(e) {
           dataPagamento: String(rawOrder.dataPagamento || "").trim(),
           dataRetirada: String(rawOrder.dataRetirada || "").trim(),
           observacoes: String(rawOrder.observacoes || "").trim(),
-          atualizadoEm: nowIso
+          atualizadoEm: nowIso,
+          tokenRetirada: String(rawOrder.tokenRetirada || Utilities.getUuid().replace(/-/g, "")).trim(),
+          dataGeracaoComprovante: String(rawOrder.dataGeracaoComprovante || nowIso).trim(),
+          entreguePor: String(rawOrder.entreguePor || "").trim()
         };
 
         upsertObjectByKey_(ordersSheet, "id", orderCode, storeOrdersHeaders_(), orderData);
@@ -216,6 +219,96 @@ function doPost(e) {
 
       var allItems = getObjectsByKeyValue_(itemsSheet, "pedidoId", foundOrder.codigo || foundOrder.id, storeOrderItemsHeaders_());
       return jsonResponse_({ status: "success", order: foundOrder, items: allItems });
+    }
+
+    if (data.action === "SAVE_STORE_CATEGORY" && data.category) {
+      var categorySheet = ensureStoreCategoriesSheet_(ss);
+      var category = normalizeStoreCategory_(data.category);
+      upsertObjectByKey_(categorySheet, "id", category.id, storeCategoryHeaders_(), category);
+      SpreadsheetApp.flush();
+      return jsonResponse_({ status: "success", category: storeCategoryObjectForApi_(category) });
+    }
+
+    if (data.action === "DELETE_STORE_CATEGORY" && data.id) {
+      var categorySheet = ensureStoreCategoriesSheet_(ss);
+      var productSheet = ensureProdutosMadeiraStoreSheet_(ss);
+      var inUse = countRowsByValue_(productSheet, "categoriaId", String(data.id));
+      if (inUse > 0) {
+        return jsonResponse_({ status: "error", message: "Categoria vinculada a produto. Remova ou altere os produtos antes de excluir." });
+      }
+      deleteRowByKey_(categorySheet, "id", String(data.id));
+      SpreadsheetApp.flush();
+      return jsonResponse_({ status: "success", deleted: true });
+    }
+
+    if (data.action === "SAVE_STORE_PRODUCT" && data.product) {
+      var productSheet = ensureProdutosMadeiraStoreSheet_(ss);
+      var product = normalizeStoreProduct_(data.product);
+      if (!product.categoriaId) {
+        return jsonResponse_({ status: "error", message: "Selecione uma categoria cadastrada." });
+      }
+      var categorySheet = ensureStoreCategoriesSheet_(ss);
+      var category = findObjectByKey_(categorySheet, "id", product.categoriaId, storeCategoryHeaders_());
+      if (!category || String(category.ativo).toLowerCase() === "não") {
+        return jsonResponse_({ status: "error", message: "Categoria inválida ou inativa." });
+      }
+      product.categoria = String(category.nome || "").trim();
+      upsertObjectByKey_(productSheet, "id", product.id, storeProductHeaders_(), product);
+      SpreadsheetApp.flush();
+      return jsonResponse_({ status: "success", product: storeProductObjectForApi_(product) });
+    }
+
+    if (data.action === "DELETE_STORE_PRODUCT" && data.id) {
+      var productSheet = ensureProdutosMadeiraStoreSheet_(ss);
+      deleteRowByKey_(productSheet, "id", String(data.id));
+      SpreadsheetApp.flush();
+      return jsonResponse_({ status: "success", deleted: true });
+    }
+
+    if (data.action === "SAVE_STORE_CONFIG" && data.config) {
+      var driveUrl = String(data.config.driveFolderUrl || "").trim();
+      var folderId = extractDriveFolderId_(driveUrl);
+      if (!folderId) {
+        return jsonResponse_({ status: "error", message: "Informe um link válido de pasta do Google Drive." });
+      }
+      try {
+        var folder = DriveApp.getFolderById(folderId);
+        folder.getName();
+      } catch (folderErr) {
+        return jsonResponse_({ status: "error", message: "Não foi possível acessar a pasta. Verifique o link e o compartilhamento da pasta." });
+      }
+      setConfigValue_(ss, "madeirastore_drive_folder_url", driveUrl);
+      setConfigValue_(ss, "madeirastore_drive_folder_id", folderId);
+      SpreadsheetApp.flush();
+      return jsonResponse_({ status: "success", config: { driveFolderUrl: driveUrl, driveFolderId: folderId } });
+    }
+
+    if (data.action === "UPLOAD_STORE_PRODUCT_IMAGE" && data.dataUrl) {
+      var folderId = getConfigValue_(ss, "madeirastore_drive_folder_id");
+      if (!folderId) {
+        return jsonResponse_({ status: "error", message: "Configure primeiro a pasta de imagens da MadeiraStore no Dashboard." });
+      }
+      var uploaded = uploadStoreProductImage_(folderId, String(data.dataUrl), String(data.fileName || "produto.jpg"));
+      return jsonResponse_({ status: "success", url: uploaded.url, fileId: uploaded.fileId });
+    }
+
+    if (data.action === "CONFIRM_STORE_PICKUP" && data.token) {
+      var ordersSheet = ensureStoreOrdersSheet_(ss);
+      var existing = findObjectByKey_(ordersSheet, "tokenRetirada", String(data.token), storeOrdersHeaders_());
+      if (!existing) {
+        return jsonResponse_({ status: "error", message: "Pedido não localizado para este QR Code." });
+      }
+      if (String(existing.statusPagamento || "") !== "PAGAMENTO_CONFIRMADO") {
+        return jsonResponse_({ status: "error", message: "Pagamento ainda não confirmado. A entrega não pode ser concluída." });
+      }
+      var nowIso = new Date().toISOString();
+      existing.statusPedido = "ENTREGUE";
+      existing.dataRetirada = existing.dataRetirada || nowIso;
+      existing.entreguePor = String(data.entreguePor || "ADMIN").trim();
+      existing.atualizadoEm = nowIso;
+      upsertObjectByKey_(ordersSheet, "id", existing.id, storeOrdersHeaders_(), existing);
+      SpreadsheetApp.flush();
+      return jsonResponse_({ status: "success", order: existing });
     }
 
     if (data.action === "LIST_GALLERY_PHOTOS" && data.folderId) {
@@ -473,12 +566,25 @@ function ensureProdutosSheet_(ss) {
   ], "#1F2937");
 }
 
-function ensureProdutosMadeiraStoreSheet_(ss) {
-  return ensureSheetWithHeaders_(ss, "Produtos_MadeiraStore", [
+function storeProductHeaders_() {
+  return [
     "id", "nome", "descricao", "preco", "imagem1", "imagem2", "imagem3",
-    "categoria", "tamanhos", "cores", "variacoes", "personalizavel",
+    "imagem1_file_id", "imagem2_file_id", "imagem3_file_id",
+    "categoriaId", "categoria", "tamanhos", "cores", "variacoes", "personalizavel",
     "disponivel", "ativo", "ordem"
-  ], "#1F2937");
+  ];
+}
+
+function ensureProdutosMadeiraStoreSheet_(ss) {
+  return ensureSheetWithHeaders_(ss, "Produtos_MadeiraStore", storeProductHeaders_(), "#1F2937");
+}
+
+function storeCategoryHeaders_() {
+  return ["id", "nome", "descricao", "ativo", "usaTamanho", "usaCor", "usaVariacao", "permitePersonalizacao", "ordem"];
+}
+
+function ensureStoreCategoriesSheet_(ss) {
+  return ensureSheetWithHeaders_(ss, "CATEGORIAS_MADEIRASTORE", storeCategoryHeaders_(), "#1F2937");
 }
 
 function ensureEventosSheet_(ss) {
@@ -785,12 +891,137 @@ function findProductById_(sheet, productId) {
   return null;
 }
 
+function normalizeStoreCategory_(cat) {
+  var now = new Date().getTime();
+  return {
+    id: String(cat.id || ("msc-" + now)).trim(),
+    nome: String(cat.nome || "").trim(),
+    descricao: String(cat.descricao || "").trim(),
+    ativo: cat.ativo === false ? "Não" : "Sim",
+    usaTamanho: cat.usaTamanho === true ? "Sim" : "Não",
+    usaCor: cat.usaCor === true ? "Sim" : "Não",
+    usaVariacao: cat.usaVariacao === true ? "Sim" : "Não",
+    permitePersonalizacao: cat.permitePersonalizacao === true ? "Sim" : "Não",
+    ordem: Number(cat.ordem || 0)
+  };
+}
+
+function storeCategoryObjectForApi_(cat) {
+  return {
+    id: cat.id, nome: cat.nome, descricao: cat.descricao,
+    ativo: String(cat.ativo).toLowerCase() !== "não",
+    usaTamanho: String(cat.usaTamanho).toLowerCase() === "sim",
+    usaCor: String(cat.usaCor).toLowerCase() === "sim",
+    usaVariacao: String(cat.usaVariacao).toLowerCase() === "sim",
+    permitePersonalizacao: String(cat.permitePersonalizacao).toLowerCase() === "sim",
+    ordem: Number(cat.ordem || 0)
+  };
+}
+
+function normalizeStoreProduct_(p) {
+  return {
+    id: String(p.id || ("msp-" + new Date().getTime())).trim(),
+    nome: String(p.nome || "").trim(),
+    descricao: String(p.descricao || "").trim(),
+    preco: Number(p.preco || 0),
+    imagem1: String(p.imagem1 || "").trim(),
+    imagem2: String(p.imagem2 || "").trim(),
+    imagem3: String(p.imagem3 || "").trim(),
+    imagem1_file_id: String(p.imagem1FileId || p.imagem1_file_id || "").trim(),
+    imagem2_file_id: String(p.imagem2FileId || p.imagem2_file_id || "").trim(),
+    imagem3_file_id: String(p.imagem3FileId || p.imagem3_file_id || "").trim(),
+    categoriaId: String(p.categoriaId || "").trim(),
+    categoria: String(p.categoria || "").trim(),
+    tamanhos: String(p.tamanhos || "").trim(),
+    cores: String(p.cores || "").trim(),
+    variacoes: String(p.variacoes || "").trim(),
+    personalizavel: p.personalizavel === true ? "Sim" : "Não",
+    disponivel: p.disponivel === false ? "Não" : "Sim",
+    ativo: p.ativo === false ? "Não" : "Sim",
+    ordem: Number(p.ordem || 0)
+  };
+}
+
+function storeProductObjectForApi_(p) {
+  return {
+    id: p.id, nome: p.nome, descricao: p.descricao, preco: Number(p.preco || 0),
+    imagem1: p.imagem1, imagem2: p.imagem2, imagem3: p.imagem3,
+    imagem1FileId: p.imagem1_file_id, imagem2FileId: p.imagem2_file_id, imagem3FileId: p.imagem3_file_id,
+    categoriaId: p.categoriaId, categoria: p.categoria,
+    tamanhos: p.tamanhos, cores: p.cores, variacoes: p.variacoes,
+    personalizavel: String(p.personalizavel).toLowerCase() === "sim",
+    disponivel: String(p.disponivel).toLowerCase() !== "não",
+    ativo: String(p.ativo).toLowerCase() !== "não",
+    ordem: Number(p.ordem || 0)
+  };
+}
+
+function extractDriveFolderId_(url) {
+  var raw = String(url || "").trim();
+  var match = raw.match(/\/folders\/([a-zA-Z0-9_-]+)/);
+  if (match && match[1]) return match[1];
+  if (/^[a-zA-Z0-9_-]{15,}$/.test(raw)) return raw;
+  return "";
+}
+
+function setConfigValue_(ss, key, value) {
+  var sheet = ensureConfiguracoesSheet_(ss);
+  var map = headerMap_(sheet);
+  var keyCol = map["chave"];
+  var valueCol = map["valor"];
+  var lastRow = sheet.getLastRow();
+  if (lastRow > 1) {
+    var values = sheet.getRange(2, keyCol, lastRow - 1, 1).getValues();
+    for (var i = 0; i < values.length; i++) {
+      if (String(values[i][0]).trim() === String(key).trim()) {
+        sheet.getRange(i + 2, valueCol).setValue(value);
+        return;
+      }
+    }
+  }
+  sheet.appendRow([key, value, "Configuração MadeiraStore"]);
+}
+
+function getConfigValue_(ss, key) {
+  var sheet = ensureConfiguracoesSheet_(ss);
+  var map = headerMap_(sheet);
+  var keyCol = map["chave"];
+  var valueCol = map["valor"];
+  if (sheet.getLastRow() <= 1) return "";
+  var values = sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn()).getValues();
+  for (var i = 0; i < values.length; i++) {
+    if (String(values[i][keyCol - 1]).trim() === String(key).trim()) {
+      return String(values[i][valueCol - 1] || "").trim();
+    }
+  }
+  return "";
+}
+
+function uploadStoreProductImage_(folderId, dataUrl, fileName) {
+  var match = String(dataUrl || "").match(/^data:([^;]+);base64,(.+)$/);
+  if (!match) throw new Error("Arquivo de imagem inválido.");
+  var mime = match[1];
+  if (mime.indexOf("image/") !== 0) throw new Error("O arquivo enviado não é uma imagem.");
+  var bytes = Utilities.base64Decode(match[2]);
+  if (bytes.length > 8 * 1024 * 1024) throw new Error("Imagem muito grande. Limite de 8 MB.");
+  var folder = DriveApp.getFolderById(folderId);
+  var blob = Utilities.newBlob(bytes, mime, fileName || ("produto-" + new Date().getTime() + ".jpg"));
+  var file = folder.createFile(blob);
+  try { file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW); } catch (e) {}
+  var fileId = file.getId();
+  return {
+    fileId: fileId,
+    url: "https://drive.google.com/thumbnail?id=" + encodeURIComponent(fileId) + "&sz=w1600"
+  };
+}
+
 // ----------------------------------------------------
 // MadeiraStore Sheet Helpers (SPEC 09)
 // ----------------------------------------------------
 
 function initStoreSheets_(ss) {
   ensureProdutosMadeiraStoreSheet_(ss);
+  ensureStoreCategoriesSheet_(ss);
   ensureStoreOrdersSheet_(ss);
   ensureStoreOrderItemsSheet_(ss);
 }
@@ -809,7 +1040,10 @@ function storeOrdersHeaders_() {
     "dataPagamento",
     "dataRetirada",
     "observacoes",
-    "atualizadoEm"
+    "atualizadoEm",
+    "tokenRetirada",
+    "dataGeracaoComprovante",
+    "entreguePor"
   ];
 }
 
