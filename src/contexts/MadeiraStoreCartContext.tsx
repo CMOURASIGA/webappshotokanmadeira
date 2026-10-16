@@ -72,15 +72,30 @@ export function MadeiraStoreCartProvider({ children }: { children: React.ReactNo
     return `${productId}::${s}::${c}::${v}::${cust}`;
   };
 
+  const getAvailableStock = (product: Product, variations?: MadeiraStoreItemVariation): number | null => {
+    if (!product.stockControlled) return null;
+    const hasVariants = !!(product.sizes?.length || product.colors?.length || product.variations?.length);
+    if (!hasVariants) return Math.max(0, Math.floor(Number(product.stockQuantity) || 0));
+    const key = [
+      variations?.size || "",
+      variations?.color || "",
+      variations?.variation || ""
+    ].map(value => String(value).trim().toLowerCase()).join("||");
+    return Math.max(0, Math.floor(Number(product.stockByVariant?.[key]) || 0));
+  };
+
   const addItem = (product: Product, quantity: number = 1, variations?: MadeiraStoreItemVariation) => {
     if (quantity <= 0 || product.available === false) return;
     const cartItemId = generateCartItemId(product.id, variations);
+    const availableStock = getAvailableStock(product, variations);
+    if (availableStock !== null && availableStock < 1) return;
 
     setItems((prevItems) => {
       const existingIdx = prevItems.findIndex((item) => item.id === cartItemId);
       if (existingIdx > -1) {
         const updated = [...prevItems];
         const newQty = updated[existingIdx].quantity + quantity;
+        if (availableStock !== null && newQty > availableStock) return prevItems;
         updated[existingIdx] = {
           ...updated[existingIdx],
           quantity: newQty,
@@ -113,10 +128,18 @@ export function MadeiraStoreCartProvider({ children }: { children: React.ReactNo
     setItems((prevItems) =>
       prevItems.map((item) => {
         if (item.id === cartItemId) {
+          const availableStock = getAvailableStock(item.product, {
+            size: item.selectedSize,
+            color: item.selectedColor,
+            variation: item.selectedVariation,
+            customization: item.customizationText
+          });
+          const quantity = availableStock === null ? newQuantity : Math.min(newQuantity, availableStock);
+          if (quantity <= 0) return item;
           return {
             ...item,
-            quantity: newQuantity,
-            subtotal: newQuantity * item.unitPrice
+            quantity,
+            subtotal: quantity * item.unitPrice
           };
         }
         return item;
