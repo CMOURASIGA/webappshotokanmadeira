@@ -20,6 +20,24 @@ function parseList(value: unknown): string[] {
   return String(value ?? "").split(/[,;|]/).map(v => v.trim()).filter(Boolean);
 }
 
+function parseStockMap(value: unknown): Record<string, number> {
+  try {
+    const parsed = JSON.parse(String(value ?? "").trim() || "{}");
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return {};
+    return Object.fromEntries(
+      Object.entries(parsed).map(([key, qty]) => [key, Math.max(0, Math.floor(Number(qty) || 0))])
+    );
+  } catch {
+    return {};
+  }
+}
+
+function stockVariantKey(size?: string, color?: string, variation?: string): string {
+  return [size || "", color || "", variation || ""]
+    .map(value => String(value).trim().toLowerCase())
+    .join("||");
+}
+
 function cleanPhone(value: unknown): string {
   return String(value ?? "").replace(/\D/g, "");
 }
@@ -118,6 +136,9 @@ function mapProduct(r: any) {
     personalizavel: parseBool(r.personalizavel, false),
     disponivel: parseBool(r.disponivel, true),
     ativo: parseBool(r.ativo, true),
+    estoqueControlado: parseBool(r.estoqueControlado, false),
+    estoqueAtual: Math.max(0, Math.floor(toNumber(r.estoqueAtual))),
+    estoqueVariacoes: parseStockMap(r.estoqueVariacoes),
     ordem: toNumber(r.ordem) || undefined
   };
 }
@@ -143,6 +164,17 @@ async function normalizeOfficialItems(rawItems: any[]) {
     if (allowedVariations.length && !allowedVariations.includes(variacao)) throw new Error("Variação selecionada não é válida para o produto.");
     const valorUnitario = toNumber(row.preco);
     if (!(valorUnitario > 0)) throw new Error(`Preço oficial inválido para ${String(row.nome || produtoId)}.`);
+
+    if (parseBool(row.estoqueControlado, false)) {
+      const hasVariants = allowedSizes.length > 0 || allowedColors.length > 0 || allowedVariations.length > 0;
+      const availableStock = hasVariants
+        ? (parseStockMap(row.estoqueVariacoes)[stockVariantKey(tamanho, cor, variacao)] || 0)
+        : Math.max(0, Math.floor(toNumber(row.estoqueAtual)));
+      if (availableStock < quantidade) {
+        throw new Error(`Estoque insuficiente para ${String(row.nome || produtoId)}. Disponível: ${availableStock}.`);
+      }
+    }
+
     return {
       produtoId,
       produtoNome: String(row.nome || produtoId).trim(),
