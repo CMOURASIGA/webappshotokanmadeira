@@ -42,6 +42,7 @@ export type Notice = {
 type AppData = {
   config: AppConfig;
   products: Product[];
+  madeiraStoreProducts: Product[];
   notices: Notice[];
   events: Notice[];
   kataVideos: Record<string, string>;
@@ -50,6 +51,7 @@ type AppData = {
   loading: boolean;
   eventsError: boolean;
   productsError: boolean;
+  madeiraStoreProductsError: boolean;
 };
 
 const AppDataContext = createContext<AppData | undefined>(undefined);
@@ -89,6 +91,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
       logo: "https://i.imgur.com/fECU6ud.png"
     },
     products: [],
+    madeiraStoreProducts: [],
     notices: [],
     events: [],
     kataVideos: {},
@@ -96,7 +99,8 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     techniqueImages: {},
     loading: true,
     eventsError: false,
-    productsError: false
+    productsError: false,
+    madeiraStoreProductsError: false
   });
 
   useEffect(() => {
@@ -207,6 +211,64 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
         } catch (pErr) {
           console.error("Could not fetch Produtos sheet due to network error", pErr);
           hasProductsError = true;
+        }
+
+        // Fetch MadeiraStore Products (source exclusiva: Produtos_MadeiraStore)
+        let madeiraStoreProductsList: Product[] = [];
+        let hasMadeiraStoreProductsError = false;
+        try {
+          const madeiraStoreProductsUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Produtos_MadeiraStore&ts=${Date.now()}`;
+          const madeiraStoreProductsRes = await fetch(madeiraStoreProductsUrl, { cache: "no-store" });
+          if (madeiraStoreProductsRes.ok) {
+            const madeiraStoreProductsCsv = await madeiraStoreProductsRes.text();
+            const parsedMadeiraStoreProducts = Papa.parse(madeiraStoreProductsCsv, { header: true }).data as any[];
+
+            madeiraStoreProductsList = parsedMadeiraStoreProducts
+              .filter(row => row && row.id && String(row.id).trim() !== "")
+              .map(row => {
+                const isActive = parseBool(row.ativo ?? row.active);
+                const active = isActive !== false;
+
+                const isAvailable = parseBool(row.disponibilidade ?? row.disponivel ?? row.available);
+                const available = isAvailable !== false;
+
+                const rawOrder = row.ordem ?? row.order;
+                const order = rawOrder ? parseInt(String(rawOrder), 10) : undefined;
+
+                return {
+                  id: String(row.id).trim(),
+                  name: (row.nome || row.name || "").trim(),
+                  description: (row.descricao || row.description || "").trim(),
+                  price: parseFloat(row.preco || row.price || "0"),
+                  images: [row.imagem1, row.imagem2, row.imagem3]
+                    .filter(img => img && String(img).trim() !== "")
+                    .map(img => extractCleanUrl(String(img).trim())),
+                  category: (row.categoria || row.category || "").trim() || undefined,
+                  sizes: parseList(row.tamanhos || row.sizes || row.tamanho),
+                  colors: parseList(row.cores || row.colors || row.cor),
+                  variations: parseList(row.variacoes || row.variations || row.variacao),
+                  customizable: parseBool(row.personalizado || row.personalizavel || row.customizable),
+                  available,
+                  order: isNaN(Number(order)) ? undefined : order,
+                  canal: "madeirastore" as const,
+                  active
+                };
+              })
+              .filter(product => product.active);
+
+            madeiraStoreProductsList.sort((a, b) => {
+              if (a.order !== undefined && b.order !== undefined) return a.order - b.order;
+              if (a.order !== undefined) return -1;
+              if (b.order !== undefined) return 1;
+              return 0;
+            });
+          } else {
+            console.warn(`Could not fetch Produtos_MadeiraStore sheet. Status: ${madeiraStoreProductsRes.status}`);
+            hasMadeiraStoreProductsError = true;
+          }
+        } catch (pErr) {
+          console.error("Could not fetch Produtos_MadeiraStore sheet due to network error", pErr);
+          hasMadeiraStoreProductsError = true;
         }
 
         // Fetch Notices (Avisos)
@@ -323,6 +385,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
         setData({
           config: configObj,
           products: productsList,
+          madeiraStoreProducts: madeiraStoreProductsList,
           notices: noticesList,
           events: eventsList,
           kataVideos: kataVideosMap,
@@ -330,7 +393,8 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
           techniqueImages: techniqueImagesMap,
           loading: false,
           eventsError: hasEventsError,
-          productsError: hasProductsError
+          productsError: hasProductsError,
+          madeiraStoreProductsError: hasMadeiraStoreProductsError
         });
 
         // Dynamically update the app icon (favicon) based on the loaded logo
