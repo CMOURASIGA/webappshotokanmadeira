@@ -1,4 +1,4 @@
-import { StoreOrder, StoreOrderItem, CreateStoreOrderPayload, StoreOrderStatus, StorePaymentStatus } from "../types/storeOrder";
+import { StoreOrder, CreateStoreOrderPayload, StoreOrderStatus, StorePaymentStatus, StoreCategory, StoreProductAdmin, StoreAdminConfig } from "../types/storeOrder";
 import { PixConfig } from "../types/championship";
 
 const DEFAULT_PIX_CONFIG: PixConfig = {
@@ -186,5 +186,96 @@ export const madeiraStoreService = {
     } catch {
       return false;
     }
+  },
+  async getAdminCatalog(adminPin: string): Promise<{ products: StoreProductAdmin[]; categories: StoreCategory[]; config: StoreAdminConfig }> {
+    const res = await fetch(`/api/store/orders?action=admin-catalog&ts=${Date.now()}`, {
+      headers: { "x-admin-pin": adminPin }
+    });
+    if (!res.ok) throw new Error("Erro ao carregar catálogo administrativo.");
+    return await res.json();
+  },
+
+  async saveCategory(category: StoreCategory, adminPin: string): Promise<StoreCategory> {
+    const res = await fetch("/api/store/orders?action=save-category", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-admin-pin": adminPin },
+      body: JSON.stringify({ category })
+    });
+    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || "Erro ao salvar categoria.");
+    return await res.json();
+  },
+
+  async deleteCategory(id: string, adminPin: string): Promise<void> {
+    const res = await fetch("/api/store/orders?action=delete-category", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-admin-pin": adminPin },
+      body: JSON.stringify({ id })
+    });
+    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || "Erro ao excluir categoria.");
+  },
+
+  async saveProduct(product: StoreProductAdmin, adminPin: string): Promise<StoreProductAdmin> {
+    const res = await fetch("/api/store/orders?action=save-product", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-admin-pin": adminPin },
+      body: JSON.stringify({ product })
+    });
+    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || "Erro ao salvar produto.");
+    return await res.json();
+  },
+
+  async deleteProduct(id: string, adminPin: string): Promise<void> {
+    const res = await fetch("/api/store/orders?action=delete-product", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-admin-pin": adminPin },
+      body: JSON.stringify({ id })
+    });
+    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || "Erro ao excluir produto.");
+  },
+
+  async saveStoreConfig(config: StoreAdminConfig, adminPin: string): Promise<StoreAdminConfig> {
+    const res = await fetch("/api/store/orders?action=save-store-config", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-admin-pin": adminPin },
+      body: JSON.stringify({ config })
+    });
+    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || "Erro ao salvar configuração da loja.");
+    return await res.json();
+  },
+
+  async uploadProductImage(file: File, adminPin: string): Promise<{ url: string; fileId: string }> {
+    const dataUrl = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ""));
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+    const res = await fetch("/api/store/orders?action=upload-product-image", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-admin-pin": adminPin },
+      body: JSON.stringify({ dataUrl, fileName: file.name || "produto.jpg" })
+    });
+    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || "Erro ao enviar imagem.");
+    return await res.json();
+  },
+
+  async getPickupOrder(token: string): Promise<StoreOrder> {
+    const res = await fetch("/api/store/orders?action=pickup-lookup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token })
+    });
+    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || "Pedido não localizado.");
+    return await res.json();
+  },
+
+  async confirmPickup(token: string, adminPin: string, entreguePor = "ADMIN"): Promise<StoreOrder> {
+    const res = await fetch("/api/store/orders?action=pickup-deliver", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", "x-admin-pin": adminPin },
+      body: JSON.stringify({ token, entreguePor })
+    });
+    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || "Erro ao confirmar entrega.");
+    return await res.json();
   }
 };
