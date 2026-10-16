@@ -22,6 +22,7 @@ const Store = lazy(() => import("./views/Store").then(m => ({ default: m.Store }
 const MadeiraStore = lazy(() => import("./views/MadeiraStore").then(m => ({ default: m.MadeiraStore })));
 const StoreOrderLookup = lazy(() => import("./views/StoreOrderLookup").then(m => ({ default: m.StoreOrderLookup })));
 const StoreDashboard = lazy(() => import("./views/StoreDashboard").then(m => ({ default: m.StoreDashboard })));
+const StorePickup = lazy(() => import("./views/StorePickup").then(m => ({ default: m.StorePickup })));
 const KatasList = lazy(() => import("./views/KatasList").then(m => ({ default: m.KatasList })));
 const KataDetail = lazy(() => import("./views/KataDetail").then(m => ({ default: m.KataDetail })));
 const TechniquesList = lazy(() => import("./views/TechniquesList").then(m => ({ default: m.TechniquesList })));
@@ -82,6 +83,7 @@ export default function App() {
                     <Route path="/madeirastore" element={<MadeiraStore />} />
                     <Route path="/madeirastore/pedido" element={<StoreOrderLookup />} />
                     <Route path="/dashboard_loja" element={<StoreDashboard />} />
+                    <Route path="/madeirastore/retirada/:token" element={<StorePickup />} />
                     <Route path="/schedule" element={<Schedule />} />
                     <Route path="/katas" element={<KatasList />} />
                     <Route path="/katas/:id" element={<KataDetail />} />
