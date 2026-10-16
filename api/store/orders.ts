@@ -89,7 +89,7 @@ async function loadOrders() {
 }
 
 async function normalizeOfficialItems(rawItems: any[]) {
-  const productRows = await readSheetRows("Produtos");
+  const productRows = await readSheetRows("Produtos_MadeiraStore");
   const products = new Map(
     productRows
       .filter(r => String(r.id || "").trim())
@@ -103,12 +103,7 @@ async function normalizeOfficialItems(rawItems: any[]) {
 
     const active = parseBool(row.ativo, true);
     const available = parseBool(row.disponivel, true);
-    const canalRaw = String(row.canal || "").trim().toLowerCase();
-    const canal = canalRaw || "store";
     if (!active || !available) throw new Error(`Produto indisponível: ${String(row.nome || produtoId)}.`);
-    if (canal !== "madeirastore" && canal !== "ambos") {
-      throw new Error(`Produto não habilitado para a MadeiraStore: ${String(row.nome || produtoId)}.`);
-    }
 
     const quantidade = Number(raw?.quantidade || 1);
     if (!Number.isInteger(quantidade) || quantidade < 1 || quantidade > 99) {
