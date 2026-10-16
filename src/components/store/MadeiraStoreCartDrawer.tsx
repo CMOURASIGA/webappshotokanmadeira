@@ -174,10 +174,10 @@ export function MadeiraStoreCartDrawer() {
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden bg-black/60 backdrop-blur-xs flex justify-end animate-in fade-in duration-200">
-      <div className="w-full max-w-md bg-white h-full shadow-2xl flex flex-col justify-between animate-in slide-in-from-right duration-300">
+      <div className="w-full max-w-md bg-white h-[100dvh] max-h-[100dvh] min-h-0 shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-300">
         
         {/* Header */}
-        <div className="p-4 sm:p-5 border-b border-neutral-100 flex items-center justify-between bg-neutral-900 text-white">
+        <div className="shrink-0 p-4 sm:p-5 border-b border-neutral-100 flex items-center justify-between bg-neutral-900 text-white">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-karate-red flex items-center justify-center font-bold text-white">
               <ShoppingBag className="w-4 h-4" />
@@ -206,7 +206,7 @@ export function MadeiraStoreCartDrawer() {
         </div>
 
         {/* Content Body */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-5">
+        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 sm:p-5">
           {/* ETAPA 1: CARRINHO */}
           {step === "cart" && (
             <>
@@ -549,7 +549,7 @@ export function MadeiraStoreCartDrawer() {
 
         {/* Footer (Apenas no passo do carrinho) */}
         {step === "cart" && items.length > 0 && (
-          <div className="p-4 sm:p-5 border-t border-neutral-200 bg-neutral-50 space-y-3">
+          <div className="shrink-0 p-4 sm:p-5 border-t border-neutral-200 bg-neutral-50 space-y-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
             <div className="flex items-center justify-between text-xs text-neutral-600">
               <span>Subtotal dos itens:</span>
               <span className="font-bold text-neutral-900 font-mono">
