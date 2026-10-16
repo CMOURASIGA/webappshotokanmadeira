@@ -70,7 +70,7 @@ function doPost(e) {
 
         var totalCalculated = 0;
         var processedItems = [];
-        var productsSheet = ensureProdutosSheet_(ss);
+        var productsSheet = ensureProdutosMadeiraStoreSheet_(ss);
 
         if (!rawItems.length) {
           return jsonResponse_({ status: "error", message: "O pedido deve conter pelo menos um item." });
@@ -86,12 +86,8 @@ function doPost(e) {
 
           var active = parseSheetBool_(product.ativo, true);
           var available = parseSheetBool_(product.disponivel, true);
-          var channel = String(product.canal || "").trim().toLowerCase() || "store";
           if (!active || !available) {
             return jsonResponse_({ status: "error", message: "Produto indisponível: " + String(product.nome || productId) });
-          }
-          if (channel !== "madeirastore" && channel !== "ambos") {
-            return jsonResponse_({ status: "error", message: "Produto não habilitado para a MadeiraStore: " + String(product.nome || productId) });
           }
 
           var qty = Number(it.quantidade || 1);
@@ -477,6 +473,14 @@ function ensureProdutosSheet_(ss) {
   ], "#1F2937");
 }
 
+function ensureProdutosMadeiraStoreSheet_(ss) {
+  return ensureSheetWithHeaders_(ss, "Produtos_MadeiraStore", [
+    "id", "nome", "descricao", "preco", "imagem1", "imagem2", "imagem3",
+    "categoria", "tamanhos", "cores", "variacoes", "personalizavel",
+    "disponivel", "ativo", "ordem"
+  ], "#1F2937");
+}
+
 function ensureEventosSheet_(ss) {
   return ensureSheetWithHeaders_(ss, "Eventos", [
     "id", "titulo", "imagem", "mostrar_popup", "link_album", "data_evento"
@@ -786,6 +790,7 @@ function findProductById_(sheet, productId) {
 // ----------------------------------------------------
 
 function initStoreSheets_(ss) {
+  ensureProdutosMadeiraStoreSheet_(ss);
   ensureStoreOrdersSheet_(ss);
   ensureStoreOrderItemsSheet_(ss);
 }
