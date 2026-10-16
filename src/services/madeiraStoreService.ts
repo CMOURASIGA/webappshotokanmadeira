@@ -65,7 +65,7 @@ export const madeiraStoreService = {
    * Consulta pública de pedido por Código + Telefone ou E-mail
    */
   async lookupOrder(codigo: string, telefoneOuEmail: string): Promise<StoreOrder> {
-    const res = await fetch("/api/store/order-lookup", {
+    const res = await fetch("/api/store/orders?action=lookup", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -89,11 +89,14 @@ export const madeiraStoreService = {
    * Busca um pedido específico por ID ou Código
    */
   async getOrder(id: string): Promise<StoreOrder> {
-    const res = await fetch(`/api/store/orders/${encodeURIComponent(id)}?ts=${Date.now()}`);
+    const res = await fetch(`/api/store/orders?ts=${Date.now()}`, { headers: { "x-admin-pin": "1926" } });
     if (!res.ok) {
       throw new Error("Pedido não encontrado.");
     }
-    return await res.json();
+    const orders: StoreOrder[] = await res.json();
+    const order = orders.find(o => o.id === id || o.codigo === id);
+    if (!order) throw new Error("Pedido não encontrado.");
+    return order;
   },
 
   /**
@@ -130,7 +133,7 @@ export const madeiraStoreService = {
       headers["x-admin-pin"] = adminPin;
     }
 
-    const res = await fetch(`/api/store/orders/${encodeURIComponent(orderId)}/status`, {
+    const res = await fetch(`/api/store/orders?id=${encodeURIComponent(orderId)}&action=status`, {
       method: "PATCH",
       headers,
       body: JSON.stringify(updates)
@@ -152,7 +155,7 @@ export const madeiraStoreService = {
    * Registra que o cliente informou ter realizado o pagamento ou enviado comprovante
    */
   async markPaymentSent(orderId: string): Promise<StoreOrder> {
-    const res = await fetch(`/api/store/orders/${encodeURIComponent(orderId)}/receipt`, {
+    const res = await fetch(`/api/store/orders?id=${encodeURIComponent(orderId)}&action=receipt`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json"
@@ -171,13 +174,17 @@ export const madeiraStoreService = {
    */
   async verifyAdminPin(pin: string): Promise<boolean> {
     try {
-      const res = await fetch(`/api/settings?ts=${Date.now()}`);
-      if (res.ok) {
-        const data = await res.json();
-        const expectedPin = String(data.adminPin || "1926").trim();
-        return pin.trim() === expectedPin;
-      }
-    } catch {}
-    return pin.trim() === "1926";
+      const res = await fetch("/api/store/orders?action=verify-admin", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-pin": pin.trim()
+        },
+        body: JSON.stringify({ action: "verify-admin" })
+      });
+      return res.ok;
+    } catch {
+      return false;
+    }
   }
 };
