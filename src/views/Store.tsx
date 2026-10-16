@@ -30,11 +30,8 @@ export function Store() {
   const [copiedPix, setCopiedPix] = useState(false);
   const [showPixDetails, setShowPixDetails] = useState(false);
 
-  // Filtrar produtos oficiais do dojo (SPEC 09 item 1: store e ambos)
-  // Registros sem canal preservam compatibilidade como 'store'
-  const storeProducts = useMemo(() => {
-    return products.filter((p) => !p.canal || p.canal === "store" || p.canal === "ambos");
-  }, [products]);
+  // Catálogo oficial Madeira: fonte exclusiva na aba Produtos
+  const storeProducts = useMemo(() => products, [products]);
 
   // Extrair categorias reais existentes dos produtos da loja oficial
   const availableCategories = useMemo(() => {
