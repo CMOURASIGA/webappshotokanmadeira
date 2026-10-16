@@ -30,22 +30,28 @@ export function Store() {
   const [copiedPix, setCopiedPix] = useState(false);
   const [showPixDetails, setShowPixDetails] = useState(false);
 
-  // Extrair categorias reais existentes dos produtos (sem dados fictícios)
+  // Filtrar produtos oficiais do dojo (SPEC 09 item 1: store e ambos)
+  // Registros sem canal preservam compatibilidade como 'store'
+  const storeProducts = useMemo(() => {
+    return products.filter((p) => !p.canal || p.canal === "store" || p.canal === "ambos");
+  }, [products]);
+
+  // Extrair categorias reais existentes dos produtos da loja oficial
   const availableCategories = useMemo(() => {
     const cats = new Set<string>();
-    products.forEach((p) => {
+    storeProducts.forEach((p) => {
       if (p.category && p.category.trim() !== "") {
         cats.add(p.category.trim());
       }
     });
     return Array.from(cats);
-  }, [products]);
+  }, [storeProducts]);
 
   // Filtrar produtos
   const filteredProducts = useMemo(() => {
-    if (selectedCategory === "all") return products;
-    return products.filter((p) => p.category === selectedCategory);
-  }, [products, selectedCategory]);
+    if (selectedCategory === "all") return storeProducts;
+    return storeProducts.filter((p) => p.category === selectedCategory);
+  }, [storeProducts, selectedCategory]);
 
   const copyPixKey = () => {
     if (!config.pix) return;
@@ -129,6 +135,38 @@ export function Store() {
 
       {/* Divulgação do Campeonato Esportivo Oficial (SPEC 08 item 4) */}
       <ChampionshipPromoBanner variant="store" />
+
+      {/* Banner de Divulgação da MadeiraStore */}
+      <div className="bg-gradient-to-r from-neutral-900 via-neutral-850 to-neutral-900 border border-neutral-700/80 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
+        <div className="flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-xl bg-karate-gold/20 text-karate-gold flex items-center justify-center shrink-0 border border-karate-gold/30">
+            <ShoppingBag className="w-5 h-5 text-karate-gold" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-black uppercase tracking-widest text-karate-gold font-mono">
+                ÁREA COMERCIAL
+              </span>
+              <span className="text-[9px] bg-karate-red text-white font-bold px-1.5 py-0.5 rounded-full">
+                MadeiraStore
+              </span>
+            </div>
+            <p className="text-sm font-bold text-white">
+              Conheça a MadeiraStore: Alimentos, acessórios, itens fitness e produtos parceiros
+            </p>
+            <p className="text-xs text-neutral-300">
+              Produtos para alunos e comunidade com checkout formal e PIX com valor exato.
+            </p>
+          </div>
+        </div>
+        <button
+          onClick={() => navigate("/madeirastore")}
+          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-neutral-100 text-neutral-950 text-xs font-bold transition-all shadow-sm shrink-0 cursor-pointer"
+        >
+          <span>Acessar MadeiraStore</span>
+          <ArrowRight className="w-4 h-4 text-karate-red" />
+        </button>
+      </div>
 
       {/* Label e Guia do Fluxo Oficial de Pedido - Posicionado ACIMA em qualquer gadget */}
       <div className="bg-neutral-900 text-white rounded-2xl p-4 sm:p-5 shadow-sm space-y-3.5 border border-neutral-800">

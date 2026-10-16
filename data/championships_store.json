@@ -1,11 +1,340 @@
 {
-  "championships": [],
-  "registrations": [],
-  "categories": [],
+  "championships": [
+    {
+      "id": "champ-1790972083984",
+      "slug": "2-campeonato",
+      "nome": "2º Festival Madeira Karate Shotokan Kids",
+      "descricao": "Horario de chegada às 08:30",
+      "dataCampeonato": "2026-11-28",
+      "local": "Madeira Artes Marciais",
+      "aberturaInscricoes": "2026-10-02T20:14:43.984Z",
+      "encerramentoInscricoes": "2026-11-20 20:14",
+      "status": "INSCRICOES_ABERTAS",
+      "valorInscricao": 30,
+      "modalidades": [
+        "Kata",
+        "Kumite"
+      ],
+      "configuracaoPix": {
+        "tipoChave": "EMAIL",
+        "chave": "madeirakarateshotokan@gmail.com",
+        "nomeRecebedor": "MADEIRA KARATE",
+        "cidadeRecebedor": "RIO DE JANEIRO",
+        "incluirValorNoQrCode": true,
+        "instrucoesAdicionais": "Pagamento referente à inscrição no torneio."
+      },
+      "regulamento": "Regras oficiais de competição baseadas nos critérios da JKA Brasil.",
+      "permiteMenores": true,
+      "idadeMinima": 4,
+      "idadeMaxima": 15,
+      "createdAt": "2026-10-02T20:14:43.984Z",
+      "updatedAt": "2026-10-05T20:43:02.231Z"
+    }
+  ],
+  "registrations": [
+    {
+      "id": "CAM2026-0001",
+      "championshipId": "champ-1790972083984",
+      "championshipName": "2º Festival Madeira Karate Shotokan Kids",
+      "nomeCompleto": "Gabriel Queiroz dos Santos Dias",
+      "dataNascimento": "2021-04-20",
+      "idadeNaDataCampeonato": 5,
+      "sexo": "Masculino",
+      "graduacao": "Faixa Branca (10º / 9º Kyu)",
+      "peso": 30,
+      "modalidade": "Kata, Kumite",
+      "telefone": "21974235665",
+      "email": "frnetto86@gmail.com",
+      "isMenor": true,
+      "nomeResponsavel": "Francisco Netto",
+      "telefoneResponsavel": "21974235665",
+      "autorizacaoResponsavel": true,
+      "aceiteRegulamento": true,
+      "categoriaId": "",
+      "categoriaNome": "Sem Categoria",
+      "status": "CONFIRMADA",
+      "paymentStatus": "PAGAMENTO_CONFIRMADO",
+      "valorInscricao": 30,
+      "dataHoraInscricao": "2026-10-05T20:49:43.828Z",
+      "conferidoEm": "2026-10-05T21:59:09.722Z",
+      "conferidoPor": "Sensei Madeira",
+      "comprovanteRecebido": false,
+      "observacoes": "",
+      "auditLog": [
+        {
+          "timestamp": "2026-10-05T20:49:43.828Z",
+          "actor": "Planilha Oficial Google Sheets",
+          "action": "SINCRONIZAÇÃO",
+          "notes": "Importado da aba oficial de Inscrições."
+        }
+      ]
+    },
+    {
+      "id": "CAM2026-0002",
+      "championshipId": "champ-1790972083984",
+      "championshipName": "2º Festival Madeira Karate Shotokan Kids",
+      "nomeCompleto": "Richard de Souza Gozsovics",
+      "dataNascimento": "2016-07-12",
+      "idadeNaDataCampeonato": 10,
+      "sexo": "Masculino",
+      "graduacao": "Faixa Amarela (8º Kyu)",
+      "peso": 39.8,
+      "modalidade": "Kata, Kumite",
+      "telefone": "21983720584",
+      "email": "dannysouza2208@gmail.com",
+      "isMenor": true,
+      "nomeResponsavel": "Danielle Brito de Souza",
+      "telefoneResponsavel": "21981449472",
+      "autorizacaoResponsavel": true,
+      "aceiteRegulamento": true,
+      "categoriaId": "",
+      "categoriaNome": "Sem Categoria",
+      "status": "CONFIRMADA",
+      "paymentStatus": "PAGAMENTO_CONFIRMADO",
+      "valorInscricao": 30,
+      "dataHoraInscricao": "2026-10-07T14:00:07.369Z",
+      "conferidoEm": "2026-10-13T12:26:29.171Z",
+      "conferidoPor": "Sensei Madeira",
+      "comprovanteRecebido": false,
+      "observacoes": "",
+      "auditLog": [
+        {
+          "timestamp": "2026-10-07T14:00:07.369Z",
+          "actor": "Planilha Oficial Google Sheets",
+          "action": "SINCRONIZAÇÃO",
+          "notes": "Importado da aba oficial de Inscrições."
+        }
+      ]
+    },
+    {
+      "id": "CAM2026-0003",
+      "championshipId": "champ-1790972083984",
+      "championshipName": "2º Festival Madeira Karate Shotokan Kids",
+      "nomeCompleto": "Ícaro Bento Alexandre",
+      "dataNascimento": "2014-09-11",
+      "idadeNaDataCampeonato": 12,
+      "sexo": "Masculino",
+      "graduacao": "Faixa Laranja (6º Kyu)",
+      "peso": 29,
+      "modalidade": "Kata, Kumite",
+      "telefone": "21964156519",
+      "email": "nara.alexandre@gmail.com",
+      "isMenor": true,
+      "nomeResponsavel": "Nara Costa Alexandre",
+      "telefoneResponsavel": "21964156519",
+      "autorizacaoResponsavel": true,
+      "aceiteRegulamento": true,
+      "categoriaId": "",
+      "categoriaNome": "Sem Categoria",
+      "status": "CONFIRMADA",
+      "paymentStatus": "PAGAMENTO_CONFIRMADO",
+      "valorInscricao": 30,
+      "dataHoraInscricao": "2026-10-09T13:47:29.474Z",
+      "conferidoEm": "2026-10-13T12:26:38.513Z",
+      "conferidoPor": "Sensei Madeira",
+      "comprovanteRecebido": false,
+      "observacoes": "",
+      "auditLog": [
+        {
+          "timestamp": "2026-10-09T13:47:29.474Z",
+          "actor": "Planilha Oficial Google Sheets",
+          "action": "SINCRONIZAÇÃO",
+          "notes": "Importado da aba oficial de Inscrições."
+        }
+      ]
+    },
+    {
+      "id": "CAM2026-0004",
+      "championshipId": "champ-1790972083984",
+      "championshipName": "2º Festival Madeira Karate Shotokan Kids",
+      "nomeCompleto": "Rodrigo Bottino Eiras Soares",
+      "dataNascimento": "2016-07-19",
+      "idadeNaDataCampeonato": 10,
+      "sexo": "Masculino",
+      "graduacao": "Faixa Amarela (8º Kyu)",
+      "peso": 42,
+      "modalidade": "Kata, Kumite",
+      "telefone": "21986853968",
+      "email": "rafaelabottino@hotmail.com",
+      "isMenor": true,
+      "nomeResponsavel": "Rafaela Bottino",
+      "telefoneResponsavel": "21981971409",
+      "autorizacaoResponsavel": true,
+      "aceiteRegulamento": true,
+      "categoriaId": "",
+      "categoriaNome": "Sem Categoria",
+      "status": "CONFIRMADA",
+      "paymentStatus": "PAGAMENTO_CONFIRMADO",
+      "valorInscricao": 30,
+      "dataHoraInscricao": "2026-10-13T12:32:04.043Z",
+      "conferidoEm": "2026-10-13T13:27:18.362Z",
+      "conferidoPor": "Sensei Madeira",
+      "comprovanteRecebido": false,
+      "observacoes": "",
+      "auditLog": [
+        {
+          "timestamp": "2026-10-13T12:32:04.043Z",
+          "actor": "Planilha Oficial Google Sheets",
+          "action": "SINCRONIZAÇÃO",
+          "notes": "Importado da aba oficial de Inscrições."
+        }
+      ]
+    },
+    {
+      "id": "CAM2026-0005",
+      "championshipId": "champ-1790972083984",
+      "championshipName": "2º Festival Madeira Karate Shotokan Kids",
+      "nomeCompleto": "Antônio Pedro da Rocha Gois",
+      "dataNascimento": "2014-04-07",
+      "idadeNaDataCampeonato": 12,
+      "sexo": "Masculino",
+      "graduacao": "Faixa Amarela (8º Kyu)",
+      "peso": 35,
+      "modalidade": "Kata, Kumite",
+      "telefone": "21967291003",
+      "email": "aprochagois@gmail.com",
+      "isMenor": true,
+      "nomeResponsavel": "Tatiana Lopes da Rocha",
+      "telefoneResponsavel": "21995692243",
+      "autorizacaoResponsavel": true,
+      "aceiteRegulamento": true,
+      "categoriaId": "",
+      "categoriaNome": "Sem Categoria",
+      "status": "CONFIRMADA",
+      "paymentStatus": "PAGAMENTO_CONFIRMADO",
+      "valorInscricao": 30,
+      "dataHoraInscricao": "2026-10-13T18:02:37.077Z",
+      "conferidoEm": "2026-10-15T14:59:37.282Z",
+      "conferidoPor": "Sensei Madeira",
+      "comprovanteRecebido": false,
+      "observacoes": "",
+      "auditLog": [
+        {
+          "timestamp": "2026-10-13T18:02:37.077Z",
+          "actor": "Planilha Oficial Google Sheets",
+          "action": "SINCRONIZAÇÃO",
+          "notes": "Importado da aba oficial de Inscrições."
+        }
+      ]
+    },
+    {
+      "id": "CAM2026-0006",
+      "championshipId": "champ-1790972083984",
+      "championshipName": "2º Festival Madeira Karate Shotokan Kids",
+      "nomeCompleto": "Heitor de Marins Spindola",
+      "dataNascimento": "2018-10-18",
+      "idadeNaDataCampeonato": 8,
+      "sexo": "Masculino",
+      "graduacao": "Faixa Amarela (8º Kyu)",
+      "peso": 45,
+      "modalidade": "Kata, Kumite",
+      "telefone": "21997467058",
+      "email": "spindolaheliton@gmail.com",
+      "isMenor": true,
+      "nomeResponsavel": "Heliton Spindola",
+      "telefoneResponsavel": "21997467058",
+      "autorizacaoResponsavel": true,
+      "aceiteRegulamento": true,
+      "categoriaId": "",
+      "categoriaNome": "Sem Categoria",
+      "status": "CONFIRMADA",
+      "paymentStatus": "PAGAMENTO_CONFIRMADO",
+      "valorInscricao": 30,
+      "dataHoraInscricao": "2026-10-15T14:33:27.216Z",
+      "conferidoEm": "2026-10-15T14:59:47.924Z",
+      "conferidoPor": "Sensei Madeira",
+      "comprovanteRecebido": false,
+      "observacoes": "",
+      "auditLog": [
+        {
+          "timestamp": "2026-10-15T14:33:27.216Z",
+          "actor": "Planilha Oficial Google Sheets",
+          "action": "SINCRONIZAÇÃO",
+          "notes": "Importado da aba oficial de Inscrições."
+        }
+      ]
+    },
+    {
+      "id": "CAM2026-0007",
+      "championshipId": "champ-1790972083984",
+      "championshipName": "2º Festival Madeira Karate Shotokan Kids",
+      "nomeCompleto": "Teste Verificação Automatizada",
+      "dataNascimento": "2015-05-10",
+      "idadeNaDataCampeonato": 0,
+      "sexo": "Masculino",
+      "graduacao": "Faixa Branca",
+      "peso": 35,
+      "modalidade": "Kata",
+      "telefone": "21999999999",
+      "email": "teste@madeirakarate.com.br",
+      "isMenor": true,
+      "nomeResponsavel": "Responsavel Teste",
+      "telefoneResponsavel": "21999999999",
+      "autorizacaoResponsavel": true,
+      "aceiteRegulamento": true,
+      "categoriaId": "",
+      "categoriaNome": "Sem Categoria",
+      "status": "RECEBIDA",
+      "paymentStatus": "AGUARDANDO_PAGAMENTO",
+      "valorInscricao": 30,
+      "dataHoraInscricao": "2026-10-16T12:50:56.283Z",
+      "conferidoEm": "",
+      "conferidoPor": "",
+      "comprovanteRecebido": false,
+      "observacoes": "",
+      "auditLog": [
+        {
+          "timestamp": "2026-10-16T12:50:56.283Z",
+          "actor": "Planilha Oficial Google Sheets",
+          "action": "SINCRONIZAÇÃO",
+          "notes": "Importado da aba oficial de Inscrições."
+        }
+      ]
+    }
+  ],
+  "categories": [
+    {
+      "id": "cat-1790973675880",
+      "championshipId": "champ-1790972083984",
+      "nome": "Todas as categorias",
+      "modalidade": "Geral",
+      "sexo": "Misto",
+      "observacoes": ""
+    }
+  ],
+  "storeOrders": [
+    {
+      "id": "MS2026-0001",
+      "codigo": "MS2026-0001",
+      "nomeCliente": "Carlos Moura",
+      "telefone": "21973681109",
+      "email": "cmourasiga@gmail.com",
+      "valorTotal": 30,
+      "statusPedido": "EM_SEPARACAO",
+      "statusPagamento": "PAGAMENTO_CONFIRMADO",
+      "dataCriacao": "2026-10-16T14:09:45.870Z",
+      "observacoes": "",
+      "atualizadoEm": "2026-10-16T14:09:59.461Z",
+      "dataPagamento": "2026-10-16T14:09:59.461Z"
+    }
+  ],
+  "storeOrderItems": [
+    {
+      "id": "MS2026-0001-item-1",
+      "pedidoId": "MS2026-0001",
+      "produtoId": "prod-1",
+      "produtoNome": "Barra de Proteina",
+      "categoria": "Suplementos",
+      "quantidade": 2,
+      "variacao": "Chocolate",
+      "valorUnitario": 15,
+      "subtotal": 30
+    }
+  ],
   "settings": {
     "adminPin": "1926",
     "googleSheetId": "1cqiHLjSY7tCKnur0FMH8s5lU2EUbSGB4vC6g2ABTjCM",
-    "googleAppsScriptUrl": "",
+    "googleAppsScriptUrl": "https://script.google.com/macros/s/AKfycbzlvJ68P0WmpFeWiqeZ9lu26mskgkgmoLN4Rz5AVrZA8NaILcc_RBtffmsjQmiRucU/exec",
     "webhookSecret": "madeira_sensei_secret_2026"
   }
 }

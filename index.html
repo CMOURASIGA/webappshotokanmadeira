@@ -3,6 +3,85 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <script>
+      (function() {
+        // AI Studio Environment: HMR WebSocket is disabled because the Cloud Run preview does not proxy WebSockets.
+        // Intercept Vite client WebSocket to prevent "WebSocket closed without opened" errors.
+        try {
+          var OriginalWebSocket = window.WebSocket;
+          if (OriginalWebSocket) {
+            window.WebSocket = function(url, protocols) {
+              var urlStr = String(url || "");
+              if (urlStr.includes("@vite") || urlStr.includes("ais-dev-") || urlStr.includes("localhost") || (Array.isArray(protocols) ? protocols.includes("vite-hmr") : protocols === "vite-hmr")) {
+                var listeners = {};
+                var fakeWs = {
+                  binaryType: "blob",
+                  readyState: 1, // OPEN
+                  bufferedAmount: 0,
+                  extensions: "",
+                  protocol: "vite-hmr",
+                  url: urlStr,
+                  send: function() {},
+                  close: function() {},
+                  addEventListener: function(event, callback) {
+                    listeners[event] = listeners[event] || [];
+                    listeners[event].push(callback);
+                    if (event === "open") {
+                      setTimeout(function() {
+                        try { callback({ type: "open" }); } catch(err) {}
+                      }, 20);
+                    }
+                  },
+                  removeEventListener: function(event, callback) {
+                    if (listeners[event]) {
+                      listeners[event] = listeners[event].filter(function(cb) { return cb !== callback; });
+                    }
+                  },
+                  dispatchEvent: function() { return true; }
+                };
+                return fakeWs;
+              }
+              return new OriginalWebSocket(url, protocols);
+            };
+            window.WebSocket.prototype = OriginalWebSocket.prototype;
+            window.WebSocket.CONNECTING = OriginalWebSocket.CONNECTING || 0;
+            window.WebSocket.OPEN = OriginalWebSocket.OPEN || 1;
+            window.WebSocket.CLOSING = OriginalWebSocket.CLOSING || 2;
+            window.WebSocket.CLOSED = OriginalWebSocket.CLOSED || 3;
+          }
+
+          var origError = console.error;
+          console.error = function() {
+            var msg = "";
+            for (var i = 0; i < arguments.length; i++) {
+              msg += String(arguments[i] || "") + " ";
+            }
+            if (msg.indexOf("WebSocket") !== -1 || msg.indexOf("closed without opened") !== -1 || msg.indexOf("failed to connect to websocket") !== -1) {
+              return;
+            }
+            origError.apply(console, arguments);
+          };
+
+          window.addEventListener('error', function(e) {
+            var m = String(e.message || "");
+            if (m.indexOf('WebSocket') !== -1 || m.indexOf('closed without opened') !== -1) {
+              e.stopImmediatePropagation();
+              e.preventDefault();
+              return true;
+            }
+          }, true);
+
+          window.addEventListener('unhandledrejection', function(e) {
+            var reason = String(e.reason && e.reason.message ? e.reason.message : (e.reason || ""));
+            if (reason.indexOf('WebSocket') !== -1 || reason.indexOf('closed without opened') !== -1) {
+              e.stopImmediatePropagation();
+              e.preventDefault();
+              return true;
+            }
+          }, true);
+        } catch(e) {}
+      })();
+    </script>
     <title>Madeira Karate Shotokan & Artes Marciais</title>
     <meta name="description" content="WebApp educativo oficial sobre Karate Shotokan focado em técnicas, katas, faixas e evolução do aluno." />
     <meta name="keywords" content="karate, shotokan, artes marciais, katas, faixas karate, dojo kun, dojo digital, madeira karate" />

@@ -11,7 +11,7 @@ import {
 const DEFAULT_SETTINGS: ChampionshipSettings = {
   adminPin: "1926",
   googleSheetId: "1cqiHLjSY7tCKnur0FMH8s5lU2EUbSGB4vC6g2ABTjCM",
-  googleAppsScriptUrl: ""
+  googleAppsScriptUrl: "https://script.google.com/macros/s/AKfycbzii8AcyaBTOUDiDW60pubiuxNgSS5ldXcZaIFsFyAUMwIURQJn62z9JPVlg8iUIzU/exec"
 };
 
 const LEGACY_SETTINGS_KEY = "madeira_champ_settings_v1";
@@ -27,7 +27,7 @@ function loadLocalValidationSettings(): ChampionshipSettings {
       ...parsed,
       adminPin: parsed.adminPin || DEFAULT_SETTINGS.adminPin,
       googleSheetId: parsed.googleSheetId || DEFAULT_SETTINGS.googleSheetId,
-      googleAppsScriptUrl: parsed.googleAppsScriptUrl || ""
+      googleAppsScriptUrl: parsed.googleAppsScriptUrl || DEFAULT_SETTINGS.googleAppsScriptUrl
     };
   } catch {
     return DEFAULT_SETTINGS;
@@ -671,8 +671,9 @@ export const championshipService = {
         memoryCache.settings = {
           ...local,
           googleSheetId: data.googleSheetId || DEFAULT_SETTINGS.googleSheetId,
-          googleAppsScriptUrl: data.googleAppsScriptUrl || ""
+          googleAppsScriptUrl: data.googleAppsScriptUrl || DEFAULT_SETTINGS.googleAppsScriptUrl
         };
+        saveLocalValidationSettings(memoryCache.settings);
         return memoryCache.settings;
       }
     } catch (err) {
@@ -691,6 +692,18 @@ export const championshipService = {
     memoryCache.settings = { ...memoryCache.settings, ...settings };
     saveLocalValidationSettings(memoryCache.settings);
     updateLocalCache();
+    try {
+      await fetch("/api/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          googleAppsScriptUrl: settings.googleAppsScriptUrl,
+          newAdminPin: settings.adminPin
+        })
+      });
+    } catch (e) {
+      console.warn("[championshipService] Falha ao persistir configurações no servidor:", e);
+    }
   },
 
   async verifyAdminPin(enteredPin: string): Promise<boolean> {
@@ -771,6 +784,28 @@ export const championshipService = {
    * Aciona a sincronização completa entre o servidor e a planilha Google Sheets
    */
   async triggerSync(): Promise<{ success: boolean; results?: any }> {
+    try {
+      const syncRes = await fetch("/api/sync", { method: "POST" });
+      if (syncRes.ok) {
+        const syncData = await syncRes.json();
+        const [championships, registrations, categories] = await Promise.all([
+          this.fetchChampionships(),
+          this.fetchRegistrations(),
+          this.fetchCategories()
+        ]);
+        return {
+          success: true,
+          results: syncData.results || {
+            championships: championships.length,
+            registrations: registrations.length,
+            categories: categories.length
+          }
+        };
+      }
+    } catch (e) {
+      console.warn("[championshipService] Erro ao sincronizar via /api/sync:", e);
+    }
+
     const [championships, registrations, categories] = await Promise.all([
       this.fetchChampionships(),
       this.fetchRegistrations(),

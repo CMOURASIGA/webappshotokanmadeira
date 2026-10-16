@@ -40,7 +40,141 @@ function doPost(e) {
 
     if (data.action === "INIT_CHAMPIONSHIP_SHEETS" || data.action === "INIT_ALL_SHEETS") {
       initChampionshipSheets_(ss);
-      return jsonResponse_({ status: "success", message: "Estrutura de campeonatos inicializada." });
+      initStoreSheets_(ss);
+      return jsonResponse_({ status: "success", message: "Estruturas de campeonatos e MadeiraStore inicializadas." });
+    }
+
+    if (data.action === "INIT_STORE_SHEETS") {
+      initStoreSheets_(ss);
+      return jsonResponse_({ status: "success", message: "Abas PEDIDOS_LOJA e ITENS_PEDIDO_LOJA inicializadas." });
+    }
+
+    if (data.action === "CREATE_STORE_ORDER") {
+      var lock = LockService.getScriptLock();
+      try {
+        lock.waitLock(10000);
+      } catch (lockErr) {
+        return jsonResponse_({ status: "error", message: "Não foi possível obter bloqueio exclusivo no momento." });
+      }
+
+      try {
+        var ordersSheet = ensureStoreOrdersSheet_(ss);
+        var itemsSheet = ensureStoreOrderItemsSheet_(ss);
+
+        var orderCode = data.order && data.order.codigo 
+          ? String(data.order.codigo).trim() 
+          : generateStoreOrderCode_(ordersSheet);
+
+        var nowIso = new Date().toISOString();
+        var rawOrder = data.order || {};
+        var rawItems = Array.isArray(data.items) ? data.items : [];
+
+        var totalCalculated = 0;
+        var processedItems = [];
+
+        for (var i = 0; i < rawItems.length; i++) {
+          var it = rawItems[i];
+          var qty = Number(it.quantidade || 1);
+          var price = Number(it.valorUnitario || it.preco || 0);
+          var sub = qty * price;
+          totalCalculated += sub;
+
+          var itemRow = {
+            pedidoId: orderCode,
+            produtoId: String(it.produtoId || "").trim(),
+            produtoNome: String(it.produtoNome || it.name || "").trim(),
+            categoria: String(it.categoria || "").trim(),
+            quantidade: qty,
+            tamanho: String(it.tamanho || "").trim(),
+            cor: String(it.cor || "").trim(),
+            variacao: String(it.variacao || "").trim(),
+            personalizacao: String(it.personalizacao || "").trim(),
+            valorUnitario: price,
+            subtotal: sub
+          };
+
+          appendObjectRow_(itemsSheet, storeOrderItemsHeaders_(), itemRow);
+          processedItems.push(itemRow);
+        }
+
+        var orderData = {
+          id: orderCode,
+          codigo: orderCode,
+          nomeCliente: String(rawOrder.nomeCliente || "").trim(),
+          telefone: String(rawOrder.telefone || "").trim(),
+          email: String(rawOrder.email || "").trim(),
+          valorTotal: Number(rawOrder.valorTotal || totalCalculated),
+          statusPedido: String(rawOrder.statusPedido || "RECEBIDO").trim(),
+          statusPagamento: String(rawOrder.statusPagamento || "AGUARDANDO_PAGAMENTO").trim(),
+          dataCriacao: String(rawOrder.dataCriacao || nowIso).trim(),
+          dataPagamento: String(rawOrder.dataPagamento || "").trim(),
+          dataRetirada: String(rawOrder.dataRetirada || "").trim(),
+          observacoes: String(rawOrder.observacoes || "").trim(),
+          atualizadoEm: nowIso
+        };
+
+        upsertObjectByKey_(ordersSheet, "id", orderCode, storeOrdersHeaders_(), orderData);
+        SpreadsheetApp.flush();
+
+        return jsonResponse_({
+          status: "success",
+          order: orderData,
+          items: processedItems
+        });
+      } finally {
+        lock.releaseLock();
+      }
+    }
+
+    if (data.action === "UPDATE_STORE_ORDER") {
+      var ordersSheet = ensureStoreOrdersSheet_(ss);
+      var orderId = String(data.orderId || (data.order && data.order.id) || (data.order && data.order.codigo) || "").trim();
+      if (!orderId) {
+        return jsonResponse_({ status: "error", message: "orderId não informado." });
+      }
+
+      var rawOrder = data.order || data;
+      var existingOrder = findObjectByKey_(ordersSheet, "id", orderId, storeOrdersHeaders_()) ||
+                          findObjectByKey_(ordersSheet, "codigo", orderId, storeOrdersHeaders_());
+
+      if (!existingOrder) {
+        return jsonResponse_({ status: "error", message: "Pedido não localizado na planilha." });
+      }
+
+      var nowIso = new Date().toISOString();
+      if (rawOrder.statusPedido) existingOrder.statusPedido = String(rawOrder.statusPedido).trim();
+      if (rawOrder.statusPagamento) {
+        existingOrder.statusPagamento = String(rawOrder.statusPagamento).trim();
+        if (existingOrder.statusPagamento === "PAGAMENTO_CONFIRMADO" && !existingOrder.dataPagamento) {
+          existingOrder.dataPagamento = nowIso;
+        }
+      }
+      if (existingOrder.statusPedido === "ENTREGUE" && !existingOrder.dataRetirada) {
+        existingOrder.dataRetirada = nowIso;
+      }
+      if (rawOrder.observacoes !== undefined) existingOrder.observacoes = String(rawOrder.observacoes).trim();
+      existingOrder.atualizadoEm = nowIso;
+
+      upsertObjectByKey_(ordersSheet, "id", existingOrder.id, storeOrdersHeaders_(), existingOrder);
+      SpreadsheetApp.flush();
+
+      return jsonResponse_({ status: "success", order: existingOrder });
+    }
+
+    if (data.action === "GET_STORE_ORDER") {
+      var ordersSheet = ensureStoreOrdersSheet_(ss);
+      var itemsSheet = ensureStoreOrderItemsSheet_(ss);
+      var orderId = String(data.orderId || data.codigo || "").trim();
+
+      var foundOrder = findObjectByKey_(ordersSheet, "id", orderId, storeOrdersHeaders_()) ||
+                       findObjectByKey_(ordersSheet, "codigo", orderId, storeOrdersHeaders_());
+
+      if (!foundOrder) {
+        return jsonResponse_({ status: "error", message: "Pedido não localizado." });
+      }
+
+      var allItems = getObjectsByKeyValue_(itemsSheet, "pedidoId", foundOrder.codigo || foundOrder.id, storeOrderItemsHeaders_());
+      return jsonResponse_({ status: "success", order: foundOrder, items: allItems });
     }
 
     if (data.action === "LIST_GALLERY_PHOTOS" && data.folderId) {
@@ -561,3 +695,121 @@ function jsonResponse_(payload) {
     .createTextOutput(JSON.stringify(payload))
     .setMimeType(ContentService.MimeType.JSON);
 }
+
+// ----------------------------------------------------
+// MadeiraStore Sheet Helpers (SPEC 09)
+// ----------------------------------------------------
+
+function initStoreSheets_(ss) {
+  ensureStoreOrdersSheet_(ss);
+  ensureStoreOrderItemsSheet_(ss);
+}
+
+function storeOrdersHeaders_() {
+  return [
+    "id",
+    "codigo",
+    "nomeCliente",
+    "telefone",
+    "email",
+    "valorTotal",
+    "statusPedido",
+    "statusPagamento",
+    "dataCriacao",
+    "dataPagamento",
+    "dataRetirada",
+    "observacoes",
+    "atualizadoEm"
+  ];
+}
+
+function storeOrderItemsHeaders_() {
+  return [
+    "pedidoId",
+    "produtoId",
+    "produtoNome",
+    "categoria",
+    "quantidade",
+    "tamanho",
+    "cor",
+    "variacao",
+    "personalizacao",
+    "valorUnitario",
+    "subtotal"
+  ];
+}
+
+function ensureStoreOrdersSheet_(ss) {
+  return getOrCreateSheetWithHeaders_(ss, "PEDIDOS_LOJA", storeOrdersHeaders_());
+}
+
+function ensureStoreOrderItemsSheet_(ss) {
+  return getOrCreateSheetWithHeaders_(ss, "ITENS_PEDIDO_LOJA", storeOrderItemsHeaders_());
+}
+
+function generateStoreOrderCode_(sheet) {
+  var year = new Date().getFullYear();
+  var prefix = "MS" + year + "-";
+  var map = headerMap_(sheet);
+  var codeCol = map["codigo"] || map["id"];
+  var maxSeq = 0;
+
+  if (codeCol && sheet.getLastRow() > 1) {
+    var values = sheet.getRange(2, codeCol, sheet.getLastRow() - 1, 1).getValues();
+    values.forEach(function(row) {
+      var val = String(row[0] || "").trim();
+      if (val.indexOf(prefix) === 0) {
+        var num = parseInt(val.replace(prefix, ""), 10);
+        if (!isNaN(num) && num > maxSeq) {
+          maxSeq = num;
+        }
+      }
+    });
+  }
+
+  var nextSeq = maxSeq + 1;
+  var padded = ("0000" + nextSeq).slice(-4);
+  return prefix + padded;
+}
+
+function findObjectByKey_(sheet, keyHeader, keyValue, headers) {
+  var map = headerMap_(sheet);
+  var col = map[keyHeader];
+  if (!col || sheet.getLastRow() <= 1) return null;
+
+  var values = sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn()).getValues();
+  for (var i = 0; i < values.length; i++) {
+    var row = values[i];
+    if (String(row[col - 1]).trim().toUpperCase() === String(keyValue).trim().toUpperCase()) {
+      var obj = {};
+      headers.forEach(function(h) {
+        var c = map[h];
+        obj[h] = c ? row[c - 1] : "";
+      });
+      return obj;
+    }
+  }
+  return null;
+}
+
+function getObjectsByKeyValue_(sheet, keyHeader, keyValue, headers) {
+  var map = headerMap_(sheet);
+  var col = map[keyHeader];
+  var result = [];
+  if (!col || sheet.getLastRow() <= 1) return result;
+
+  var values = sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn()).getValues();
+  for (var i = 0; i < values.length; i++) {
+    var row = values[i];
+    if (String(row[col - 1]).trim().toUpperCase() === String(keyValue).trim().toUpperCase()) {
+      var obj = {};
+      headers.forEach(function(h) {
+        var c = map[h];
+        obj[h] = c ? row[c - 1] : "";
+      });
+      result.push(obj);
+    }
+  }
+  return result;
+}
+

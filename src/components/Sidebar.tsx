@@ -46,7 +46,8 @@ export function Sidebar() {
         { name: "Eventos", path: "/events", icon: Camera },
         { name: "Campeonatos", path: "/campeonatos", icon: Trophy },
         { name: "Grade de Horários", path: "/schedule", icon: Calendar },
-        { name: "Loja", path: "/store", icon: ShoppingBag },
+        { name: "Loja Oficial", path: "/store", icon: ShoppingBag },
+        { name: "MadeiraStore", path: "/madeirastore", icon: ShoppingBag },
       ]
     },
     {

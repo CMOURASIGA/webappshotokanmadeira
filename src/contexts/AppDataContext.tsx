@@ -23,6 +23,7 @@ export type Product = {
   customizable?: boolean;
   available?: boolean;
   order?: number;
+  canal?: "store" | "madeirastore" | "ambos";
   active?: boolean;
 };
 
@@ -181,6 +182,12 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
                   customizable: parseBool(row.personalizado || row.personalizavel || row.customizable),
                   available,
                   order: isNaN(Number(order)) ? undefined : order,
+                  canal: ((): "store" | "madeirastore" | "ambos" => {
+                    const rawCanal = String(row.canal || row.channel || "").toLowerCase().trim();
+                    if (rawCanal === "madeirastore") return "madeirastore";
+                    if (rawCanal === "ambos" || rawCanal === "ambas" || rawCanal === "both") return "ambos";
+                    return "store";
+                  })(),
                   active
                 };
               })

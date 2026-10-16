@@ -10,6 +10,7 @@ import { SplashScreen } from "./components/SplashScreen";
 import { AppDataProvider } from "./contexts/AppDataContext";
 import { StudentProvider } from "./contexts/StudentContext";
 import { CartProvider } from "./contexts/CartContext";
+import { MadeiraStoreCartProvider } from "./contexts/MadeiraStoreCartContext";
 import { NoticePopup } from "./components/NoticePopup";
 import { Analytics } from "./components/Analytics";
 import { Analytics as VercelAnalytics } from "@vercel/analytics/react";
@@ -18,6 +19,9 @@ import { OfflineIndicator } from "./components/pwa/OfflineIndicator";
 // Lazy loading & Code-splitting das views para otimização de FCP, LCP e bundle size
 const Home = lazy(() => import("./views/Home").then(m => ({ default: m.Home })));
 const Store = lazy(() => import("./views/Store").then(m => ({ default: m.Store })));
+const MadeiraStore = lazy(() => import("./views/MadeiraStore").then(m => ({ default: m.MadeiraStore })));
+const StoreOrderLookup = lazy(() => import("./views/StoreOrderLookup").then(m => ({ default: m.StoreOrderLookup })));
+const StoreDashboard = lazy(() => import("./views/StoreDashboard").then(m => ({ default: m.StoreDashboard })));
 const KatasList = lazy(() => import("./views/KatasList").then(m => ({ default: m.KatasList })));
 const KataDetail = lazy(() => import("./views/KataDetail").then(m => ({ default: m.KataDetail })));
 const TechniquesList = lazy(() => import("./views/TechniquesList").then(m => ({ default: m.TechniquesList })));
@@ -54,42 +58,47 @@ export default function App() {
     <AppDataProvider>
       <StudentProvider>
         <CartProvider>
-          <VercelAnalytics />
-          {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
-          <NoticePopup canShow={!showSplash} />
-          <OfflineIndicator />
-          <HashRouter>
-            <Analytics />
-            <Layout>
-              <Suspense fallback={<RouteLoadingFallback />}>
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/student-area" element={<StudentArea />} />
-                  <Route path="/area-do-aluno" element={<StudentArea />} />
-                  <Route path="/mural" element={<Mural />} />
-                  <Route path="/events" element={<Events />} />
-                  <Route path="/galerias/:id" element={<GalleryDetail />} />
-                  <Route path="/campeonatos" element={<ChampionshipDetail />} />
-                  <Route path="/campeonatos/:slug" element={<ChampionshipDetail />} />
-                  <Route path="/campeonatos/:slug/consulta" element={<ChampionshipLookup />} />
-                  <Route path="/dashboard_campeonato" element={<ChampionshipDashboard />} />
-                  <Route path="/store" element={<Store />} />
-                  <Route path="/schedule" element={<Schedule />} />
-                  <Route path="/katas" element={<KatasList />} />
-                  <Route path="/katas/:id" element={<KataDetail />} />
-                  <Route path="/techniques" element={<TechniquesList />} />
-                  <Route path="/techniques/:id" element={<TechniqueDetail />} />
-                  <Route path="/belts" element={<BeltsList />} />
-                  <Route path="/dojo-kun" element={<DojoKun />} />
-                  <Route path="/what-is-kata" element={<WhatIsKata />} />
-                  <Route path="/vocabulary" element={<Vocabulary />} />
-                  <Route path="/history" element={<History />} />
-                  <Route path="/kata-series" element={<KataSeries />} />
-                  <Route path="*" element={<Maintenance />} />
-                </Routes>
-              </Suspense>
-            </Layout>
-          </HashRouter>
+          <MadeiraStoreCartProvider>
+            <VercelAnalytics />
+            {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
+            <NoticePopup canShow={!showSplash} />
+            <OfflineIndicator />
+            <HashRouter>
+              <Analytics />
+              <Layout>
+                <Suspense fallback={<RouteLoadingFallback />}>
+                  <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/student-area" element={<StudentArea />} />
+                    <Route path="/area-do-aluno" element={<StudentArea />} />
+                    <Route path="/mural" element={<Mural />} />
+                    <Route path="/events" element={<Events />} />
+                    <Route path="/galerias/:id" element={<GalleryDetail />} />
+                    <Route path="/campeonatos" element={<ChampionshipDetail />} />
+                    <Route path="/campeonatos/:slug" element={<ChampionshipDetail />} />
+                    <Route path="/campeonatos/:slug/consulta" element={<ChampionshipLookup />} />
+                    <Route path="/dashboard_campeonato" element={<ChampionshipDashboard />} />
+                    <Route path="/store" element={<Store />} />
+                    <Route path="/madeirastore" element={<MadeiraStore />} />
+                    <Route path="/madeirastore/pedido" element={<StoreOrderLookup />} />
+                    <Route path="/dashboard_loja" element={<StoreDashboard />} />
+                    <Route path="/schedule" element={<Schedule />} />
+                    <Route path="/katas" element={<KatasList />} />
+                    <Route path="/katas/:id" element={<KataDetail />} />
+                    <Route path="/techniques" element={<TechniquesList />} />
+                    <Route path="/techniques/:id" element={<TechniqueDetail />} />
+                    <Route path="/belts" element={<BeltsList />} />
+                    <Route path="/dojo-kun" element={<DojoKun />} />
+                    <Route path="/what-is-kata" element={<WhatIsKata />} />
+                    <Route path="/vocabulary" element={<Vocabulary />} />
+                    <Route path="/history" element={<History />} />
+                    <Route path="/kata-series" element={<KataSeries />} />
+                    <Route path="*" element={<Maintenance />} />
+                  </Routes>
+                </Suspense>
+              </Layout>
+            </HashRouter>
+          </MadeiraStoreCartProvider>
         </CartProvider>
       </StudentProvider>
     </AppDataProvider>

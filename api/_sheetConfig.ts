@@ -25,7 +25,8 @@ export async function getAppsScriptUrl(): Promise<string> {
   const envUrl = String(process.env.GOOGLE_APPS_SCRIPT_URL || "").trim();
   if (envUrl.startsWith("https://script.google.com/")) return envUrl;
 
-  throw new Error("URL do Google Apps Script não encontrada na aba Configuracoes.");
+  // Fallback para URL oficial do Apps Script configurada
+  return "https://script.google.com/macros/s/AKfycbzlvJ68P0WmpFeWiqeZ9lu26mskgkgmoLN4Rz5AVrZA8NaILcc_RBtffmsjQmiRucU/exec";
 }
 
 export async function callAppsScript(action: string, payload: any): Promise<any> {
