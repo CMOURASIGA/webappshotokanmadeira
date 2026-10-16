@@ -59,27 +59,31 @@ function doPost(e) {
       try {
         var ordersSheet = ensureStoreOrdersSheet_(ss);
         var itemsSheet = ensureStoreOrderItemsSheet_(ss);
+        var productsSheet = ensureProdutosMadeiraStoreSheet_(ss);
 
-        var orderCode = data.order && data.order.codigo 
-          ? String(data.order.codigo).trim() 
+        var orderCode = data.order && data.order.codigo
+          ? String(data.order.codigo).trim()
           : generateStoreOrderCode_(ordersSheet);
 
         var nowIso = new Date().toISOString();
         var rawOrder = data.order || {};
         var rawItems = Array.isArray(data.items) ? data.items : [];
-
         var totalCalculated = 0;
         var processedItems = [];
-        var productsSheet = ensureProdutosMadeiraStoreSheet_(ss);
+        var changedProducts = {};
+        var stockTouched = false;
 
         if (!rawItems.length) {
           return jsonResponse_({ status: "error", message: "O pedido deve conter pelo menos um item." });
         }
 
+        // Primeiro valida todo o pedido e calcula a baixa em memória.
+        // Só depois persiste estoque, pedido e itens, evitando linhas órfãs por falha de validação.
         for (var i = 0; i < rawItems.length; i++) {
           var it = rawItems[i] || {};
           var productId = String(it.produtoId || "").trim();
-          var product = findProductById_(productsSheet, productId);
+          var product = changedProducts[productId] || findProductById_(productsSheet, productId);
+
           if (!product) {
             return jsonResponse_({ status: "error", message: "Produto não localizado: " + productId });
           }
@@ -117,10 +121,37 @@ function doPost(e) {
             return jsonResponse_({ status: "error", message: "Preço oficial inválido para " + String(product.nome || productId) });
           }
 
+          if (parseSheetBool_(product.estoqueControlado, false)) {
+            var hasVariantStock = allowedSizes.length || allowedColors.length || allowedVariations.length;
+            if (hasVariantStock) {
+              var stockMap = parseStoreStockMap_(product.estoqueVariacoes);
+              var stockKey = storeStockVariantKey_(size, color, variation);
+              var stockAvailable = Math.max(0, Math.floor(Number(stockMap[stockKey] || 0)));
+              if (stockAvailable < qty) {
+                return jsonResponse_({
+                  status: "error",
+                  message: "Estoque insuficiente para " + String(product.nome || productId) + ". Disponível: " + stockAvailable + "."
+                });
+              }
+              stockMap[stockKey] = stockAvailable - qty;
+              product.estoqueVariacoes = JSON.stringify(stockMap);
+            } else {
+              var simpleStock = Math.max(0, Math.floor(parseSheetNumber_(product.estoqueAtual)));
+              if (simpleStock < qty) {
+                return jsonResponse_({
+                  status: "error",
+                  message: "Estoque insuficiente para " + String(product.nome || productId) + ". Disponível: " + simpleStock + "."
+                });
+              }
+              product.estoqueAtual = simpleStock - qty;
+            }
+            changedProducts[productId] = product;
+            stockTouched = true;
+          }
+
           var sub = Math.round((qty * price) * 100) / 100;
           totalCalculated += sub;
-
-          var itemRow = {
+          processedItems.push({
             pedidoId: orderCode,
             produtoId: productId,
             produtoNome: String(product.nome || productId).trim(),
@@ -132,11 +163,18 @@ function doPost(e) {
             personalizacao: String(it.personalizacao || "").trim(),
             valorUnitario: price,
             subtotal: sub
-          };
-
-          appendObjectRow_(itemsSheet, storeOrderItemsHeaders_(), itemRow);
-          processedItems.push(itemRow);
+          });
         }
+
+        Object.keys(changedProducts).forEach(function(productId) {
+          upsertObjectByKey_(
+            productsSheet,
+            "id",
+            productId,
+            storeProductHeaders_(),
+            changedProducts[productId]
+          );
+        });
 
         var orderData = {
           id: orderCode,
@@ -154,55 +192,92 @@ function doPost(e) {
           atualizadoEm: nowIso,
           tokenRetirada: String(rawOrder.tokenRetirada || Utilities.getUuid().replace(/-/g, "")).trim(),
           dataGeracaoComprovante: String(rawOrder.dataGeracaoComprovante || nowIso).trim(),
-          entreguePor: String(rawOrder.entreguePor || "").trim()
+          entreguePor: String(rawOrder.entreguePor || "").trim(),
+          estoqueBaixado: stockTouched ? "Sim" : "Não",
+          estoqueRestituido: "Não"
         };
 
         upsertObjectByKey_(ordersSheet, "id", orderCode, storeOrdersHeaders_(), orderData);
-        SpreadsheetApp.flush();
 
-        return jsonResponse_({
-          status: "success",
-          order: orderData,
-          items: processedItems
-        });
+        for (var j = 0; j < processedItems.length; j++) {
+          appendObjectRow_(itemsSheet, storeOrderItemsHeaders_(), processedItems[j]);
+        }
+
+        SpreadsheetApp.flush();
+        return jsonResponse_({ status: "success", order: orderData, items: processedItems });
       } finally {
         lock.releaseLock();
       }
     }
 
     if (data.action === "UPDATE_STORE_ORDER") {
-      var ordersSheet = ensureStoreOrdersSheet_(ss);
-      var orderId = String(data.orderId || (data.order && data.order.id) || (data.order && data.order.codigo) || "").trim();
-      if (!orderId) {
-        return jsonResponse_({ status: "error", message: "orderId não informado." });
+      var lock = LockService.getScriptLock();
+      try {
+        lock.waitLock(10000);
+      } catch (lockErr) {
+        return jsonResponse_({ status: "error", message: "Não foi possível obter bloqueio exclusivo no momento." });
       }
 
-      var rawOrder = data.order || data;
-      var existingOrder = findObjectByKey_(ordersSheet, "id", orderId, storeOrdersHeaders_()) ||
-                          findObjectByKey_(ordersSheet, "codigo", orderId, storeOrdersHeaders_());
-
-      if (!existingOrder) {
-        return jsonResponse_({ status: "error", message: "Pedido não localizado na planilha." });
-      }
-
-      var nowIso = new Date().toISOString();
-      if (rawOrder.statusPedido) existingOrder.statusPedido = String(rawOrder.statusPedido).trim();
-      if (rawOrder.statusPagamento) {
-        existingOrder.statusPagamento = String(rawOrder.statusPagamento).trim();
-        if (existingOrder.statusPagamento === "PAGAMENTO_CONFIRMADO" && !existingOrder.dataPagamento) {
-          existingOrder.dataPagamento = nowIso;
+      try {
+        var ordersSheet = ensureStoreOrdersSheet_(ss);
+        var orderId = String(data.orderId || (data.order && data.order.id) || (data.order && data.order.codigo) || "").trim();
+        if (!orderId) {
+          return jsonResponse_({ status: "error", message: "orderId não informado." });
         }
-      }
-      if (existingOrder.statusPedido === "ENTREGUE" && !existingOrder.dataRetirada) {
-        existingOrder.dataRetirada = nowIso;
-      }
-      if (rawOrder.observacoes !== undefined) existingOrder.observacoes = String(rawOrder.observacoes).trim();
-      existingOrder.atualizadoEm = nowIso;
 
-      upsertObjectByKey_(ordersSheet, "id", existingOrder.id, storeOrdersHeaders_(), existingOrder);
-      SpreadsheetApp.flush();
+        var rawOrder = data.order || data;
+        var existingOrder = findObjectByKey_(ordersSheet, "id", orderId, storeOrdersHeaders_()) ||
+                            findObjectByKey_(ordersSheet, "codigo", orderId, storeOrdersHeaders_());
 
-      return jsonResponse_({ status: "success", order: existingOrder });
+        if (!existingOrder) {
+          return jsonResponse_({ status: "error", message: "Pedido não localizado na planilha." });
+        }
+
+        var nowIso = new Date().toISOString();
+        var previousStatus = String(existingOrder.statusPedido || "").trim();
+        var nextStatus = rawOrder.statusPedido ? String(rawOrder.statusPedido).trim() : previousStatus;
+
+        // Cancelamento devolve o estoque exatamente uma vez.
+        if (
+          previousStatus !== "CANCELADO" &&
+          nextStatus === "CANCELADO" &&
+          String(existingOrder.estoqueBaixado || "").toLowerCase() === "sim" &&
+          String(existingOrder.estoqueRestituido || "").toLowerCase() !== "sim"
+        ) {
+          changeStoreOrderStock_(ss, existingOrder.codigo || existingOrder.id, 1);
+          existingOrder.estoqueRestituido = "Sim";
+        }
+
+        // Se um pedido cancelado for reaberto, reserva novamente o mesmo estoque.
+        if (
+          previousStatus === "CANCELADO" &&
+          nextStatus !== "CANCELADO" &&
+          String(existingOrder.estoqueBaixado || "").toLowerCase() === "sim" &&
+          String(existingOrder.estoqueRestituido || "").toLowerCase() === "sim"
+        ) {
+          changeStoreOrderStock_(ss, existingOrder.codigo || existingOrder.id, -1);
+          existingOrder.estoqueRestituido = "Não";
+        }
+
+        if (rawOrder.statusPedido) existingOrder.statusPedido = nextStatus;
+        if (rawOrder.statusPagamento) {
+          existingOrder.statusPagamento = String(rawOrder.statusPagamento).trim();
+          if (existingOrder.statusPagamento === "PAGAMENTO_CONFIRMADO" && !existingOrder.dataPagamento) {
+            existingOrder.dataPagamento = nowIso;
+          }
+        }
+        if (existingOrder.statusPedido === "ENTREGUE" && !existingOrder.dataRetirada) {
+          existingOrder.dataRetirada = nowIso;
+        }
+        if (rawOrder.observacoes !== undefined) existingOrder.observacoes = String(rawOrder.observacoes).trim();
+        existingOrder.atualizadoEm = nowIso;
+
+        upsertObjectByKey_(ordersSheet, "id", existingOrder.id, storeOrdersHeaders_(), existingOrder);
+        SpreadsheetApp.flush();
+        return jsonResponse_({ status: "success", order: existingOrder });
+      } finally {
+        lock.releaseLock();
+      }
     }
 
     if (data.action === "GET_STORE_ORDER") {
@@ -571,7 +646,7 @@ function storeProductHeaders_() {
     "id", "nome", "descricao", "preco", "imagem1", "imagem2", "imagem3",
     "imagem1_file_id", "imagem2_file_id", "imagem3_file_id",
     "categoriaId", "categoria", "tamanhos", "cores", "variacoes", "personalizavel",
-    "disponivel", "ativo", "ordem"
+    "disponivel", "ativo", "estoqueControlado", "estoqueAtual", "estoqueVariacoes", "ordem"
   ];
 }
 
@@ -938,6 +1013,11 @@ function normalizeStoreProduct_(p) {
     personalizavel: p.personalizavel === true ? "Sim" : "Não",
     disponivel: p.disponivel === false ? "Não" : "Sim",
     ativo: p.ativo === false ? "Não" : "Sim",
+    estoqueControlado: p.estoqueControlado === true ? "Sim" : "Não",
+    estoqueAtual: Math.max(0, Math.floor(Number(p.estoqueAtual || 0))),
+    estoqueVariacoes: typeof p.estoqueVariacoes === "string"
+      ? p.estoqueVariacoes
+      : JSON.stringify(p.estoqueVariacoes || {}),
     ordem: Number(p.ordem || 0)
   };
 }
@@ -952,8 +1032,101 @@ function storeProductObjectForApi_(p) {
     personalizavel: String(p.personalizavel).toLowerCase() === "sim",
     disponivel: String(p.disponivel).toLowerCase() !== "não",
     ativo: String(p.ativo).toLowerCase() !== "não",
+    estoqueControlado: String(p.estoqueControlado).toLowerCase() === "sim",
+    estoqueAtual: Math.max(0, Math.floor(Number(p.estoqueAtual || 0))),
+    estoqueVariacoes: parseStoreStockMap_(p.estoqueVariacoes),
     ordem: Number(p.ordem || 0)
   };
+}
+
+function parseStoreStockMap_(value) {
+  try {
+    var raw = String(value || "").trim();
+    if (!raw) return {};
+    var parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return {};
+    var result = {};
+    Object.keys(parsed).forEach(function(key) {
+      result[key] = Math.max(0, Math.floor(Number(parsed[key] || 0)));
+    });
+    return result;
+  } catch (e) {
+    return {};
+  }
+}
+
+function storeStockVariantKey_(size, color, variation) {
+  return [size || "", color || "", variation || ""]
+    .map(function(value) { return String(value).trim().toLowerCase(); })
+    .join("||");
+}
+
+function changeStoreOrderStock_(ss, orderCode, direction) {
+  var itemsSheet = ensureStoreOrderItemsSheet_(ss);
+  var productsSheet = ensureProdutosMadeiraStoreSheet_(ss);
+  var items = getObjectsByKeyValue_(
+    itemsSheet,
+    "pedidoId",
+    orderCode,
+    storeOrderItemsHeaders_()
+  );
+
+  var changedProducts = {};
+
+  for (var i = 0; i < items.length; i++) {
+    var item = items[i];
+    var productId = String(item.produtoId || "").trim();
+    var product = changedProducts[productId] || findProductById_(productsSheet, productId);
+
+    if (!product || !parseSheetBool_(product.estoqueControlado, false)) continue;
+
+    var qty = Math.max(0, Math.floor(Number(item.quantidade || 0)));
+    var allowedSizes = parseSheetList_(product.tamanhos);
+    var allowedColors = parseSheetList_(product.cores);
+    var allowedVariations = parseSheetList_(product.variacoes);
+    var hasVariants = allowedSizes.length || allowedColors.length || allowedVariations.length;
+
+    if (hasVariants) {
+      var stockMap = parseStoreStockMap_(product.estoqueVariacoes);
+      var key = storeStockVariantKey_(item.tamanho, item.cor, item.variacao);
+      var current = Math.max(0, Math.floor(Number(stockMap[key] || 0)));
+
+      if (direction < 0 && current < qty) {
+        throw new Error(
+          "Estoque insuficiente para reabrir o pedido: " +
+          String(product.nome || productId) +
+          ". Disponível: " + current + "."
+        );
+      }
+
+      stockMap[key] = direction > 0 ? current + qty : current - qty;
+      product.estoqueVariacoes = JSON.stringify(stockMap);
+    } else {
+      var simpleStock = Math.max(0, Math.floor(parseSheetNumber_(product.estoqueAtual)));
+
+      if (direction < 0 && simpleStock < qty) {
+        throw new Error(
+          "Estoque insuficiente para reabrir o pedido: " +
+          String(product.nome || productId) +
+          ". Disponível: " + simpleStock + "."
+        );
+      }
+
+      product.estoqueAtual = direction > 0 ? simpleStock + qty : simpleStock - qty;
+    }
+
+    changedProducts[productId] = product;
+  }
+
+  Object.keys(changedProducts).forEach(function(productId) {
+    upsertObjectByKey_(
+      productsSheet,
+      "id",
+      productId,
+      storeProductHeaders_(),
+      changedProducts[productId]
+    );
+  });
 }
 
 function extractDriveFolderId_(url) {
@@ -1043,7 +1216,9 @@ function storeOrdersHeaders_() {
     "atualizadoEm",
     "tokenRetirada",
     "dataGeracaoComprovante",
-    "entreguePor"
+    "entreguePor",
+    "estoqueBaixado",
+    "estoqueRestituido"
   ];
 }
 
