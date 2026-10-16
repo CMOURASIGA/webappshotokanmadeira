@@ -150,6 +150,12 @@ export function Sidebar() {
         >
           ⚙️ Painel de Campeonatos (Admin)
         </Link>
+        <Link 
+          to="/dashboard_loja"
+          className="text-[10px] text-neutral-400 hover:text-karate-gold transition-colors font-medium block"
+        >
+          🛍️ Painel da Loja (Admin)
+        </Link>
         <span className="text-[10px] font-jp text-neutral-500 tracking-widest block">
           空手道 • JKA SHOTOKAN
         </span>
