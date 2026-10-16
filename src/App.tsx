@@ -4,7 +4,7 @@
  */
 
 import { HashRouter, Routes, Route } from "react-router-dom";
-import { useState, lazy, Suspense } from "react";
+import { useState, lazy, Suspense, useEffect } from "react";
 import { Layout } from "./components/Layout";
 import { SplashScreen } from "./components/SplashScreen";
 import { AppDataProvider } from "./contexts/AppDataContext";
@@ -54,6 +54,18 @@ function RouteLoadingFallback() {
 
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
+
+  useEffect(() => {
+    const host = window.location.hostname.toLowerCase();
+    const currentHash = window.location.hash || "";
+
+    if (
+      host === "loja.madeirakarate.com.br" &&
+      (!currentHash || currentHash === "#" || currentHash === "#/" || currentHash === "#/home")
+    ) {
+      window.location.replace("/#/madeirastore");
+    }
+  }, []);
 
   return (
     <AppDataProvider>
