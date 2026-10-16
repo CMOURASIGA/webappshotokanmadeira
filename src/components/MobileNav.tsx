@@ -260,6 +260,13 @@ export function MobileNav({ onOpenSearch }: { onOpenSearch?: () => void }) {
           >
             ⚙️ Painel de Campeonatos (Admin)
           </Link>
+          <Link
+            to="/dashboard_loja"
+            onClick={() => setMenuOpen(false)}
+            className="text-[10px] text-neutral-400 hover:text-karate-gold transition-colors font-medium block"
+          >
+            🛍️ Painel da Loja (Admin)
+          </Link>
           <p className="text-[10px] text-neutral-500 font-jp tracking-wider">
             空手道 • SHOTOKAN JKA
           </p>
