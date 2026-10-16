@@ -244,19 +244,53 @@ export const madeiraStoreService = {
   },
 
   async uploadProductImage(file: File, adminPin: string): Promise<{ url: string; fileId: string }> {
-    const dataUrl = await new Promise<string>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(String(reader.result || ""));
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-    const res = await fetch("/api/store/orders?action=upload-product-image", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "x-admin-pin": adminPin },
-      body: JSON.stringify({ dataUrl, fileName: file.name || "produto.jpg" })
-    });
-    if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || "Erro ao enviar imagem.");
-    return await res.json();
+    const objectUrl = URL.createObjectURL(file);
+    try {
+      const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => reject(new Error("Não foi possível ler a imagem selecionada."));
+        img.src = objectUrl;
+      });
+
+      const maxSize = 1600;
+      const ratio = Math.min(1, maxSize / Math.max(image.naturalWidth, image.naturalHeight));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.max(1, Math.round(image.naturalWidth * ratio));
+      canvas.height = Math.max(1, Math.round(image.naturalHeight * ratio));
+      const ctx = canvas.getContext("2d");
+      if (!ctx) throw new Error("Não foi possível preparar a imagem.");
+      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+      let quality = 0.82;
+      let dataUrl = canvas.toDataURL("image/jpeg", quality);
+      while (dataUrl.length > 1900000 && quality > 0.42) {
+        quality -= 0.08;
+        dataUrl = canvas.toDataURL("image/jpeg", quality);
+      }
+
+      if (dataUrl.length > 1900000) {
+        throw new Error("A imagem ficou muito grande. Tente outra foto.");
+      }
+
+      const res = await fetch("/api/store/orders?action=upload-product-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-admin-pin": adminPin },
+        body: JSON.stringify({
+          dataUrl,
+          fileName: (file.name || "produto").replace(/\.[^.]+$/, "") + ".jpg"
+        })
+      });
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || "Erro ao enviar imagem.");
+      }
+
+      return await res.json();
+    } finally {
+      URL.revokeObjectURL(objectUrl);
+    }
   },
 
   async getPickupOrder(token: string): Promise<StoreOrder> {
