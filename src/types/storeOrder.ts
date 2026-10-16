@@ -96,6 +96,9 @@ export interface StoreProductAdmin {
   personalizavel: boolean;
   disponivel: boolean;
   ativo: boolean;
+  estoqueControlado?: boolean;
+  estoqueAtual?: number;
+  estoqueVariacoes?: Record<string, number>;
   ordem?: number;
 }
 
