@@ -34,8 +34,20 @@ export function MadeiraStoreProductCard({ product }: MadeiraStoreProductCardProp
 
   const { addItem, setIsCartDrawerOpen } = useMadeiraStoreCart();
 
+  const selectedStock = (() => {
+    if (!product.stockControlled) return null;
+    const hasVariants = !!(product.sizes?.length || product.colors?.length || product.variations?.length);
+    if (!hasVariants) return Math.max(0, Math.floor(Number(product.stockQuantity) || 0));
+    const key = [selectedSize || "", selectedColor || "", selectedVariation || ""]
+      .map(value => value.trim().toLowerCase())
+      .join("||");
+    return Math.max(0, Math.floor(Number(product.stockByVariant?.[key]) || 0));
+  })();
+
+  const canBuy = product.available !== false && (selectedStock === null || selectedStock > 0);
+
   const handleAddToCart = (openCart = false) => {
-    if (product.available === false) return;
+    if (!canBuy) return;
 
     addItem(product, 1, {
       size: selectedSize,
@@ -91,7 +103,7 @@ export function MadeiraStoreProductCard({ product }: MadeiraStoreProductCardProp
             </span>
           )}
 
-          {product.available === false && (
+          {!canBuy && (
             <span className="bg-red-600/90 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider ml-auto">
               Indisponível
             </span>
@@ -153,6 +165,15 @@ export function MadeiraStoreProductCard({ product }: MadeiraStoreProductCardProp
           {product.description && (
             <p className="text-xs text-neutral-600 leading-relaxed line-clamp-3">
               {product.description}
+            </p>
+          )}
+          {product.stockControlled && (
+            <p className={`text-[11px] mt-2 font-semibold ${selectedStock === 0 ? "text-red-600" : selectedStock !== null && selectedStock <= 3 ? "text-amber-700" : "text-neutral-500"}`}>
+              {selectedStock === 0
+                ? "Sem estoque para esta opção"
+                : selectedStock !== null
+                ? `${selectedStock} unidade${selectedStock === 1 ? "" : "s"} disponível${selectedStock === 1 ? "" : "is"}`
+                : ""}
             </p>
           )}
         </div>
@@ -270,9 +291,9 @@ export function MadeiraStoreProductCard({ product }: MadeiraStoreProductCardProp
           <button
             type="button"
             onClick={() => handleAddToCart(false)}
-            disabled={product.available === false}
+            disabled={!canBuy}
             className={`flex-1 py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm ${
-              product.available === false
+              !canBuy
                 ? "bg-neutral-200 text-neutral-400 cursor-not-allowed"
                 : addedAnimation
                 ? "bg-emerald-600 text-white"
@@ -287,7 +308,7 @@ export function MadeiraStoreProductCard({ product }: MadeiraStoreProductCardProp
             ) : (
               <>
                 <Plus className="w-4 h-4" />
-                <span>Adicionar ao Carrinho</span>
+                <span>{canBuy ? "Adicionar ao Carrinho" : "Sem estoque"}</span>
               </>
             )}
           </button>
@@ -295,9 +316,9 @@ export function MadeiraStoreProductCard({ product }: MadeiraStoreProductCardProp
           <button
             type="button"
             onClick={() => handleAddToCart(true)}
-            disabled={product.available === false}
+            disabled={!canBuy}
             className={`py-2.5 px-3 rounded-xl font-bold text-xs border transition-all active:scale-95 shrink-0 ${
-              product.available === false
+              !canBuy
                 ? "bg-neutral-100 text-neutral-300 border-neutral-200 cursor-not-allowed"
                 : "bg-karate-red/10 hover:bg-karate-red hover:text-white text-karate-red border-karate-red/20 cursor-pointer"
             }`}
