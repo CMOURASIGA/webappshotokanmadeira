@@ -55,6 +55,7 @@ export function MadeiraStoreCartDrawer() {
   const [pixQrCodeUrl, setPixQrCodeUrl] = useState<string>("");
   const [copiedPix, setCopiedPix] = useState(false);
   const [markedPaymentSent, setMarkedPaymentSent] = useState(false);
+  const [receiptDownloaded, setReceiptDownloaded] = useState(false);
 
   if (!isCartDrawerOpen) return null;
 
@@ -130,6 +131,76 @@ export function MadeiraStoreCartDrawer() {
     }
   };
 
+  const handleDownloadReceipt = async () => {
+    if (!createdOrder?.tokenRetirada) {
+      setSubmitError("O pedido ainda não possui token de retirada. Atualize o Apps Script antes de gerar novos pedidos.");
+      return;
+    }
+
+    const pickupUrl = `${window.location.origin}${window.location.pathname}#/madeirastore/retirada/${createdOrder.tokenRetirada}`;
+    const pickupQr = await generatePixQrCodeDataUrl(pickupUrl);
+    const canvas = document.createElement("canvas");
+    canvas.width = 1080;
+    canvas.height = 1600;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#111111";
+    ctx.textAlign = "center";
+    ctx.font = "700 42px Arial";
+    ctx.fillText("MADEIRA KARATE", 540, 130);
+    ctx.font = "700 30px Arial";
+    ctx.fillText("COMPROVANTE DE PEDIDO", 540, 205);
+
+    try {
+      if (config.logo) {
+        const logo = new Image();
+        logo.crossOrigin = "anonymous";
+        await new Promise<void>((resolve) => {
+          logo.onload = () => resolve();
+          logo.onerror = () => resolve();
+          logo.src = config.logo;
+        });
+        if (logo.width) ctx.drawImage(logo, 455, 245, 170, 170);
+      }
+    } catch {}
+
+    ctx.textAlign = "left";
+    ctx.font = "700 36px Arial";
+    ctx.fillText(`Pedido: ${createdOrder.codigo}`, 100, 500);
+    ctx.font = "400 28px Arial";
+    ctx.fillText(`Cliente: ${createdOrder.nomeCliente}`, 100, 555);
+    ctx.fillText(`Data: ${new Date(createdOrder.dataCriacao).toLocaleString("pt-BR")}`, 100, 605);
+    ctx.fillText(`Valor: R$ ${createdOrder.valorTotal.toFixed(2).replace(".", ",")}`, 100, 655);
+    ctx.fillText(`Status: ${createdOrder.statusPedido}`, 100, 705);
+
+    const qr = new Image();
+    await new Promise<void>((resolve) => {
+      qr.onload = () => resolve();
+      qr.onerror = () => resolve();
+      qr.src = pickupQr;
+    });
+    if (qr.width) ctx.drawImage(qr, 315, 790, 450, 450);
+
+    ctx.textAlign = "center";
+    ctx.font = "700 28px Arial";
+    ctx.fillText("Apresente este QR Code na retirada do pedido.", 540, 1300);
+    ctx.font = "400 22px Arial";
+    ctx.fillStyle = "#555555";
+    ctx.fillText("O responsável poderá consultar e confirmar a entrega pelo QR Code.", 540, 1350);
+    ctx.fillText(createdOrder.codigo, 540, 1420);
+
+    const link = document.createElement("a");
+    link.download = `MadeiraStore-${createdOrder.codigo}.png`;
+    link.href = canvas.toDataURL("image/png");
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setReceiptDownloaded(true);
+  };
+
   const handleCopyPix = () => {
     if (!pixPayload) return;
     navigator.clipboard.writeText(pixPayload);
@@ -170,6 +241,7 @@ export function MadeiraStoreCartDrawer() {
       setPixPayload("");
       setPixQrCodeUrl("");
       setMarkedPaymentSent(false);
+      setReceiptDownloaded(false);
     }
   };
 
@@ -503,11 +575,27 @@ export function MadeiraStoreCartDrawer() {
                 </div>
               </div>
 
+              <div className={`p-4 rounded-2xl border space-y-3 ${receiptDownloaded ? "bg-emerald-50 border-emerald-200" : "bg-amber-50 border-amber-300"}`}>
+                <div className="text-center">
+                  <span className="text-xs font-bold block">{receiptDownloaded ? "Comprovante salvo" : "Salve seu comprovante para continuar"}</span>
+                  <p className="text-[11px] text-neutral-600 mt-1">
+                    O comprovante contém o número do pedido e um QR Code para consulta e confirmação da retirada.
+                  </p>
+                </div>
+                <button
+                  onClick={handleDownloadReceipt}
+                  className="w-full py-3 px-4 bg-neutral-900 hover:bg-black text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2"
+                >
+                  <QrCode className="w-4 h-4" />
+                  <span>{receiptDownloaded ? "Baixar comprovante novamente" : "Baixar comprovante do pedido"}</span>
+                </button>
+              </div>
+
               {/* Botão Já Realizei o Pagamento */}
               <div className="p-3 bg-neutral-100 rounded-xl space-y-2">
                 <button
                   onClick={handleMarkPaymentDone}
-                  disabled={markedPaymentSent}
+                  disabled={markedPaymentSent || !receiptDownloaded}
                   className={`w-full py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
                     markedPaymentSent
                       ? "bg-emerald-600 text-white cursor-default"
@@ -523,15 +611,22 @@ export function MadeiraStoreCartDrawer() {
               </div>
 
               {/* Botão de Envio de Comprovante via WhatsApp */}
-              <a
-                href={generateWhatsAppUrl()}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full py-3 px-4 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-sm"
-              >
-                <MessageCircle className="w-4 h-4" />
-                <span>Enviar comprovante pelo WhatsApp</span>
-              </a>
+              {receiptDownloaded ? (
+                <a
+                  href={generateWhatsAppUrl()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-3 px-4 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-sm"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  <span>Enviar comprovante pelo WhatsApp</span>
+                </a>
+              ) : (
+                <div className="w-full py-3 px-4 bg-neutral-300 text-neutral-500 rounded-xl text-xs font-bold flex items-center justify-center gap-2 cursor-not-allowed">
+                  <MessageCircle className="w-4 h-4" />
+                  <span>Baixe o comprovante antes de continuar</span>
+                </div>
+              )}
 
               {/* Link para consulta */}
               <div className="pt-2 text-center">
