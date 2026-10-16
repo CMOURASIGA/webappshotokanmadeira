@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { createPortal } from "react-dom";
 import { 
   X, 
   Trash2, 
@@ -172,8 +173,8 @@ export function MadeiraStoreCartDrawer() {
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-50 overflow-hidden bg-black/60 backdrop-blur-xs flex justify-end animate-in fade-in duration-200">
+  return createPortal(
+    <div className="fixed inset-0 z-[100] overflow-hidden bg-black/60 backdrop-blur-xs flex justify-end animate-in fade-in duration-200">
       <div className="w-full max-w-md bg-white h-[100dvh] max-h-[100dvh] min-h-0 shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-right duration-300">
         
         {/* Header */}
@@ -574,6 +575,7 @@ export function MadeiraStoreCartDrawer() {
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
