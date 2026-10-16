@@ -27,20 +27,23 @@ export interface StoreOrderItem {
 }
 
 export interface StoreOrder {
-  id: string; // e.g. "MS2026-0001"
-  codigo: string; // e.g. "MS2026-0001"
+  id: string;
+  codigo: string;
   nomeCliente: string;
   telefone: string;
   email: string;
   valorTotal: number;
   statusPedido: StoreOrderStatus;
   statusPagamento: StorePaymentStatus;
-  dataCriacao: string; // ISO string
+  dataCriacao: string;
   dataPagamento?: string;
   dataRetirada?: string;
   observacoes?: string;
   atualizadoEm: string;
   itens?: StoreOrderItem[];
+  tokenRetirada?: string;
+  dataGeracaoComprovante?: string;
+  entreguePor?: string;
 }
 
 export interface CreateStoreOrderPayload {
@@ -60,4 +63,43 @@ export interface CreateStoreOrderPayload {
     valorUnitario: number;
     subtotal: number;
   }>;
+}
+
+export interface StoreCategory {
+  id: string;
+  nome: string;
+  descricao?: string;
+  ativo: boolean;
+  usaTamanho: boolean;
+  usaCor: boolean;
+  usaVariacao: boolean;
+  permitePersonalizacao: boolean;
+  ordem?: number;
+}
+
+export interface StoreProductAdmin {
+  id: string;
+  nome: string;
+  descricao?: string;
+  preco: number;
+  imagem1?: string;
+  imagem2?: string;
+  imagem3?: string;
+  imagem1FileId?: string;
+  imagem2FileId?: string;
+  imagem3FileId?: string;
+  categoriaId: string;
+  categoria?: string;
+  tamanhos?: string;
+  cores?: string;
+  variacoes?: string;
+  personalizavel: boolean;
+  disponivel: boolean;
+  ativo: boolean;
+  ordem?: number;
+}
+
+export interface StoreAdminConfig {
+  driveFolderUrl?: string;
+  driveFolderId?: string;
 }
