@@ -68,7 +68,7 @@ export function ChampionshipDetail() {
         registrationSummary: "Registration Summary", athlete: "Athlete", participation: "Participation", allModalities: "All championship modalities", eventModalities: "Event modalities", grade: "Grade", weight: "Weight", ageAtEvent: "Age on event date", minor: "Minor", phone: "Phone", email: "Email", guardian: "Legal Guardian",
         trackRegistration: "Track / Update Registration Later", backHome: "Back to Home", eventDate: "Event Date", location: "Location", officialForm: "Official Registration Form", athleteData: "Athlete Information", fillCarefully: "Complete the form carefully. The athlete's age will be calculated for the championship date",
         fullName: "Athlete Full Name", birthDate: "Date of Birth", allowedAge: "Allowed age range", ageOutside: "age outside the permitted range.", sexForCategories: "Sex for Category Organization", male: "Male", female: "Female", currentGrade: "Current Grade / Belt", bodyWeight: "Body Weight (kg)", weightHelp: "Used for Kumite bracket balancing.", athletePhone: "Athlete WhatsApp / Mobile", athleteEmail: "Athlete Email", minorAuthorization: "Minor Athlete Authorization", guardianName: "Legal Guardian Name", guardianPhone: "Guardian Phone / WhatsApp", registrationsUnavailable: "Registration Unavailable", formClosed: "The registration form is closed for this event.",
-        periodOpen: "Registration Open", periodBefore: "Registration Not Open Yet", periodClosed: "Registration Closed", periodOpenMsg: "Registration is currently open for this event.", periodBeforeMsg: "Registration has not opened yet.", periodClosedMsg: "Registration is currently closed for this event."
+        periodOpen: "Registration Open", periodBefore: "Registration Not Open Yet", periodClosed: "Registration Closed", periodOpenMsg: "Registration is currently open for this event.", periodBeforeMsg: "Registration has not opened yet.", periodClosedMsg: "Registration is currently closed for this event.", loadingChampionship:"Loading championship data...", noneFound:"No Championship Found", noneHint:"There are no championships registered or currently open for registration.", backStart:"Back to Home", receiptTitle:"Payment Receipt Submission", receiptHelp:"To have the registration reviewed and confirmed by the Sensei, send the receipt directly through the dojo official WhatsApp."
       }
     : language === "ja"
     ? {
@@ -82,7 +82,7 @@ export function ChampionshipDetail() {
         registrationSummary: "申込内容", athlete: "選手", participation: "参加", allModalities: "大会の全種目", eventModalities: "大会種目", grade: "級・段位", weight: "体重", ageAtEvent: "大会当日の年齢", minor: "未成年", phone: "電話", email: "メール", guardian: "法定保護者",
         trackRegistration: "後で申込を確認・変更", backHome: "ホームに戻る", eventDate: "開催日", location: "会場", officialForm: "公式申込フォーム", athleteData: "選手情報", fillCarefully: "正確に入力してください。年齢は大会当日を基準に計算されます",
         fullName: "選手氏名", birthDate: "生年月日", allowedAge: "対象年齢", ageOutside: "対象年齢外です。", sexForCategories: "カテゴリ編成用の性別", male: "男性", female: "女性", currentGrade: "現在の級・帯", bodyWeight: "体重 (kg)", weightHelp: "Kumite の組合せ調整に使用します。", athletePhone: "選手の WhatsApp / 携帯", athleteEmail: "選手メール", minorAuthorization: "未成年選手の同意", guardianName: "法定保護者氏名", guardianPhone: "保護者の電話 / WhatsApp", registrationsUnavailable: "申込受付停止中", formClosed: "この大会の申込受付は終了しています。",
-        periodOpen: "申込受付中", periodBefore: "申込開始前", periodClosed: "申込受付終了", periodOpenMsg: "現在、この大会の申込を受け付けています。", periodBeforeMsg: "申込受付はまだ開始していません。", periodClosedMsg: "現在、この大会の申込受付は終了しています。"
+        periodOpen: "申込受付中", periodBefore: "申込開始前", periodClosed: "申込受付終了", periodOpenMsg: "現在、この大会の申込を受け付けています。", periodBeforeMsg: "申込受付はまだ開始していません。", periodClosedMsg: "現在、この大会の申込受付は終了しています。", loadingChampionship:"大会情報を読み込み中...", noneFound:"大会が見つかりません", noneHint:"現在、登録済みまたは申込受付中の大会はありません。", backStart:"ホームに戻る", receiptTitle:"支払証明の送付", receiptHelp:"申込内容を先生が確認するため、道場公式 WhatsApp から支払証明を送信してください。"
       }
     : {
         errName: "Por favor, preencha o Nome Completo do Atleta.", errBirth: "Por favor, informe a Data de Nascimento do Atleta.", errAgePrefix: "Este campeonato aceita atletas de", to: "a", years: "anos", errAgeSuffix: "considerando a idade na data do evento.",
@@ -95,7 +95,7 @@ export function ChampionshipDetail() {
         registrationSummary: "Resumo da Inscrição Cadastrada", athlete: "Atleta", participation: "Participação", allModalities: "Todas as modalidades do campeonato", eventModalities: "Modalidades do evento", grade: "Graduação", weight: "Peso", ageAtEvent: "Idade no Campeonato", minor: "Menor", phone: "Telefone", email: "E-mail", guardian: "Responsável Legal",
         trackRegistration: "Acompanhar / Alterar Inscrição Futuramente", backHome: "Voltar ao Início", eventDate: "Data do Evento", location: "Local", officialForm: "Ficha de Inscrição Oficial", athleteData: "Dados do Atleta", fillCarefully: "Preencha com atenção. A idade do atleta será calculada rigorosamente para a data do campeonato",
         fullName: "Nome Completo do Atleta", birthDate: "Data de Nascimento", allowedAge: "Faixa etária permitida", ageOutside: "idade fora da faixa permitida.", sexForCategories: "Sexo para Organização de Categorias", male: "Masculino", female: "Feminino", currentGrade: "Graduação / Faixa Atual", bodyWeight: "Peso Corporal (kg)", weightHelp: "Utilizado para balanceamento das chaves de Kumite.", athletePhone: "WhatsApp / Celular do Atleta", athleteEmail: "E-mail do Atleta", minorAuthorization: "Autorização de Menor de Idade", guardianName: "Nome do Responsável Legal", guardianPhone: "Telefone / WhatsApp do Responsável", registrationsUnavailable: "Inscrições Não Disponíveis", formClosed: "O formulário de inscrições encontra-se fechado para este evento.",
-        periodOpen: "Inscrições Abertas", periodBefore: "Inscrições ainda não abertas", periodClosed: "Inscrições Encerradas", periodOpenMsg: "As inscrições estão abertas para este evento.", periodBeforeMsg: "As inscrições ainda não foram abertas.", periodClosedMsg: "As inscrições estão encerradas para este evento."
+        periodOpen: "Inscrições Abertas", periodBefore: "Inscrições ainda não abertas", periodClosed: "Inscrições Encerradas", periodOpenMsg: "As inscrições estão abertas para este evento.", periodBeforeMsg: "As inscrições ainda não foram abertas.", periodClosedMsg: "As inscrições estão encerradas para este evento.", loadingChampionship:"Carregando dados do campeonato...", noneFound:"Nenhum Campeonato Encontrado", noneHint:"Não há campeonatos cadastrados ou com inscrições ativas no momento.", backStart:"Voltar ao Início", receiptTitle:"Envio do Comprovante de Pagamento", receiptHelp:"Para que a inscrição seja conferida e confirmada pelo Sensei, envie o comprovante diretamente pelo WhatsApp oficial do Dojo."
       };
 
   const beltDisplay: Record<string, string> = Object.fromEntries(BELT_OPTIONS.map((belt) => {
@@ -333,7 +333,7 @@ export function ChampionshipDetail() {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center p-8 space-y-3">
         <div className="w-10 h-10 border-4 border-karate-red border-t-transparent rounded-full animate-spin" />
-        <p className="text-sm text-neutral-500 font-medium">Carregando dados do campeonato...</p>
+        <p className="text-sm text-neutral-500 font-medium">{copy.loadingChampionship}</p>
       </div>
     );
   }
@@ -344,13 +344,13 @@ export function ChampionshipDetail() {
         <div className="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-4 text-neutral-400">
           <Trophy className="w-8 h-8" />
         </div>
-        <h1 className="text-2xl font-bold font-jp text-neutral-900 mb-2">Nenhum Campeonato Encontrado</h1>
-        <p className="text-sm text-neutral-600 mb-6">Não há campeonatos cadastrados ou com inscrições ativas no momento.</p>
+        <h1 className="text-2xl font-bold font-jp text-neutral-900 mb-2">{copy.noneFound}</h1>
+        <p className="text-sm text-neutral-600 mb-6">{copy.noneHint}</p>
         <Link 
           to="/" 
           className="inline-flex items-center gap-2 px-5 py-2.5 bg-neutral-900 text-white rounded-xl text-sm font-semibold hover:bg-neutral-800 transition-colors"
         >
-          <ArrowLeft className="w-4 h-4" /> Voltar ao Início
+          <ArrowLeft className="w-4 h-4" /> {copy.backStart}
         </Link>
       </div>
     );
@@ -480,7 +480,7 @@ export function ChampionshipDetail() {
                 className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-neutral-900 hover:bg-neutral-800 text-white rounded-xl text-xs font-semibold transition-colors cursor-pointer shadow-sm"
               >
                 {copiedPix ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
-                {copiedPix ? "Código Pix Copiado!" : "Copiar {copy.pixCopyPaste}"}
+                {copiedPix ? copy.pixCopied : copy.copyPix}
               </button>
             </div>
           </div>
@@ -490,9 +490,9 @@ export function ChampionshipDetail() {
             <div className="flex items-start gap-3">
               <MessageCircle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
               <div>
-                <h3 className="text-sm font-bold text-amber-900">Envio do Comprovante de Pagamento</h3>
+                <h3 className="text-sm font-bold text-amber-900">{copy.receiptTitle}</h3>
                 <p className="text-xs text-amber-800 mt-1 leading-relaxed">
-                  Para que a inscrição seja conferida e confirmada pelo Sensei, envie o comprovante diretamente pelo WhatsApp oficial do Dojo.
+                  {copy.receiptHelp}
                 </p>
               </div>
             </div>
@@ -505,7 +505,7 @@ export function ChampionshipDetail() {
                 className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-colors shadow-sm cursor-pointer"
               >
                 <MessageCircle className="w-4 h-4" />
-                Enviar Comprovante pelo WhatsApp
+                {copy.sendReceipt}
                 <ExternalLink className="w-3.5 h-3.5 ml-1 opacity-70" />
               </a>
 
@@ -852,7 +852,7 @@ export function ChampionshipDetail() {
                   </span>
                 </div>
                 <div className="text-xs text-neutral-700 pl-6">
-                  <strong>Modalidades do evento:</strong> {formatModalidadesList(championship.modalidades)}
+                  <strong>{copy.eventModalities}:</strong> {formatModalidadesList(championship.modalidades)}
                 </div>
                 <div className="text-[11px] text-neutral-500 pl-6 leading-relaxed">
                   A inscrição é única e o atleta compete em todas as modalidades oficiais configuradas para este evento de acordo com sua categoria etária e graduação.
