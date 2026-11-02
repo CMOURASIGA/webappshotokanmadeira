@@ -33,7 +33,7 @@ export function GalleryDetail() {
     ? { load: "Loading photos from Google Drive...", loadError: "Unable to open this gallery", back: "Back to Events & Photos", events: "Events & Photos", photos: "photos", gallery: "Gallery", empty: "This folder does not have published photos yet.", close: "Close photo", previous: "Previous photo", next: "Next photo", of: "of", error: "Error loading gallery." }
     : language === "ja"
     ? { load: "Google Drive から写真を読み込み中...", loadError: "このギャラリーを開けませんでした", back: "イベント・写真に戻る", events: "イベント・写真", photos: "枚", gallery: "ギャラリー", empty: "このフォルダにはまだ公開写真がありません。", close: "写真を閉じる", previous: "前の写真", next: "次の写真", of: "/", error: "ギャラリーの読み込みに失敗しました。" }
-    : { load: "{copy.load}", loadError: "{copy.loadError}", back: "{copy.back}", events: "{copy.events}", photos: "fotos", gallery: "{copy.gallery}", empty: "{copy.empty}", close: "Fechar foto", previous: "Foto anterior", next: "Próxima foto", of: "de", error: copy.error };
+    : { load: "Carregando fotos do Google Drive...", loadError: "Não foi possível abrir esta galeria", back: "Voltar para Eventos & Fotos", events: "Eventos & Fotos", photos: "fotos", gallery: "Galeria", empty: "Esta pasta ainda não possui fotos publicadas.", close: "Fechar foto", previous: "Foto anterior", next: "Próxima foto", of: "de", error: "Erro ao carregar galeria." };
 
   useEffect(() => {
     if (!id) return;
@@ -78,7 +78,7 @@ export function GalleryDetail() {
     return (
       <div className="min-h-[55vh] flex items-center justify-center gap-3 text-neutral-500">
         <Loader2 className="w-6 h-6 animate-spin text-karate-red" />
-        <span className="text-sm">Carregando fotos do Google Drive...</span>
+        <span className="text-sm">{copy.load}</span>
       </div>
     );
   }
@@ -87,10 +87,10 @@ export function GalleryDetail() {
     return (
       <div className="max-w-xl mx-auto py-16 text-center space-y-4">
         <AlertCircle className="w-10 h-10 text-karate-red mx-auto" />
-        <h1 className="text-xl font-black">Não foi possível abrir esta galeria</h1>
+        <h1 className="text-xl font-black">{copy.loadError}</h1>
         <p className="text-sm text-neutral-500">{error}</p>
         <Link to="/events" className="inline-flex items-center gap-2 text-sm font-bold text-karate-red hover:underline">
-          <ArrowLeft className="w-4 h-4" /> Voltar para Eventos & Fotos
+          <ArrowLeft className="w-4 h-4" /> {copy.back}
         </Link>
       </div>
     );
@@ -104,7 +104,7 @@ export function GalleryDetail() {
         <div className="flex items-center justify-between gap-4">
           <Link to="/events" className="inline-flex items-center gap-2 text-xs font-semibold text-neutral-500 hover:text-karate-red">
             <ArrowLeft className="w-4 h-4" />
-            Eventos & Fotos
+            {copy.events}
           </Link>
           <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-500">
             <Images className="w-4 h-4" />
@@ -113,7 +113,7 @@ export function GalleryDetail() {
         </div>
 
         <div className="border-b border-neutral-200 pb-5">
-          <span className="text-[10px] uppercase tracking-[0.22em] text-karate-red font-bold">Galeria</span>
+          <span className="text-[10px] uppercase tracking-[0.22em] text-karate-red font-bold">{copy.gallery}</span>
           <h1 className="text-2xl sm:text-3xl font-black text-neutral-900 mt-1">{data.gallery.titulo}</h1>
           {data.gallery.descricao && (
             <p className="text-sm text-neutral-500 mt-2 max-w-2xl">{data.gallery.descricao}</p>
@@ -123,7 +123,7 @@ export function GalleryDetail() {
         {data.photos.length === 0 ? (
           <div className="bg-white border border-neutral-200 rounded-2xl p-12 text-center">
             <Images className="w-10 h-10 mx-auto text-neutral-300 mb-3" />
-            <p className="text-sm text-neutral-500">Esta pasta ainda não possui fotos publicadas.</p>
+            <p className="text-sm text-neutral-500">{copy.empty}</p>
           </div>
         ) : (
           <div className="columns-2 md:columns-3 lg:columns-4 gap-3 sm:gap-4 space-y-3 sm:space-y-4">
