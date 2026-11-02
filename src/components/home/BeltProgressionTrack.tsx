@@ -11,10 +11,10 @@ interface BeltProgressionTrackProps {
 export function BeltProgressionTrack({ belts }: BeltProgressionTrackProps) {
   const { language } = useLanguage();
   const copy = language === "en"
-    ? { official: "Official JKA Brazil Path", title: "Belt Progression", intro: "From 10th Kyu, White Belt, to 1st Dan, Black Belt Shodan. Select a belt to view the technical program.", all: "View all grades and higher Dan levels", belt: "Belt", program: "Technical Program", requirements: "Requirements", source: "Official source" }
+    ? { official: "Official JKA Brazil Path", title: "Belt Progression", intro: "From 10th Kyu, White Belt, to 1st Dan, Black Belt Shodan. Select a belt to view the technical program.", all: "View all grades and higher Dan levels", belt: "Belt", program: "Technical Program", requirements: "Requirements", source: "Official source", fullSheet: "View Full Official Sheet", official: "Official JKA Brazil Path", techniques: "techniques", more: "more...", kataRequired: "Required Kata", officialReq: "Official JKA Brazil Requirements", adminRules: "Administrative Rules (JKA 2026)", minTime: "Minimum interval", previousGrade: "Previous grade", minAge: "Minimum age" }
     : language === "ja"
-    ? { official: "JKA Brasil 公式の段階", title: "帯の進級", intro: "10級の白帯から初段の黒帯まで。帯を選択すると技術課程を確認できます。", all: "すべての級・上位段位を見る", belt: "帯", program: "技術課程", requirements: "要件", source: "公式資料" }
-    : { official: "Trilha Oficial JKA Brasil", title: "{copy.title}", intro: "Do 10º Kyu, Faixa Branca, ao 1º Dan, Faixa Preta Shodan. Toque em uma faixa para ver o programa técnico.", all: "Ver todas as graduações e Dans superiores", belt: "Faixa", program: "{copy.program}", requirements: "{copy.requirements}", source: "{copy.source}" };
+    ? { official: "JKA Brasil 公式の段階", title: "帯の進級", intro: "10級の白帯から初段の黒帯まで。帯を選択すると技術課程を確認できます。", all: "すべての級・上位段位を見る", belt: "帯", program: "技術課程", requirements: "要件", source: "公式資料", fullSheet: "公式詳細を見る", techniques: "技", more: "ほか", kataRequired: "指定形", officialReq: "JKA Brasil 公式要件", adminRules: "管理規定（JKA 2026）", minTime: "最低期間", previousGrade: "前段階", minAge: "最低年齢" }
+    : { official: "Trilha Oficial JKA Brasil", title: "Progressão de Faixas", intro: "Do 10º Kyu, Faixa Branca, ao 1º Dan, Faixa Preta Shodan. Toque em uma faixa para ver o programa técnico.", all: "Ver todas as graduações e Dans superiores", belt: "Faixa", program: "Programa Técnico", requirements: "Requisitos", source: "Fonte oficial", fullSheet: "Ver Ficha Oficial Completa", techniques: "técnicas", more: "mais...", kataRequired: "Kata Exigido", officialReq: "Requisitos Oficiais JKA Brasil", adminRules: "Regras Administrativas (JKA 2026)", minTime: "Carência mínima", previousGrade: "Graduação anterior", minAge: "Idade mínima" };
   // Trilha oficial JKA: 10º Kyu (Branca) até 1º Dan (Preta / Shodan)
   const primaryBelts = belts.filter(b => 
     b.id === "white" || 
@@ -151,7 +151,7 @@ export function BeltProgressionTrack({ belts }: BeltProgressionTrackProps) {
               to={`/belts#belt-${selectedBelt.id}`}
               className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-neutral-900 hover:bg-black text-white text-xs sm:text-sm font-bold transition-colors shrink-0"
             >
-              <span>Ver Ficha Oficial Completa</span>
+              <span>{copy.fullSheet}</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -160,7 +160,7 @@ export function BeltProgressionTrack({ belts }: BeltProgressionTrackProps) {
           <div className="pt-5 space-y-4">
             <h3 className="text-xs uppercase font-bold tracking-wider text-neutral-600 flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-karate-red" />
-              {copy.requirements} Oficiais JKA Brasil
+              {copy.officialReq}
             </h3>
 
             {/* Kihon, Kata, Kumite Highlights */}
@@ -169,7 +169,7 @@ export function BeltProgressionTrack({ belts }: BeltProgressionTrackProps) {
               {selectedBelt.kihon && selectedBelt.kihon.length > 0 && (
                 <div className="p-3.5 rounded-xl bg-neutral-50 border border-neutral-200/80 space-y-2">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-karate-red block">
-                    Kihon ({selectedBelt.kihon.length} técnicas)
+                    Kihon ({selectedBelt.kihon.length} {copy.techniques})
                   </span>
                   <div className="space-y-1 font-mono text-xs text-neutral-800">
                     {selectedBelt.kihon.slice(0, 3).map((k, i) => (
@@ -177,7 +177,7 @@ export function BeltProgressionTrack({ belts }: BeltProgressionTrackProps) {
                     ))}
                     {selectedBelt.kihon.length > 3 && (
                       <div className="text-[11px] text-neutral-400 font-sans italic">
-                        +{selectedBelt.kihon.length - 3} mais...
+                        +{selectedBelt.kihon.length - 3} {copy.more}
                       </div>
                     )}
                   </div>
@@ -188,7 +188,7 @@ export function BeltProgressionTrack({ belts }: BeltProgressionTrackProps) {
               {selectedBelt.kata && selectedBelt.kata.length > 0 && (
                 <div className="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200 space-y-2">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-amber-900 block">
-                    Kata Exigido
+                    {copy.kataRequired}
                   </span>
                   <div className="space-y-1 font-mono text-xs text-amber-950 font-bold">
                     {selectedBelt.kata.map((k, i) => (
@@ -216,7 +216,7 @@ export function BeltProgressionTrack({ belts }: BeltProgressionTrackProps) {
             {/* Dan Rules se Shodan */}
             {selectedBelt.danRules && (
               <div className="p-3 rounded-xl bg-neutral-100 border border-neutral-200 text-xs text-neutral-700">
-                <strong>Regras Administrativas (JKA 2026):</strong> Carência mínima: {selectedBelt.danRules.minimumTime} | Graduação anterior: {selectedBelt.danRules.previousGrade} | Idade mínima: {selectedBelt.danRules.minimumAge}
+                <strong>{copy.adminRules}:</strong> {copy.minTime}: {selectedBelt.danRules.minimumTime} | {copy.previousGrade}: {selectedBelt.danRules.previousGrade} | {copy.minAge}: {selectedBelt.danRules.minimumAge}
               </div>
             )}
           </div>
