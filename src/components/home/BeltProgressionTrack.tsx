@@ -2,12 +2,19 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Award, ArrowRight, CheckCircle2, Sparkles, ExternalLink } from "lucide-react";
 import { Belt } from "../../types";
+import { useLanguage } from "../../i18n/LanguageContext";
 
 interface BeltProgressionTrackProps {
   belts: Belt[];
 }
 
 export function BeltProgressionTrack({ belts }: BeltProgressionTrackProps) {
+  const { language } = useLanguage();
+  const copy = language === "en"
+    ? { official: "Official JKA Brazil Path", title: "Belt Progression", intro: "From 10th Kyu, White Belt, to 1st Dan, Black Belt Shodan. Select a belt to view the technical program.", all: "View all grades and higher Dan levels", belt: "Belt", program: "Technical Program", requirements: "Requirements", source: "Official source" }
+    : language === "ja"
+    ? { official: "JKA Brasil 公式の段階", title: "帯の進級", intro: "10級の白帯から初段の黒帯まで。帯を選択すると技術課程を確認できます。", all: "すべての級・上位段位を見る", belt: "帯", program: "技術課程", requirements: "要件", source: "公式資料" }
+    : { official: "Trilha Oficial JKA Brasil", title: "{copy.title}", intro: "Do 10º Kyu, Faixa Branca, ao 1º Dan, Faixa Preta Shodan. Toque em uma faixa para ver o programa técnico.", all: "Ver todas as graduações e Dans superiores", belt: "Faixa", program: "{copy.program}", requirements: "{copy.requirements}", source: "{copy.source}" };
   // Trilha oficial JKA: 10º Kyu (Branca) até 1º Dan (Preta / Shodan)
   const primaryBelts = belts.filter(b => 
     b.id === "white" || 
@@ -33,13 +40,13 @@ export function BeltProgressionTrack({ belts }: BeltProgressionTrackProps) {
         <div>
           <div className="flex items-center gap-2 text-karate-red font-bold text-xs uppercase tracking-wider mb-1">
             <Award className="w-4 h-4" />
-            <span>Trilha Oficial JKA Brasil</span>
+            <span>{copy.official}</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-black font-jp tracking-tight text-neutral-900">
-            A Jornada das Faixas
+            {copy.title}
           </h2>
           <p className="text-sm text-neutral-600 mt-0.5">
-            Do 10º Kyu (Faixa Branca) ao 1º Dan (Faixa Preta Shodan). Toque em uma faixa para ver o programa técnico.
+            {copy.intro}
           </p>
         </div>
 
@@ -47,7 +54,7 @@ export function BeltProgressionTrack({ belts }: BeltProgressionTrackProps) {
           to="/belts"
           className="inline-flex items-center gap-1.5 text-sm font-bold text-karate-red hover:text-red-700 transition-colors shrink-0 group"
         >
-          <span>Ver todas as graduações e Dans superiores</span>
+          <span>{copy.all}</span>
           <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
         </Link>
       </div>
@@ -126,7 +133,7 @@ export function BeltProgressionTrack({ belts }: BeltProgressionTrackProps) {
               <div>
                 <div className="flex items-center gap-2">
                   <h3 className="text-xl sm:text-2xl font-black font-jp text-neutral-900">
-                    Faixa {selectedBelt.name}
+                    {copy.belt} {selectedBelt.name}
                   </h3>
                   <span className="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-neutral-100 text-neutral-700 border border-neutral-200">
                     {selectedBelt.level}
@@ -153,7 +160,7 @@ export function BeltProgressionTrack({ belts }: BeltProgressionTrackProps) {
           <div className="pt-5 space-y-4">
             <h3 className="text-xs uppercase font-bold tracking-wider text-neutral-600 flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-karate-red" />
-              Requisitos Oficiais JKA Brasil
+              {copy.requirements} Oficiais JKA Brasil
             </h3>
 
             {/* Kihon, Kata, Kumite Highlights */}
