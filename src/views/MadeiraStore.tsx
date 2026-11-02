@@ -126,13 +126,13 @@ export function MadeiraStore() {
         {/* Link alternativo para Loja Oficial JKA */}
         <div className="mt-6 pt-4 border-t border-neutral-800 flex flex-wrap items-center justify-between gap-3 text-xs">
           <span className="text-neutral-400">
-            Procurando uniformes, dogis e faixas oficiais JKA?
+            {t("store.jkaPrompt")}
           </span>
           <Link
             to="/store"
             className="text-karate-gold hover:underline font-bold inline-flex items-center gap-1"
           >
-            <span>Ir para Loja Oficial de Artigos JKA</span>
+            <span>{t("store.jkaLink")}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
@@ -193,7 +193,7 @@ export function MadeiraStore() {
       {loading ? (
         <div className="min-h-[300px] flex flex-col items-center justify-center p-8 space-y-3">
           <div className="w-8 h-8 border-3 border-karate-red border-t-transparent rounded-full animate-spin" />
-          <span className="text-xs font-medium text-neutral-500">Carregando catálogo da MadeiraStore...</span>
+          <span className="text-xs font-medium text-neutral-500">{t("store.loading")}</span>
         </div>
       ) : filteredProducts.length === 0 ? (
         <div className="bg-white rounded-2xl border border-neutral-200 p-8 sm:p-12 text-center max-w-lg mx-auto">
@@ -205,7 +205,7 @@ export function MadeiraStore() {
           </h3>
           <p className="text-xs text-neutral-500 leading-relaxed mb-4">
             {searchTerm || selectedCategory !== "all"
-              ? "Tente ajustar o termo de busca ou limpar a categoria selecionada."
+              ? t("store.adjustFilters")
               : t("store.noneHint")}
           </p>
           {(searchTerm || selectedCategory !== "all") && (
