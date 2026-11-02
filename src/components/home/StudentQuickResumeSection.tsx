@@ -10,7 +10,7 @@ export function StudentQuickResumeSection() {
     ? { continueStudy: "Continue Studying", recent: "Recently viewed", movements: "movements memorized", resume: "Resume", technique: "Technique", student: "Student Area", favorites: "favorites", exam: "Exam", saved: "Saved on this device", title: "Student Area & Individual Training", new: "New", intro: "Save favorite Kata, track memorized movements and keep Sensei notes on your device.", access: "Open Student Area" }
     : language === "ja"
     ? { continueStudy: "学習を続ける", recent: "最近見た内容", movements: "動作を記憶済み", resume: "再開", technique: "技術", student: "会員エリア", favorites: "お気に入り", exam: "審査", saved: "この端末に保存", title: "会員エリア・個人稽古", new: "新機能", intro: "お気に入りの形、覚えた動作、先生からのメモをこの端末に保存できます。", access: "会員エリアを開く" }
-    : { continueStudy: "{copy.continueStudy}", recent: "{copy.recent}", movements: "{copy.movements}", resume: "Retomar", technique: "Técnica", student: "Área do Aluno", favorites: "favoritos", exam: "Exame", saved: "{copy.saved}", title: "{copy.title}", new: "{copy.new}", intro: "{copy.intro}", access: "Acessar Área do Aluno" };
+    : { continueStudy: "Continuar Estudando", recent: "Visto recentemente", movements: "movimentos memorizados", resume: "Retomar", technique: "Técnica", student: "Área do Aluno", favorites: "favoritos", exam: "Exame", saved: "Salvo neste aparelho", title: "Área do Aluno & Treinamento Individual", new: "Novo", intro: "Salve seus katas favoritos, acompanhe movimentos memorizados e guarde anotações do Sensei no seu aparelho.", access: "Acessar Área do Aluno" };
   const { 
     lastStudy, 
     getKataProgress, 
@@ -33,11 +33,11 @@ export function StudentQuickResumeSection() {
             <div className="flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-karate-red/10 text-karate-red text-xs font-bold uppercase tracking-wider">
                 <Play className="w-3 h-3 fill-karate-red" />
-                Continuar Estudando
+                {copy.continueStudy}
               </span>
               <span className="text-xs text-neutral-400 flex items-center gap-1">
                 <Clock className="w-3.5 h-3.5" />
-                Visto recentemente
+                {copy.recent}
               </span>
             </div>
 
@@ -58,7 +58,7 @@ export function StudentQuickResumeSection() {
                   return (
                     <>
                       <div className="flex items-center justify-between text-xs font-medium text-neutral-600">
-                        <span>{progress.completed} de {progress.total} movimentos memorizados</span>
+                        <span>{progress.completed} / {progress.total} {copy.movements}</span>
                         <span className="font-bold text-karate-red">{progress.percentage}%</span>
                       </div>
                       <div className="w-full h-2 bg-neutral-100 rounded-full overflow-hidden border border-neutral-200/60">
@@ -124,14 +124,14 @@ export function StudentQuickResumeSection() {
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="font-bold text-sm sm:text-base text-neutral-900 font-jp">
-                  Área do Aluno & Treinamento Individual
+                  {copy.title}
                 </h2>
                 <span className="text-[10px] bg-karate-gold/20 text-neutral-800 font-bold px-2 py-0.5 rounded-full uppercase">
-                  Novo
+                  {copy.new}
                 </span>
               </div>
               <p className="text-xs text-neutral-500 mt-0.5">
-                Salve seus katas favoritos, acompanhe movimentos memorizados e guarde anotações do Sensei no seu aparelho.
+                {copy.intro}
               </p>
             </div>
           </div>
