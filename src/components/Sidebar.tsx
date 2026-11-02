@@ -20,6 +20,7 @@ import {
 import { useAppData } from "../contexts/AppDataContext";
 import { useCart } from "../contexts/CartContext";
 import { PWAInstallButton } from "./pwa/PWAInstallButton";
+import { useLanguage } from "../i18n/LanguageContext";
 
 interface NavItem {
   name: string;
@@ -36,37 +37,38 @@ export function Sidebar() {
   const location = useLocation();
   const { config } = useAppData();
   const { totalItems } = useCart();
+  const { t } = useLanguage();
 
   const sections: NavSection[] = [
     {
-      title: "PRINCIPAL",
+      title: t("nav.main"),
       items: [
-        { name: "Início", path: "/", icon: Home },
-        { name: "Mural", path: "/mural", icon: Megaphone },
-        { name: "Eventos", path: "/events", icon: Camera },
-        { name: "Campeonatos", path: "/campeonatos", icon: Trophy },
-        { name: "Grade de Horários", path: "/schedule", icon: Calendar },
-        { name: "Loja Oficial", path: "/store", icon: ShoppingBag },
+        { name: t("nav.home"), path: "/", icon: Home },
+        { name: t("nav.wall"), path: "/mural", icon: Megaphone },
+        { name: t("nav.events"), path: "/events", icon: Camera },
+        { name: t("nav.championships"), path: "/campeonatos", icon: Trophy },
+        { name: t("nav.schedule"), path: "/schedule", icon: Calendar },
+        { name: t("nav.officialStore"), path: "/store", icon: ShoppingBag },
         { name: "MadeiraStore", path: "/madeirastore", icon: ShoppingBag },
       ]
     },
     {
-      title: "TREINAMENTO",
+      title: t("nav.training"),
       items: [
-        { name: "Área do Aluno", path: "/student-area", icon: GraduationCap },
+        { name: t("nav.studentArea"), path: "/student-area", icon: GraduationCap },
         { name: "Katas", path: "/katas", icon: BookOpen },
-        { name: "Técnicas", path: "/techniques", icon: Shield },
-        { name: "Faixas", path: "/belts", icon: List },
-        { name: "Série de Katas", path: "/kata-series", icon: Layers },
+        { name: t("nav.techniques"), path: "/techniques", icon: Shield },
+        { name: t("nav.belts"), path: "/belts", icon: List },
+        { name: t("nav.kataSeries"), path: "/kata-series", icon: Layers },
       ]
     },
     {
-      title: "CONHECIMENTO",
+      title: t("nav.knowledge"),
       items: [
-        { name: "Vocabulário", path: "/vocabulary", icon: Sparkles },
-        { name: "O que é Kata?", path: "/what-is-kata", icon: HelpCircle },
+        { name: t("nav.vocabulary"), path: "/vocabulary", icon: Sparkles },
+        { name: t("nav.whatIsKata"), path: "/what-is-kata", icon: HelpCircle },
         { name: "Dojo Kun", path: "/dojo-kun", icon: ScrollText },
-        { name: "História", path: "/history", icon: History },
+        { name: t("nav.history"), path: "/history", icon: History },
       ]
     }
   ];
