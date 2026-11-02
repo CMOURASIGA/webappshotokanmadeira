@@ -49,14 +49,13 @@ export function Layout({ children }: { children: ReactNode }) {
         {/* Header Superior Responsivo */}
         <header className="h-16 sm:h-20 bg-white border-b border-gray-200 flex items-center justify-between px-3 sm:px-6 md:px-8 lg:px-10 shrink-0 sticky top-0 z-30">
           <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-            {/* Tag Dojo Digital para Desktop */}
-            <span className="text-[#BC002D] font-bold text-xs sm:text-sm tracking-[0.2em] uppercase italic hidden lg:block shrink-0">
-              {t("header.digitalDojo")}
-            </span>
-            <div className="hidden lg:block h-4 w-[1px] bg-gray-300"></div>
-            <span className="text-gray-600 text-xs hidden lg:block truncate">
-              {t("header.studyDiscipline")}
-            </span>
+            {/* Identidade + seletor de idioma no Desktop */}
+            <div className="hidden lg:flex flex-col items-start justify-center gap-1 shrink-0">
+              <span className="text-[#BC002D] font-bold text-xs sm:text-sm tracking-[0.2em] uppercase italic leading-none">
+                {t("header.digitalDojo")}
+              </span>
+              <LanguageSelector compact />
+            </div>
             
             {/* Marca Madeira Karate para Mobile e Tablet */}
             <Link to="/" className="lg:hidden flex items-center gap-2.5 min-w-0 group">
@@ -80,10 +79,6 @@ export function Layout({ children }: { children: ReactNode }) {
 
           {/* Área de Busca e Ações */}
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="hidden sm:block">
-              <LanguageSelector compact />
-            </div>
-
             {/* Botão de Carrinho / Loja */}
             <Link
               to="/store"
