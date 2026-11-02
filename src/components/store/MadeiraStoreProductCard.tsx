@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Product } from "../../contexts/AppDataContext";
 import { useMadeiraStoreCart } from "../../contexts/MadeiraStoreCartContext";
+import { useLanguage } from "../../i18n/LanguageContext";
 
 interface MadeiraStoreProductCardProps {
   product: Product;
@@ -33,6 +34,12 @@ export function MadeiraStoreProductCard({ product }: MadeiraStoreProductCardProp
   const [addedAnimation, setAddedAnimation] = useState(false);
 
   const { addItem, setIsCartDrawerOpen } = useMadeiraStoreCart();
+  const { language } = useLanguage();
+  const copy = language === "en"
+    ? { noPhoto: "Product photo unavailable", ask: "Contact the staff for details", unavailable: "Unavailable", previous: "Previous image", next: "Next image", go: "Go to image", noStock: "Out of stock for this option", unit: "unit available", units: "units available", size: "Size", color: "Color", option: "Option / Flavor", select: "Select", customize: "Add a name for engraving / customization", example: "Example: name for identification", asEntered: "It will be produced exactly as entered.", added: "Added!", add: "Add to Cart", out: "Out of stock", buy: "Buy Now", checkout: "Buy and proceed to checkout" }
+    : language === "ja"
+    ? { noPhoto: "商品画像はありません", ask: "詳しくはスタッフにお問い合わせください", unavailable: "在庫なし", previous: "前の画像", next: "次の画像", go: "画像へ", noStock: "この選択肢は在庫切れです", unit: "点在庫あり", units: "点在庫あり", size: "サイズ", color: "色", option: "種類 / フレーバー", select: "選択", customize: "名入れ・カスタマイズを追加", example: "例: 識別用の名前", asEntered: "入力内容のとおりに作成されます。", added: "追加しました", add: "カートに追加", out: "在庫なし", buy: "今すぐ購入", checkout: "購入して決済へ進む" }
+    : { noPhoto: "{copy.noPhoto}", ask: "{copy.ask}", unavailable: "{copy.unavailable}", previous: "Imagem anterior", next: "Próxima imagem", go: "Ir para foto", noStock: "Sem estoque para esta opção", unit: "unidade disponível", units: "unidades disponíveis", size: "Tamanho", color: "Cor", option: "Opção / Sabor", select: "Selecione", customize: "Adicionar nome para gravação / personalização", example: "Ex: Nome para identificação", asEntered: "{copy.asEntered}", added: "Adicionado!", add: "Adicionar ao Carrinho", out: "Sem estoque", buy: "{copy.buy}", checkout: "Comprar e ir para o checkout" };
 
   const selectedStock = (() => {
     if (!product.stockControlled) return null;
@@ -119,7 +126,7 @@ export function MadeiraStoreProductCard({ product }: MadeiraStoreProductCardProp
                 setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
               }}
               className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 hover:bg-white text-neutral-800 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
-              aria-label="Imagem anterior"
+              aria-label={copy.previous}
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -129,7 +136,7 @@ export function MadeiraStoreProductCard({ product }: MadeiraStoreProductCardProp
                 setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
               }}
               className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 hover:bg-white text-neutral-800 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
-              aria-label="Próxima imagem"
+              aria-label={copy.next}
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -142,7 +149,7 @@ export function MadeiraStoreProductCard({ product }: MadeiraStoreProductCardProp
                   className={`h-1.5 rounded-full transition-all ${
                     currentImageIndex === idx ? "bg-karate-red w-5" : "bg-white/70 w-1.5 hover:bg-white"
                   }`}
-                  aria-label={`Ir para foto ${idx + 1}`}
+                  aria-label={`${copy.go} ${idx + 1}`}
                 />
               ))}
             </div>
@@ -170,9 +177,9 @@ export function MadeiraStoreProductCard({ product }: MadeiraStoreProductCardProp
           {product.stockControlled && (
             <p className={`text-[11px] mt-2 font-semibold ${selectedStock === 0 ? "text-red-600" : selectedStock !== null && selectedStock <= 3 ? "text-amber-700" : "text-neutral-500"}`}>
               {selectedStock === 0
-                ? "Sem estoque para esta opção"
+                ? copy.noStock
                 : selectedStock !== null
-                ? `${selectedStock} unidade${selectedStock === 1 ? "" : "s"} disponível${selectedStock === 1 ? "" : "is"}`
+                ? `${selectedStock} ${selectedStock === 1 ? copy.unit : copy.units}`
                 : ""}
             </p>
           )}
@@ -184,7 +191,7 @@ export function MadeiraStoreProductCard({ product }: MadeiraStoreProductCardProp
           {product.sizes && product.sizes.length > 0 && (
             <div>
               <span className="block text-[11px] font-bold text-neutral-700 uppercase tracking-wider mb-1.5">
-                Tamanho: <span className="text-neutral-500 font-normal">{selectedSize || "Selecione"}</span>
+                {copy.size}: <span className="text-neutral-500 font-normal">{selectedSize || copy.select}</span>
               </span>
               <div className="flex flex-wrap gap-1.5">
                 {product.sizes.map((size) => (
@@ -209,7 +216,7 @@ export function MadeiraStoreProductCard({ product }: MadeiraStoreProductCardProp
           {product.colors && product.colors.length > 0 && (
             <div>
               <span className="block text-[11px] font-bold text-neutral-700 uppercase tracking-wider mb-1.5">
-                Cor: <span className="text-neutral-500 font-normal">{selectedColor || "Selecione"}</span>
+                {copy.color}: <span className="text-neutral-500 font-normal">{selectedColor || copy.select}</span>
               </span>
               <div className="flex flex-wrap gap-1.5">
                 {product.colors.map((color) => (
@@ -234,7 +241,7 @@ export function MadeiraStoreProductCard({ product }: MadeiraStoreProductCardProp
           {product.variations && product.variations.length > 0 && (
             <div>
               <span className="block text-[11px] font-bold text-neutral-700 uppercase tracking-wider mb-1.5">
-                Opção / Sabor: <span className="text-neutral-500 font-normal">{selectedVariation || "Selecione"}</span>
+                {copy.option}: <span className="text-neutral-500 font-normal">{selectedVariation || copy.select}</span>
               </span>
               <div className="flex flex-wrap gap-1.5">
                 {product.variations.map((variation) => (
@@ -264,7 +271,7 @@ export function MadeiraStoreProductCard({ product }: MadeiraStoreProductCardProp
                 className="text-xs text-neutral-600 hover:text-neutral-900 font-semibold flex items-center gap-1.5"
               >
                 <Sparkles className="w-3.5 h-3.5 text-karate-gold" />
-                <span>Adicionar nome para gravação / personalização</span>
+                <span>{copy.customize}</span>
               </button>
 
               {showCustomInput && (
@@ -273,7 +280,7 @@ export function MadeiraStoreProductCard({ product }: MadeiraStoreProductCardProp
                     type="text"
                     value={customizationText}
                     onChange={(e) => setCustomizationText(e.target.value)}
-                    placeholder="Ex: Nome para identificação"
+                    placeholder={copy.example}
                     maxLength={50}
                     className="w-full text-xs p-2 rounded-lg bg-neutral-50 border border-neutral-300 text-neutral-900 focus:outline-none focus:border-karate-red"
                   />
@@ -303,12 +310,12 @@ export function MadeiraStoreProductCard({ product }: MadeiraStoreProductCardProp
             {addedAnimation ? (
               <>
                 <Check className="w-4 h-4" />
-                <span>Adicionado!</span>
+                <span>{copy.added}</span>
               </>
             ) : (
               <>
                 <Plus className="w-4 h-4" />
-                <span>{canBuy ? "Adicionar ao Carrinho" : "Sem estoque"}</span>
+                <span>{canBuy ? copy.add : copy.out}</span>
               </>
             )}
           </button>
@@ -322,7 +329,7 @@ export function MadeiraStoreProductCard({ product }: MadeiraStoreProductCardProp
                 ? "bg-neutral-100 text-neutral-300 border-neutral-200 cursor-not-allowed"
                 : "bg-karate-red/10 hover:bg-karate-red hover:text-white text-karate-red border-karate-red/20 cursor-pointer"
             }`}
-            title="Comprar e ir para o checkout"
+            title={copy.checkout}
           >
             Comprar Agora
           </button>
