@@ -23,10 +23,10 @@ export function NoticeModal({
 }: NoticeModalProps) {
   const { language } = useLanguage();
   const copy = language === "en"
-    ? { close: "Close", notice: "Announcement", imageError: "This announcement image could not be loaded", previous: "Previous announcement", next: "Next announcement", goTo: "Go to announcement", instagram: "Open on Instagram", openLink: "Open link", album: "View Full Album" }
+    ? { close: "Close", notice: "Announcement", imageError: "This announcement image could not be loaded", imageUnavailable: "Image temporarily unavailable", previous: "Previous announcement", next: "Next announcement", goTo: "Go to announcement", instagram: "Open on Instagram", openLink: "Open link", album: "View Full Album" }
     : language === "ja"
-    ? { close: "閉じる", notice: "お知らせ", imageError: "このお知らせ画像を読み込めませんでした", previous: "前のお知らせ", next: "次のお知らせ", goTo: "お知らせへ移動", instagram: "Instagram で開く", openLink: "リンクを開く", album: "アルバム全体を見る" }
-    : { close: "Fechar", notice: "Aviso", imageError: "Não foi possível carregar a arte deste aviso", previous: "Aviso anterior", next: "Próximo aviso", goTo: "Ir para o aviso", instagram: "Abrir no Instagram", openLink: "Abrir link", album: "Ver Álbum Completo" };
+    ? { close: "閉じる", notice: "お知らせ", imageError: "このお知らせ画像を読み込めませんでした", imageUnavailable: "画像を一時的に表示できません", previous: "前のお知らせ", next: "次のお知らせ", goTo: "お知らせへ移動", instagram: "Instagram で開く", openLink: "リンクを開く", album: "アルバム全体を見る" }
+    : { close: "Fechar", notice: "Aviso", imageError: "Não foi possível carregar a arte deste aviso", imageUnavailable: "Imagem temporariamente indisponível", previous: "Aviso anterior", next: "Próximo aviso", goTo: "Ir para o aviso", instagram: "Abrir no Instagram", openLink: "Abrir link", album: "Ver Álbum Completo" };
   const [orientation, setOrientation] = useState<ImageOrientation>("unknown");
   const [imageLoading, setImageLoading] = useState(true);
   const [imageError, setImageError] = useState(false);
@@ -186,7 +186,7 @@ export function NoticeModal({
                 <ImageOff className="w-7 h-7 text-neutral-400" />
               </div>
               <div className="space-y-1 text-center">
-                <p className="text-white font-medium text-base">Imagem temporariamente indisponível</p>
+                <p className="text-white font-medium text-base">{copy.imageUnavailable}</p>
                 <p className="text-xs text-neutral-300">{copy.imageError}</p>
               </div>
             </div>
