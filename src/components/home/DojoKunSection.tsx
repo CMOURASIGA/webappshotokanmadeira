@@ -11,46 +11,60 @@ export function DojoKunSection() {
     : { ethics: "Código de Ética Marcial", title: "Dojo Kun: Os 5 Preceitos", intro: "Recitados ao final de cada treino, os princípios associados a Gichin Funakoshi orientam a formação e a conduta do praticante.", study: "Estudar Dojo Kun e Niju Kun", precept: "Preceito", quote: "O Karate começa e termina com respeito. Nunca se esqueça disso.", founder: "Mestre Gichin Funakoshi, fundador do Shotokan", history: "Conhecer a História do Shotokan" };
   const dojoKunItems = [
     {
-      number: "一",
-      numeral: "1",
-      jp: "人格完成に努むること",
+      number: "一", numeral: "1", jp: "人格完成に努むること",
       romaji: "Hitotsu! Jinkaku kansei ni tsutomuru koto.",
       pt: "Esforçar-se para a formação do caráter.",
-      insight: "O objetivo máximo do Karate não é a vitória sobre o oponente, mas o aperfeiçoamento moral de si mesmo."
+      en: "Seek perfection of character.",
+      ja: "人格完成に努むること。",
+      insightPt: "O aperfeiçoamento do caráter é parte central da prática, além do desenvolvimento técnico.",
+      insightEn: "The development of character is central to practice, beyond technical improvement.",
+      insightJa: "技術の向上だけでなく、人格を磨くことも稽古の大切な目的です。"
     },
     {
-      number: "一",
-      numeral: "2",
-      jp: "誠の道を守ること",
+      number: "一", numeral: "2", jp: "誠の道を守ること",
       romaji: "Hitotsu! Makoto no michi o mamoru koto.",
-      pt: "Fidelidade para com o verdadeiro caminho da razão.",
-      insight: "Agir com sinceridade, integridade e retidão de conduta dentro e fora do tatame."
+      pt: "Ser fiel ao caminho da sinceridade.",
+      en: "Be faithful to the path of sincerity.",
+      ja: "誠の道を守ること。",
+      insightPt: "A sinceridade e a integridade devem orientar a conduta dentro e fora do Dojo.",
+      insightEn: "Sincerity and integrity should guide conduct inside and outside the Dojo.",
+      insightJa: "誠実さと正しい行いを、道場の内外で大切にします。"
     },
     {
-      number: "一",
-      numeral: "3",
-      jp: "努力の精神を養うこと",
+      number: "一", numeral: "3", jp: "努力の精神を養うこと",
       romaji: "Hitotsu! Doryoku no seishin o yashinau koto.",
-      pt: "Criar o intuito de esforço.",
-      insight: "A dedicação contínua e a perseverança transformam repetições exaustivas em mestria."
+      pt: "Cultivar o espírito de esforço.",
+      en: "Cultivate a spirit of effort.",
+      ja: "努力の精神を養うこと。",
+      insightPt: "A evolução vem da prática constante, da perseverança e da atenção aos detalhes.",
+      insightEn: "Progress comes from consistent practice, perseverance and attention to detail.",
+      insightJa: "継続した稽古、忍耐、細部への注意が上達につながります。"
     },
     {
-      number: "一",
-      numeral: "4",
-      jp: "礼儀を重んずること",
+      number: "一", numeral: "4", jp: "礼儀を重んずること",
       romaji: "Hitotsu! Reigi o omonzuru koto.",
-      pt: "Respeito acima de tudo.",
-      insight: "O Karate-Do começa com uma saudação (Rei) e termina com respeito a mestres, colegas e à vida."
+      pt: "Respeitar a etiqueta e a cortesia.",
+      en: "Respect etiquette and courtesy.",
+      ja: "礼儀を重んずること。",
+      insightPt: "Rei expressa respeito pelo Sensei, pelos colegas, pelo Dojo e pela tradição.",
+      insightEn: "Rei expresses respect for the Sensei, fellow practitioners, the Dojo and tradition.",
+      insightJa: "礼は、先生、仲間、道場、そして伝統への敬意を表します。"
     },
     {
-      number: "一",
-      numeral: "5",
-      jp: "血気の勇を戒むること",
+      number: "一", numeral: "5", jp: "血気の勇を戒むること",
       romaji: "Hitotsu! Kekki no yu o imashimuru koto.",
-      pt: "Conter o espírito de agressão.",
-      insight: "A verdadeira coragem reside no autocontrole e na serenidade de não ceder à violência desmedida."
+      pt: "Conter a impulsividade e a agressividade.",
+      en: "Guard against reckless courage and aggression.",
+      ja: "血気の勇を戒むること。",
+      insightPt: "O autocontrole é essencial para que a força e a técnica sejam usadas com responsabilidade.",
+      insightEn: "Self-control is essential so that strength and technique are used responsibly.",
+      insightJa: "力と技を責任を持って使うために、自制心を大切にします。"
     }
-  ];
+  ].map(item => ({
+    ...item,
+    teaching: language === "en" ? item.en : language === "ja" ? item.ja : item.pt,
+    insight: language === "en" ? item.insightEn : language === "ja" ? item.insightJa : item.insightPt
+  }));
 
   return (
     <section className="space-y-6">
@@ -106,7 +120,7 @@ export function DojoKunSection() {
 
               {/* Portuguese Core Teaching */}
               <h3 className="font-bold text-sm sm:text-base text-neutral-900 leading-snug group-hover:text-karate-red transition-colors">
-                {item.pt}
+                {item.teaching}
               </h3>
             </div>
 
