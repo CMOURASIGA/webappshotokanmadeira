@@ -17,11 +17,13 @@ import { useAppData } from "../contexts/AppDataContext";
 import { useMadeiraStoreCart } from "../contexts/MadeiraStoreCartContext";
 import { MadeiraStoreProductCard } from "../components/store/MadeiraStoreProductCard";
 import { MadeiraStoreCartDrawer } from "../components/store/MadeiraStoreCartDrawer";
+import { useLanguage } from "../i18n/LanguageContext";
 
 export function MadeiraStore() {
   const navigate = useNavigate();
   const { madeiraStoreProducts, loading, madeiraStoreProductsError } = useAppData();
   const { totalItems, totalAmount, setIsCartDrawerOpen } = useMadeiraStoreCart();
+  const { t } = useLanguage();
 
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState("");
@@ -60,7 +62,7 @@ export function MadeiraStore() {
           className="flex items-center gap-1.5 text-xs sm:text-sm text-neutral-500 hover:text-karate-red font-medium transition-colors cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Voltar</span>
+          <span>{t("common.back")}</span>
         </button>
 
         <div className="flex items-center gap-2">
@@ -69,7 +71,7 @@ export function MadeiraStore() {
             to="/madeirastore/pedido"
             className="px-3 py-1.5 rounded-xl border border-neutral-300 hover:border-neutral-400 text-neutral-700 text-xs font-bold transition-all bg-white shadow-xs"
           >
-            Consultar Pedido
+            {t("store.lookup")}
           </Link>
 
           {/* Botão de Carrinho */}
@@ -89,7 +91,7 @@ export function MadeiraStore() {
                 </span>
               )}
             </div>
-            <span>{totalItems > 0 ? "Ver Carrinho" : "Carrinho"}</span>
+            <span>{totalItems > 0 ? t("store.viewCart") : t("store.cart")}</span>
             {totalAmount > 0 && (
               <span className="text-neutral-200 font-normal hidden sm:inline">
                 (R$ {totalAmount.toFixed(2).replace(".", ",")})
@@ -105,7 +107,7 @@ export function MadeiraStore() {
         <div className="max-w-2xl relative z-10 space-y-2">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neutral-800 border border-neutral-700 text-karate-gold text-xs font-bold tracking-wider uppercase font-mono">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Área Comercial Madeira</span>
+            <span>{t("store.area")}</span>
           </div>
 
           <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-white">
@@ -113,11 +115,11 @@ export function MadeiraStore() {
           </h1>
 
           <p className="text-sm sm:text-base text-neutral-300 font-medium">
-            Produtos selecionados para alunos e comunidade Madeira Karate.
+            {t("store.subtitle")}
           </p>
 
           <p className="text-xs text-neutral-400 pt-1 leading-relaxed">
-            Alimentos, itens de treino, acessórios e produtos de parceiros. Faça seu pedido com checkout formal, receba o PIX com o valor exato e retire no dojo.
+            {t("store.description")}
           </p>
         </div>
 
@@ -146,13 +148,13 @@ export function MadeiraStore() {
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Buscar produtos na MadeiraStore..."
+              placeholder={t("store.search")}
               className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-neutral-300 bg-white text-xs text-neutral-900 focus:outline-none focus:border-karate-red shadow-xs"
             />
           </div>
 
           <span className="text-xs text-neutral-500 font-medium self-end sm:self-auto">
-            {filteredProducts.length} {filteredProducts.length === 1 ? "produto encontrado" : "produtos encontrados"}
+            {filteredProducts.length} {filteredProducts.length === 1 ? t("store.productFound") : t("store.productsFound")}
           </span>
         </div>
 
@@ -167,7 +169,7 @@ export function MadeiraStore() {
                   : "bg-white text-neutral-700 border border-neutral-200 hover:border-neutral-300"
               }`}
             >
-              Todos os Produtos
+              {t("store.allProducts")}
             </button>
 
             {availableCategories.map((category) => (
@@ -199,12 +201,12 @@ export function MadeiraStore() {
             <Package className="w-7 h-7" />
           </div>
           <h3 className="font-bold text-neutral-800 text-base mb-1">
-            Nenhum produto encontrado
+            {t("store.none")}
           </h3>
           <p className="text-xs text-neutral-500 leading-relaxed mb-4">
             {searchTerm || selectedCategory !== "all"
               ? "Tente ajustar o termo de busca ou limpar a categoria selecionada."
-              : "Não há produtos cadastrados para a MadeiraStore na planilha oficial neste momento."}
+              : t("store.noneHint")}
           </p>
           {(searchTerm || selectedCategory !== "all") && (
             <button
@@ -214,7 +216,7 @@ export function MadeiraStore() {
               }}
               className="px-4 py-2 bg-neutral-900 text-white rounded-xl text-xs font-bold hover:bg-black transition-all cursor-pointer"
             >
-              Limpar Filtros
+              {t("store.clearFilters")}
             </button>
           )}
         </div>
@@ -233,8 +235,8 @@ export function MadeiraStore() {
             <ShieldCheck className="w-4 h-4" />
           </div>
           <div>
-            <h4 className="font-bold text-neutral-900 text-xs mb-0.5">Pagamento Seguro PIX</h4>
-            <p className="text-[11px] leading-snug">Chave oficial com conferência manual da secretaria.</p>
+            <h4 className="font-bold text-neutral-900 text-xs mb-0.5">{t("store.paymentTitle")}</h4>
+            <p className="text-[11px] leading-snug">{t("store.paymentText")}</p>
           </div>
         </div>
 
@@ -243,8 +245,8 @@ export function MadeiraStore() {
             <Package className="w-4 h-4" />
           </div>
           <div>
-            <h4 className="font-bold text-neutral-900 text-xs mb-0.5">Retirada no Dojo</h4>
-            <p className="text-[11px] leading-snug">Produtos conferidos e retirados presencialmente no dojo.</p>
+            <h4 className="font-bold text-neutral-900 text-xs mb-0.5">{t("store.pickupTitle")}</h4>
+            <p className="text-[11px] leading-snug">{t("store.pickupText")}</p>
           </div>
         </div>
 
@@ -253,8 +255,8 @@ export function MadeiraStore() {
             <HelpCircle className="w-4 h-4" />
           </div>
           <div>
-            <h4 className="font-bold text-neutral-900 text-xs mb-0.5">Acompanhamento</h4>
-            <p className="text-[11px] leading-snug">Consulte seu código de pedido a qualquer momento.</p>
+            <h4 className="font-bold text-neutral-900 text-xs mb-0.5">{t("store.trackingTitle")}</h4>
+            <p className="text-[11px] leading-snug">{t("store.trackingText")}</p>
           </div>
         </div>
       </div>
