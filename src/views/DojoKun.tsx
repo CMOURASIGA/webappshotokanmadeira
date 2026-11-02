@@ -71,11 +71,11 @@ const copyByLanguage = {
 } as const;
 
 const dojoKun = [
-  { jp: "一、人格完成に努むること", romaji: "Hitotsu! Jinkaku kansei ni tsutomuru koto.", pt: "人格の完成に努めること。", en: "Seek perfection of character.", ja: "人格完成に努むること。" },
-  { jp: "一、誠の道を守ること", romaji: "Hitotsu! Makoto no michi o mamoru koto.", pt: "誠の道を守ること。", en: "Be faithful to the path of sincerity.", ja: "誠の道を守ること。" },
-  { jp: "一、努力の精神を養うこと", romaji: "Hitotsu! Doryoku no seishin o yashinau koto.", pt: "努力の精神を養うこと。", en: "Cultivate a spirit of effort.", ja: "努力の精神を養うこと。" },
-  { jp: "一、礼儀を重んずること", romaji: "Hitotsu! Reigi o omonzuru koto.", pt: "礼儀を重んずること。", en: "Respect etiquette.", ja: "礼儀を重んずること。" },
-  { jp: "一、血気の勇を戒むること", romaji: "Hitotsu! Kekki no yu o imashimuru koto.", pt: "軽率な勇気や攻撃性を戒めること。", en: "Guard against reckless courage.", ja: "血気の勇を戒むること。" }
+  { jp: "一、人格完成に努むること", romaji: "Hitotsu! Jinkaku kansei ni tsutomuru koto.", pt: "Esforçar-se para a formação do caráter.", en: "Seek perfection of character.", ja: "人格完成に努むること。" },
+  { jp: "一、誠の道を守ること", romaji: "Hitotsu! Makoto no michi o mamoru koto.", pt: "Ser fiel ao caminho da sinceridade.", en: "Be faithful to the path of sincerity.", ja: "誠の道を守ること。" },
+  { jp: "一、努力の精神を養うこと", romaji: "Hitotsu! Doryoku no seishin o yashinau koto.", pt: "Cultivar o espírito de esforço.", en: "Cultivate a spirit of effort.", ja: "努力の精神を養うこと。" },
+  { jp: "一、礼儀を重んずること", romaji: "Hitotsu! Reigi o omonzuru koto.", pt: "Respeitar a etiqueta e a cortesia.", en: "Respect etiquette.", ja: "礼儀を重んずること。" },
+  { jp: "一、血気の勇を戒むること", romaji: "Hitotsu! Kekki no yu o imashimuru koto.", pt: "Conter a impulsividade e a agressividade.", en: "Guard against reckless courage.", ja: "血気の勇を戒むること。" }
 ];
 
 const nijuKun = [
