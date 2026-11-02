@@ -1,7 +1,7 @@
 import { randomUUID } from "crypto";
 import { callAppsScript, readSheetRows } from "../_sheetConfig.js";
 
-const ADMIN_PIN = String(process.env.MADEIRA_ADMIN_PIN || "1926").trim();
+const ADMIN_PIN = String(process.env.MADEIRA_ADMIN_PIN || "").trim();
 
 function toNumber(value: unknown): number {
   const raw = String(value ?? "0").trim();
@@ -43,6 +43,7 @@ function cleanPhone(value: unknown): string {
 }
 
 function isAdmin(req: any): boolean {
+  if (!ADMIN_PIN) return false;
   return String(req.headers?.["x-admin-pin"] || "").trim() === ADMIN_PIN;
 }
 
