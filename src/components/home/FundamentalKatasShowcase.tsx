@@ -11,10 +11,10 @@ interface FundamentalKatasShowcaseProps {
 export function FundamentalKatasShowcase({ katas, totalKatas }: FundamentalKatasShowcaseProps) {
   const { language } = useLanguage();
   const copy = language === "en"
-    ? { foundation: "Style Foundations", title: "Fundamental Kata", intro: "The technical foundation of Shotokan: the five Heian Kata and Tekki Shodan, emphasizing posture, movement and embusen.", video: "Heian Series on Video", all: "View all", movements: "JKA mov.", updating: "Sequence being updated", study: "Study Kata and Movements", details: "View Kata details" }
+    ? { foundation: "Style Foundations", title: "Fundamental Kata", intro: "The technical foundation of Shotokan: the five Heian Kata and Tekki Shodan, emphasizing posture, movement and embusen.", video: "Heian Series on Video", all: "View all", movements: "JKA mov.", updating: "Sequence being updated", study: "Study Kata and Movements", details: "View Kata details", officialMovementsTitle: "Official movement count according to JKA Headquarters" }
     : language === "ja"
-    ? { foundation: "流派の基礎", title: "基本の形", intro: "Shotokan の技術的な基礎となる平安五段階と鉄騎初段。立ち方、移動、演武線を学びます。", video: "平安シリーズ動画", all: "すべて見る", movements: "JKA 動作", updating: "動作順を更新中", study: "形と動作を学ぶ", details: "形の詳細を見る" }
-    : { foundation: "Fundamentos do Estilo", title: "{copy.title}", intro: "A base técnica do Shotokan. Os 5 Katas da série Heian e o Tekki Shodan para fortalecimento de postura, deslocamento e embusen.", video: "{copy.video}", all: "Ver todos os", movements: "mov. JKA", updating: "{copy.updating}", study: "Estudar Kata e Movimentos", details: "Ver detalhes do Kata" };
+    ? { foundation: "流派の基礎", title: "基本の形", intro: "Shotokan の技術的な基礎となる平安五段階と鉄騎初段。立ち方、移動、演武線を学びます。", video: "平安シリーズ動画", all: "すべて見る", movements: "JKA 動作", updating: "動作順を更新中", study: "形と動作を学ぶ", details: "形の詳細を見る", officialMovementsTitle: "JKA Headquarters に基づく公式動作数" }
+    : { foundation: "Fundamentos do Estilo", title: "Katas Fundamentais", intro: "A base técnica do Shotokan. Os 5 Katas da série Heian e o Tekki Shodan para fortalecimento de postura, deslocamento e embusen.", video: "Série Heian em Vídeo", all: "Ver todos os", movements: "mov. JKA", updating: "Sequência em atualização", study: "Estudar Kata e Movimentos", details: "Ver detalhes do Kata", officialMovementsTitle: "Quantidade oficial de movimentos segundo JKA Headquarters" };
   // Fundamental katas for foundational study: Heian 1-5 + Tekki Shodan
   const fundamentalIds = [
     "heian-shodan",
@@ -41,7 +41,7 @@ export function FundamentalKatasShowcase({ katas, totalKatas }: FundamentalKatas
             <span>{copy.foundation}</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-black font-jp tracking-tight text-neutral-900">
-            Katas Fundamentais
+            {copy.title}
           </h2>
           <p className="text-sm text-neutral-600 mt-0.5">
             {copy.intro}
@@ -53,7 +53,7 @@ export function FundamentalKatasShowcase({ katas, totalKatas }: FundamentalKatas
             to="/kata-series"
             className="text-xs font-bold text-neutral-600 hover:text-karate-red transition-colors"
           >
-            Série Heian em Vídeo
+            {copy.video}
           </Link>
           <span className="text-neutral-300">•</span>
           <Link
@@ -83,14 +83,14 @@ export function FundamentalKatasShowcase({ katas, totalKatas }: FundamentalKatas
 
                 <div className="flex flex-col items-end gap-1 text-xs text-neutral-500 font-medium">
                   {kata.movementsCount > 0 && (
-                    <span className="flex items-center gap-1 font-mono" title="Quantidade oficial de movimentos segundo JKA Headquarters">
+                    <span className="flex items-center gap-1 font-mono" title={copy.officialMovementsTitle}>
                       <Layers className="w-3.5 h-3.5 text-neutral-400" />
                       {kata.movementsCount} {copy.movements}
                     </span>
                   )}
                   {(!kata.movements || kata.movements.length === 0) && (
                     <span className="text-[11px] text-neutral-400 font-sans italic">
-                      Sequência em atualização
+                      {copy.updating}
                     </span>
                   )}
                 </div>
