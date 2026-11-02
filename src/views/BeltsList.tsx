@@ -4,9 +4,16 @@ import { graduationRequirements } from "../data/graduationRequirements";
 import { getDanExamAdminRule } from "../data/jkaExamRules";
 import { jkaReferences, JKA_DISCLAIMER } from "../data/jkaReferences";
 import { competitionReferences, COMPETITION_GOVERNANCE_NOTICE } from "../data/jkaCompetitionRules";
+import { useLanguage } from "../i18n/LanguageContext";
 
 export function BeltsList() {
   const navigate = useNavigate();
+  const { language } = useLanguage();
+  const copy = language === "en"
+    ? { back:"Back", official:"Official JKA Brazil Guideline", title:"Belts and Grades (Obi)", intro:"Official progression from 10th Kyu to 5th Dan. Technical Kihon, Kata and Kumite requirements follow the JKA Brasil Kyu/Dan grading guide, while administrative exam rules and competition references are governed separately.", techProgram:"Technical Program", guide:"Official guide", adminRules:"Dan Administrative Rules", notice:"For accuracy, detailed technical requirements and official administrative excerpts below are preserved in Portuguese exactly as published by JKA Brasil. We translate the navigation and explanatory interface, but do not alter official source wording without a validated translation.", belt:"Belt", source:"Source", program:"Technical Program", unavailable:"Technical content is not registered in this version.", fundamentals:"Fundamentals", form:"Form", combat:"Sparring", examinerNotes:"Examiner Notes" }
+    : language === "ja"
+    ? { back:"戻る", official:"JKA Brasil 公式指針", title:"帯・級段位 (Obi)", intro:"10級から五段までの公式な進級体系です。Kihon、Kata、Kumite の技術要件は JKA Brasil の級・段審査ガイドに基づき、審査運用規定や大会規定とは分けて管理しています。", techProgram:"技術課程", guide:"公式ガイド", adminRules:"段審査の運用規定", notice:"正確性を優先し、以下の詳細な技術要件と公式な運用文書の引用は、JKA Brasil が公開したポルトガル語原文のまま表示します。操作画面と説明部分は翻訳しますが、検証されていない翻訳で公式文言を変更しません。", belt:"帯", source:"出典", program:"技術課程", unavailable:"この版には技術内容が登録されていません。", fundamentals:"基本", form:"形", combat:"組手", examinerNotes:"審査員向け注記" }
+    : { back:"Voltar", official:"Diretriz Oficial JKA Brasil", title:"{copy.title}", intro:"Sequência oficial de 10º Kyu ao 5º Dan. Programa técnico de Kihon, Kata e Kumite alinhado ao Guia para Graduação Kyu/Dan da JKA Brasil, com governança separada para regras administrativas de exame e referências de competição.", techProgram:"Programa Técnico", guide:"{copy.guide}", adminRules:"Regras Administrativas de Dan", notice:"", belt:"Faixa", source:"Fonte", program:"Programa Técnico", unavailable:"Conteúdo técnico não cadastrado nesta versão.", fundamentals:"Fundamentos", form:"Forma", combat:"Combate", examinerNotes:"Observações da Banca Examinadora" };
 
   return (
     <div className="space-y-10 animate-in fade-in duration-500 max-w-5xl mx-auto pb-16">
@@ -14,38 +21,38 @@ export function BeltsList() {
         onClick={() => navigate(-1)}
         className="flex items-center gap-2 text-sm text-neutral-500 hover:text-karate-red font-medium transition-colors"
       >
-        <ArrowLeft className="w-4 h-4" /> Voltar
+        <ArrowLeft className="w-4 h-4" /> {copy.back}
       </button>
 
       {/* Header Institucional */}
       <div className="text-center space-y-4">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-karate-red/10 text-karate-red text-xs font-bold uppercase tracking-wider">
           <Award className="w-3.5 h-3.5" />
-          <span>Diretriz Oficial JKA Brasil</span>
+          <span>{copy.official}</span>
         </div>
         <h2 className="text-4xl md:text-5xl font-bold font-jp text-neutral-900">
-          Faixas e Graduações (Obi)
+          {copy.title}
         </h2>
         <p className="text-neutral-600 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-          Sequência oficial de 10º Kyu ao 5º Dan. Programa técnico de Kihon, Kata e Kumite rigorosamente alinhado ao <strong>Guia para Graduação Kyu/Dan da JKA Brasil</strong>, com governança separada para regras administrativas de exame e referências de competição.
+          {copy.intro}
         </p>
 
         {/* Links rápidos de referência */}
         <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
           <div className="inline-flex items-center gap-2 text-xs text-neutral-600 bg-neutral-100 px-3.5 py-1.5 rounded-xl border border-neutral-200">
-            <span>Programa Técnico: <strong>Guia Kyu/Dan JKA Brasil</strong></span>
+            <span>{copy.techProgram}: <strong>Guia Kyu/Dan JKA Brasil</strong></span>
             <a 
               href="https://jkabrasil.com.br/guia-para-graduacao-kyu-dan/" 
               target="_blank" 
               rel="noopener noreferrer"
               className="text-karate-red hover:underline font-semibold inline-flex items-center gap-1"
             >
-              Guia oficial <ExternalLink className="w-3 h-3" />
+              {copy.guide} <ExternalLink className="w-3 h-3" />
             </a>
           </div>
 
           <div className="inline-flex items-center gap-2 text-xs text-neutral-600 bg-amber-50 px-3.5 py-1.5 rounded-xl border border-amber-200">
-            <span>Regras Administrativas de Dan: <strong>JKA Brasil 2026</strong></span>
+            <span>{copy.adminRules}: <strong>JKA Brasil 2026</strong></span>
             <a 
               href="https://jkabrasil.com.br/wp-content/uploads/2026/01/5-Exame-de-Grau-JKA-2026-MARINGA-Investimentos.pdf" 
               target="_blank" 
@@ -57,6 +64,12 @@ export function BeltsList() {
           </div>
         </div>
       </div>
+
+      {language !== "pt" && (
+        <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-900 leading-relaxed">
+          {copy.notice}
+        </div>
+      )}
 
       {/* Lista de Graduações */}
       <div className="space-y-8">
@@ -92,7 +105,7 @@ export function BeltsList() {
                   <div>
                     <div className="flex items-center gap-2">
                       <h3 className="text-xl sm:text-2xl font-bold font-jp text-neutral-900">
-                        Faixa {req.beltName}
+                        {copy.belt} {req.beltName}
                       </h3>
                       <span className="bg-neutral-900 text-white text-xs font-bold px-2.5 py-0.5 rounded-full">
                         {req.level}
@@ -115,7 +128,7 @@ export function BeltsList() {
                     className="inline-flex items-center gap-1.5 text-xs text-neutral-600 hover:text-karate-red font-medium transition-colors bg-white px-3 py-1.5 rounded-lg border border-neutral-200 shadow-2xs"
                   >
                     <FileText className="w-3.5 h-3.5 text-karate-red" />
-                    <span>Fonte: {req.source.name.split("—")[0].trim()}</span>
+                    <span>{copy.source}: {req.source.name.split("—")[0].trim()}</span>
                     <ExternalLink className="w-3 h-3 text-neutral-400" />
                   </a>
                 </div>
@@ -130,8 +143,8 @@ export function BeltsList() {
                     <div className="p-4 rounded-xl bg-neutral-100 border border-neutral-200 text-neutral-600 text-sm flex items-start gap-3">
                       <Info className="w-5 h-5 text-neutral-400 shrink-0 mt-0.5" />
                       <div>
-                        <strong className="block text-neutral-800 font-semibold mb-0.5">Programa Técnico:</strong>
-                        <span>Conteúdo técnico não cadastrado nesta versão.</span>
+                        <strong className="block text-neutral-800 font-semibold mb-0.5">{copy.program}:</strong>
+                        <span>{copy.unavailable}</span>
                       </div>
                     </div>
                   </div>
@@ -143,7 +156,7 @@ export function BeltsList() {
                       <div className="space-y-2.5">
                         <h4 className="text-xs font-bold text-neutral-500 uppercase tracking-wider flex items-center gap-1.5">
                           <span className="w-2 h-2 rounded-full bg-karate-red" />
-                          Kihon (Fundamentos)
+                          Kihon ({copy.fundamentals})
                         </h4>
                         <div className="bg-neutral-50 rounded-xl p-4 border border-neutral-200/70 space-y-2">
                           {req.kihon.map((kItem, kIdx) => (
@@ -161,7 +174,7 @@ export function BeltsList() {
                       <div className="space-y-2.5">
                         <h4 className="text-xs font-bold text-neutral-500 uppercase tracking-wider flex items-center gap-1.5">
                           <span className="w-2 h-2 rounded-full bg-amber-500" />
-                          Kata (Forma)
+                          Kata ({copy.form})
                         </h4>
                         <div className="flex flex-wrap gap-2">
                           {req.kata.map((kataItem, kataIdx) => (
@@ -182,7 +195,7 @@ export function BeltsList() {
                       <div className="space-y-2.5">
                         <h4 className="text-xs font-bold text-neutral-500 uppercase tracking-wider flex items-center gap-1.5">
                           <span className="w-2 h-2 rounded-full bg-blue-600" />
-                          Kumite (Combate)
+                          Kumite ({copy.combat})
                         </h4>
                         <div className="bg-blue-50/50 rounded-xl p-4 border border-blue-100 space-y-1.5">
                           {req.kumite.map((kumiteItem, kumiteIdx) => (
@@ -198,7 +211,7 @@ export function BeltsList() {
                     {/* Observações Oficiais da Banca */}
                     {req.notes && req.notes.length > 0 && (
                       <div className="p-3.5 rounded-xl bg-neutral-50 border border-neutral-200/80 text-xs text-neutral-600 space-y-1">
-                        <strong className="block text-neutral-700 font-semibold">Observações da Banca Examinadora:</strong>
+                        <strong className="block text-neutral-700 font-semibold">{copy.examinerNotes}:</strong>
                         <ul className="list-disc list-inside space-y-0.5">
                           {req.notes.map((noteItem, noteIdx) => (
                             <li key={noteIdx}>{noteItem}</li>
