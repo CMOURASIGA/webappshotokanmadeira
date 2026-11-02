@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Megaphone, Calendar, ArrowRight, Image as ImageIcon, CheckCircle2, AlertCircle } from "lucide-react";
 import { Notice } from "../../contexts/AppDataContext";
 import { InstagramEmbed } from "../InstagramEmbed";
+import { useLanguage } from "../../i18n/LanguageContext";
 
 interface DojoAnnouncementsSectionProps {
   notices: Notice[];
@@ -38,13 +39,13 @@ function parseDateToTimestamp(dateStr?: string): number | null {
   return isNaN(ts) ? null : ts;
 }
 
-function formatEventDisplayDate(dateStr?: string, formattedDateFallback?: string): string {
+function formatEventDisplayDate(dateStr?: string, formattedDateFallback?: string, locale = "pt-BR"): string {
   if (formattedDateFallback) return formattedDateFallback;
   if (!dateStr) return "Data a definir";
   const ts = parseDateToTimestamp(dateStr);
   if (!ts) return dateStr;
   const d = new Date(ts);
-  return d.toLocaleDateString("pt-BR", {
+  return d.toLocaleDateString(locale, {
     day: "2-digit",
     month: "long",
     year: "numeric"
@@ -58,6 +59,12 @@ export function DojoAnnouncementsSection({
   eventsError,
   onOpenNoticeModal
 }: DojoAnnouncementsSectionProps) {
+  const { language, locale } = useLanguage();
+  const copy = language === "en"
+    ? { noticeTitle: "News Board", upcomingTitle: "Upcoming Events & Calendar", eventTitle: "Dojo Events & Calendar", galleryTitle: "Dojo Events & Galleries", noticeSubtitle: "Official announcements and institutional messages from the dojo.", upcomingSubtitle: "Confirmed dates organized chronologically for exams, seminars and tournaments.", eventSubtitle: "Calendar and history of activities, grading exams and martial events.", official: "Official Communication", agenda: "Schedule & Activities", wall: "News", upcoming: "Upcoming Events", events: "Events", loadError: "Unable to load events", instability: "There was a temporary issue communicating with the official spreadsheet.", noNotices: "No recent announcements", noEvents: "No events published at the moment", noNoticesHint: "New announcements will appear here and on the dojo news board.", noEventsHint: "New events, seminars, grading exams and Madeira Karate activities will appear here.", media: "Video / Post", tap: "Tap to view", image: "View image", notice: "Notice", event: "Event", confirmed: "Confirmed", completed: "Completed", details: "Event details", full: "Open full image", latest: "Showing the latest dojo announcements.", future: "Showing the next confirmed events on the dojo schedule.", activities: "Showing dojo events and activities.", none: "No events published at the moment.", fullWall: "Open Full News Board", calendar: "Open Events Calendar", dateTbd: "Date to be confirmed" }
+    : language === "ja"
+    ? { noticeTitle: "お知らせ", upcomingTitle: "今後のイベント・予定", eventTitle: "道場イベント・予定", galleryTitle: "イベント・ギャラリー", noticeSubtitle: "道場からの公式なお知らせや連絡事項です。", upcomingSubtitle: "審査、講習会、大会などの確定日程を時系列で表示します。", eventSubtitle: "活動、昇級・昇段審査、武道イベントの予定と記録です。", official: "公式連絡", agenda: "予定・活動", wall: "お知らせ", upcoming: "今後のイベント", events: "イベント", loadError: "イベントを読み込めませんでした", instability: "公式スプレッドシートとの通信に一時的な問題が発生しました。", noNotices: "新しいお知らせはありません", noEvents: "現在公開中のイベントはありません", noNoticesHint: "新しい連絡事項はここに表示されます。", noEventsHint: "新しいイベント、講習会、審査、大会情報はここに表示されます。", media: "動画・投稿", tap: "タップして表示", image: "画像を見る", notice: "お知らせ", event: "イベント", confirmed: "確定", completed: "終了", details: "イベント詳細", full: "画像を開く", latest: "最新のお知らせを表示しています。", future: "今後の確定イベントを表示しています。", activities: "道場のイベントと活動を表示しています。", none: "現在公開中のイベントはありません。", fullWall: "お知らせ一覧へ", calendar: "イベント一覧へ", dateTbd: "日程未定" }
+    : { noticeTitle: "Mural de Avisos", upcomingTitle: "Próximos Eventos & Calendário", eventTitle: "Eventos & Calendário do Dojo", galleryTitle: "Eventos & Galerias do Dojo", noticeSubtitle: "Fique por dentro dos informativos oficiais, recados e comunicados institucionais do dojo.", upcomingSubtitle: "Datas confirmadas e organizadas cronologicamente para exames de faixa, seminários e torneios.", eventSubtitle: "Calendário e histórico de atividades, exames de graduação e eventos marciais.", official: "Comunicação Oficial", agenda: "Agenda & Atividades", wall: "Mural", upcoming: "Próximos Eventos", events: "Eventos", loadError: "{copy.loadError}", instability: "{copy.instability}", noNotices: "Nenhum comunicado recente", noEvents: "Nenhum evento publicado no momento", noNoticesHint: "Novos avisos e recados serão anunciados aqui e no quadro de avisos do dojo.", noEventsHint: "Novos eventos, seminários, exames e atividades da Madeira Karate serão divulgados aqui.", media: "{copy.media}", tap: "{copy.tap}", image: "{copy.image}", notice: "Aviso", event: "Evento", confirmed: "{copy.confirmed}", completed: "{copy.completed}", details: "Detalhes do evento", full: "Abrir arte completa", latest: "Mostrando os comunicados mais recentes da academia.", future: "Mostrando os próximos eventos confirmados na agenda do dojo.", activities: copy.activities, none: "Nenhum evento publicado no momento.", fullWall: "Ir para o Mural Completo", calendar: "Ir para o Calendário de Eventos", dateTbd: "Data a definir" };
   const [activeTab, setActiveTab] = useState<"notices" | "events">("notices");
 
   // Chronological event processing with preference for upcoming events
@@ -100,18 +107,18 @@ export function DojoAnnouncementsSection({
 
   // Section title and subtitle based on temporal criteria
   const sectionTitle = activeTab === "notices"
-    ? "Mural de Avisos"
+    ? copy.noticeTitle
     : hasFutureEvents
-      ? "Próximos Eventos & Calendário"
+      ? copy.upcomingTitle
       : hasTemporalCriteria
-        ? "Eventos & Calendário do Dojo"
-        : "Eventos & Galerias do Dojo";
+        ? copy.eventTitle
+        : copy.galleryTitle;
 
   const sectionSubtitle = activeTab === "notices"
-    ? "Fique por dentro dos informativos oficiais, recados e comunicados institucionais do dojo."
+    ? copy.noticeSubtitle
     : hasFutureEvents
-      ? "Datas confirmadas e organizadas cronologicamente para exames de faixa, seminários e torneios."
-      : "Calendário e histórico de atividades, exames de graduação e eventos marciais.";
+      ? copy.upcomingSubtitle
+      : copy.eventSubtitle;
 
   return (
     <section id="mural-e-eventos" className="space-y-6 scroll-mt-20">
@@ -120,7 +127,7 @@ export function DojoAnnouncementsSection({
         <div>
           <div className="flex items-center gap-2 text-karate-red font-bold text-xs uppercase tracking-wider mb-1">
             {activeTab === "notices" ? <Megaphone className="w-4 h-4" /> : <Calendar className="w-4 h-4" />}
-            <span>{activeTab === "notices" ? "Comunicação Oficial" : "Agenda & Atividades"}</span>
+            <span>{activeTab === "notices" ? copy.official : copy.agenda}</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-black font-jp tracking-tight text-neutral-900">
             {sectionTitle}
@@ -141,7 +148,7 @@ export function DojoAnnouncementsSection({
             }`}
           >
             <Megaphone className="w-3.5 h-3.5 text-karate-red" />
-            <span>Mural ({notices.length})</span>
+            <span>{copy.wall} ({notices.length})</span>
           </button>
 
           <button
@@ -154,7 +161,7 @@ export function DojoAnnouncementsSection({
           >
             <Calendar className="w-3.5 h-3.5 text-karate-gold" />
             <span>
-              {hasFutureEvents ? "Próximos Eventos" : "Eventos"} ({events.length})
+              {hasFutureEvents ? copy.upcoming : copy.events} ({events.length})
             </span>
           </button>
         </div>
@@ -185,12 +192,12 @@ export function DojoAnnouncementsSection({
             {activeTab === "notices" ? <Megaphone className="w-6 h-6" /> : <Calendar className="w-6 h-6" />}
           </div>
           <h3 className="text-base font-bold text-neutral-800">
-            {activeTab === "notices" ? "Nenhum comunicado recente" : "Nenhum evento publicado no momento"}
+            {activeTab === "notices" ? copy.noNotices : copy.noEvents}
           </h3>
           <p className="text-xs text-neutral-500">
             {activeTab === "notices"
-              ? "Novos avisos e recados serão anunciados aqui e no quadro de avisos do dojo."
-              : "Novos eventos, seminários, exames e atividades da Madeira Karate serão divulgados aqui."}
+              ? copy.noNoticesHint
+              : copy.noEventsHint}
           </p>
         </div>
       ) : (
@@ -249,7 +256,7 @@ export function DojoAnnouncementsSection({
                         ? "bg-karate-red text-white" 
                         : "bg-karate-gold text-neutral-900"
                     }`}>
-                      {activeTab === "notices" ? "Aviso" : "Evento"}
+                      {activeTab === "notices" ? copy.notice : copy.event}
                     </span>
 
                     {/* Status badge for events with dates */}
@@ -275,7 +282,7 @@ export function DojoAnnouncementsSection({
                       <div className="flex items-center gap-1.5 text-xs text-neutral-600 font-semibold mb-2">
                         <Calendar className="w-3.5 h-3.5 text-karate-gold shrink-0" />
                         <span className="truncate">
-                          {formatEventDisplayDate(item.date, item.formattedDate)}
+                          {formatEventDisplayDate(item.date, item.formattedDate, locale)}
                         </span>
                       </div>
                     )}
@@ -286,7 +293,7 @@ export function DojoAnnouncementsSection({
                   </div>
 
                   <div className="pt-3 mt-3 border-t border-neutral-100 flex items-center justify-between text-xs font-bold text-neutral-500 group-hover:text-karate-black transition-colors">
-                    <span>{activeTab === "events" ? "Detalhes do evento" : "Abrir arte completa"}</span>
+                    <span>{activeTab === "events" ? copy.details : copy.full}</span>
                     <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                   </div>
                 </div>
@@ -300,18 +307,18 @@ export function DojoAnnouncementsSection({
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pt-2">
         <div className="text-xs text-neutral-600">
           {activeTab === "notices"
-            ? "Mostrando os comunicados mais recentes da academia."
+            ? copy.latest
             : events.length > 0
               ? (hasFutureEvents
-                ? "Mostrando os próximos eventos confirmados na agenda do dojo."
+                ? copy.future
                 : "Mostrando eventos e atividades do dojo.")
-              : "Nenhum evento publicado no momento."}
+              : copy.none}
         </div>
         <Link
           to={activeTab === "notices" ? "/mural" : "/events"}
           className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-karate-red hover:text-red-700 transition-colors"
         >
-          <span>{activeTab === "notices" ? "Ir para o Mural Completo" : "Ir para o Calendário de Eventos"}</span>
+          <span>{activeTab === "notices" ? copy.fullWall : copy.calendar}</span>
           <ArrowRight className="w-4 h-4" />
         </Link>
       </div>
