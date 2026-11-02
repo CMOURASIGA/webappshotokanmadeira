@@ -20,11 +20,18 @@ import { useAppData } from "../contexts/AppDataContext";
 import { useCart } from "../contexts/CartContext";
 import { ProductCardV2 } from "../components/store/ProductCardV2";
 import { ChampionshipPromoBanner } from "../components/championship/ChampionshipPromoBanner";
+import { useLanguage } from "../i18n/LanguageContext";
 
 export function Store() {
   const navigate = useNavigate();
   const { products, config, loading, productsError } = useAppData();
   const { totalItems, subtotal, setIsCartOpen } = useCart();
+  const { language } = useLanguage();
+  const copy = language === "en"
+    ? { back: "Back", viewOrder: "View My Order", viewCart: "View Cart", selectedOrder: "Selected Order", savedDevice: "Saved on this device", itemWaiting: "item ready to send", itemsWaiting: "items ready to send", reviewSend: "Review & Send Order", commercial: "COMMERCIAL AREA", madeiraTitle: "Discover MadeiraStore: products, accessories, fitness items and partner products", madeiraText: "Products for students and the community with formal checkout and exact PIX amount.", accessMadeira: "Open MadeiraStore", howOrder: "How does ordering from Madeira Karate work?", howOrderText: "No advance charge: stock and size availability are confirmed by the staff via WhatsApp.", hidePix: "Hide PIX details", showPix: "View PIX Key", choose: "Choose", chooseText: "Select size, color and items in the cart.", whatsappText: "The item list is sent to the dojo staff.", confirmation: "Confirmation", confirmationText: "The team confirms stock and timing at the dojo.", pickup: "Pickup", pickupText: "Secure PIX after confirmation, then collect at the dojo.", attention: "Attention", attentionText: "Please only make the transfer after the staff confirms availability of your size.", officialPix: "Official PIX Key", copied: "Copied!", copyKey: "Copy Key", paymentInfo: "Payment details will be provided by the dojo staff after the order and item availability are confirmed.", officialArticles: "Official JKA Articles", storeTitle: "Official Dojo Store", localMemory: "Local memory", securePix: "Secure PIX", filter: "Filter", all: "All", loading: "Loading official store catalog...", loadError: "Unable to load the store", loadErrorText: "There was a temporary issue connecting to the product spreadsheet. Try reloading or contact the dojo staff via WhatsApp.", tryAgain: "Try Again", contactStaff: "Contact Staff", noProducts: "No products available at the moment", noProductsText: "We are updating our stock of dogi, belts and uniforms. Contact the dojo staff for special orders or sizing questions.", whatsappStaff: "Contact Staff on WhatsApp", noCategory: "No products are registered in the selected category.", viewAll: "View all products" }
+    : language === "ja"
+    ? { back: "戻る", viewOrder: "注文内容を見る", viewCart: "カートを見る", selectedOrder: "選択中の商品", savedDevice: "この端末に保存", itemWaiting: "点を送信待ち", itemsWaiting: "点を送信待ち", reviewSend: "確認して注文を送る", commercial: "商品エリア", madeiraTitle: "MadeiraStore: 商品、アクセサリー、フィットネス用品、提携商品", madeiraText: "会員とコミュニティ向けの商品を、正式な注文手続きと正確な PIX 金額でご案内します。", accessMadeira: "MadeiraStore を開く", howOrder: "Madeira Karate の注文方法", howOrderText: "前払いはありません。在庫とサイズは WhatsApp でスタッフが確認します。", hidePix: "PIX 情報を隠す", showPix: "PIX キーを見る", choose: "選択", chooseText: "サイズ、色、商品を選んでカートに追加します。", whatsappText: "商品一覧を道場スタッフへ送信します。", confirmation: "確認", confirmationText: "スタッフが道場で在庫と受取時期を確認します。", pickup: "受取", pickupText: "確認後に PIX で支払い、道場で受け取ります。", attention: "ご注意", attentionText: "サイズの在庫確認が完了してから送金してください。", officialPix: "公式 PIX キー", copied: "コピーしました", copyKey: "キーをコピー", paymentInfo: "注文内容と在庫を確認した後、道場スタッフから支払情報をご案内します。", officialArticles: "JKA 公式用品", storeTitle: "道場公式ストア", localMemory: "端末に保存", securePix: "安全な PIX", filter: "絞り込み", all: "すべて", loading: "公式ストアの商品を読み込み中...", loadError: "ストアを読み込めませんでした", loadErrorText: "商品スプレッドシートとの通信に一時的な問題が発生しました。再読み込みするか WhatsApp で道場スタッフにお問い合わせください。", tryAgain: "再試行", contactStaff: "スタッフに連絡", noProducts: "現在販売中の商品はありません", noProductsText: "道着、帯、ユニフォームの在庫を更新中です。特別注文やサイズについては道場スタッフにお問い合わせください。", whatsappStaff: "WhatsApp で問い合わせ", noCategory: "選択したカテゴリに商品はありません。", viewAll: "すべての商品を見る" }
+    : { back: "Voltar", viewOrder: "Ver Meu Pedido", viewCart: "Ver Carrinho", selectedOrder: "Pedido Selecionado", savedDevice: "Salvo no aparelho", itemWaiting: "item aguardando envio", itemsWaiting: "itens aguardando envio", reviewSend: "Conferir & Enviar Pedido", commercial: "ÁREA COMERCIAL", madeiraTitle: "Conheça a MadeiraStore: produtos, acessórios, itens fitness e produtos parceiros", madeiraText: "Produtos para alunos e comunidade com checkout formal e PIX com valor exato.", accessMadeira: "Acessar MadeiraStore", howOrder: "Como funciona o pedido na Madeira Karate?", howOrderText: "Sem cobrança antecipada: reserva de estoque e tamanho confirmados pela secretaria via WhatsApp.", hidePix: "Ocultar dados do PIX", showPix: "Consultar Chave PIX", choose: "Escolha", chooseText: "Selecione tamanho, cor e itens no carrinho.", whatsappText: "Envio automático da lista para a secretaria.", confirmation: "Confirmação", confirmationText: "Equipe confirma estoque e prazos no dojo.", pickup: "Retirada", pickupText: "PIX seguro após confirmação e retirada no treino.", attention: "Atenção", attentionText: "Por gentileza, só realize a transferência após a confirmação da disponibilidade do seu tamanho pela secretaria.", officialPix: "Chave PIX Oficial", copied: "Copiada!", copyKey: "Copiar Chave", paymentInfo: "Os dados de pagamento serão fornecidos pela secretaria após a confirmação do pedido e disponibilidade dos itens.", officialArticles: "Artigos Oficiais JKA", storeTitle: "Loja Oficial do Dojo", localMemory: "Memória local", securePix: "PIX seguro", filter: "Filtrar", all: "Todos", loading: "Carregando catálogo da loja oficial...", loadError: "Não foi possível carregar a loja", loadErrorText: "Ocorreu uma instabilidade na conexão com a planilha de produtos. Por favor, tente recarregar ou contate a secretaria diretamente pelo WhatsApp.", tryAgain: "Tentar Novamente", contactStaff: "Falar com a Secretaria", noProducts: "Nenhum produto disponível no momento", noProductsText: "Estamos atualizando nosso estoque de dogis, faixas e uniformes. Consulte a secretaria do dojo para encomendas especiais ou dúvidas de tamanhos.", whatsappStaff: "Consultar Secretaria no WhatsApp", noCategory: "Nenhum produto cadastrado para a categoria selecionada.", viewAll: "Ver todos os produtos" };
 
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [copiedPix, setCopiedPix] = useState(false);
@@ -66,7 +73,7 @@ export function Store() {
           className="flex items-center gap-1.5 text-xs sm:text-sm text-neutral-500 hover:text-karate-red font-medium transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Voltar</span>
+          <span>{copy.back}</span>
         </button>
 
         <button
@@ -85,7 +92,7 @@ export function Store() {
               </span>
             )}
           </div>
-          <span>{totalItems > 0 ? "Ver Meu Pedido" : "Ver Carrinho"}</span>
+          <span>{totalItems > 0 ? copy.viewOrder : copy.viewCart}</span>
           {subtotal > 0 && (
             <span className="text-neutral-200 font-normal hidden sm:inline">
               (R$ {subtotal.toFixed(2).replace(".", ",")})
@@ -107,12 +114,12 @@ export function Store() {
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-karate-gold font-mono">
-                  Pedido Selecionado
+                  {copy.selectedOrder}
                 </span>
-                <span className="text-[10px] text-neutral-400">• Salvo no aparelho</span>
+                <span className="text-[10px] text-neutral-400">• {copy.savedDevice}</span>
               </div>
               <p className="text-xs sm:text-sm font-bold text-white">
-                {totalItems} {totalItems === 1 ? "item aguardando envio" : "itens aguardando envio"}
+                {totalItems} {totalItems === 1 ? copy.itemWaiting : copy.itemsWaiting}
                 <span className="text-karate-gold font-mono ml-2">
                   (R$ {subtotal.toFixed(2).replace(".", ",")})
                 </span>
@@ -124,7 +131,7 @@ export function Store() {
             onClick={() => setIsCartOpen(true)}
             className="w-full sm:w-auto px-4 py-2 rounded-xl bg-karate-red hover:bg-red-700 text-white text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-2 shrink-0 cursor-pointer"
           >
-            <span>Conferir & Enviar Pedido</span>
+            <span>{copy.reviewSend}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
@@ -142,17 +149,17 @@ export function Store() {
           <div>
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-black uppercase tracking-widest text-karate-gold font-mono">
-                ÁREA COMERCIAL
+                {copy.commercial}
               </span>
               <span className="text-[9px] bg-karate-red text-white font-bold px-1.5 py-0.5 rounded-full">
                 MadeiraStore
               </span>
             </div>
             <p className="text-sm font-bold text-white">
-              Conheça a MadeiraStore: Alimentos, acessórios, itens fitness e produtos parceiros
+              {copy.madeiraTitle}
             </p>
             <p className="text-xs text-neutral-300">
-              Produtos para alunos e comunidade com checkout formal e PIX com valor exato.
+              {copy.madeiraText}
             </p>
           </div>
         </div>
@@ -160,7 +167,7 @@ export function Store() {
           onClick={() => navigate("/madeirastore")}
           className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-neutral-100 text-neutral-950 text-xs font-bold transition-all shadow-sm shrink-0 cursor-pointer"
         >
-          <span>Acessar MadeiraStore</span>
+          <span>{copy.accessMadeira}</span>
           <ArrowRight className="w-4 h-4 text-karate-red" />
         </button>
       </div>
@@ -174,10 +181,10 @@ export function Store() {
             </div>
             <div>
               <h2 className="text-sm sm:text-base font-bold font-jp text-white leading-tight">
-                Como funciona o pedido na Madeira Karate?
+                {copy.howOrder}
               </h2>
               <p className="text-[11px] text-neutral-400">
-                Sem cobrança antecipada: reserva de estoque e tamanho confirmados pela secretaria via WhatsApp.
+                {copy.howOrderText}
               </p>
             </div>
           </div>
@@ -186,7 +193,7 @@ export function Store() {
             onClick={() => setShowPixDetails(!showPixDetails)}
             className="text-xs text-karate-gold hover:underline font-bold self-start sm:self-auto shrink-0 cursor-pointer py-1"
           >
-            {showPixDetails ? "Ocultar dados do PIX" : "Consultar Chave PIX"}
+            {showPixDetails ? copy.hidePix : copy.showPix}
           </button>
         </div>
 
@@ -198,10 +205,10 @@ export function Store() {
             </div>
             <div className="min-w-0">
               <h3 className="text-[11px] sm:text-xs font-bold text-white uppercase tracking-wider truncate">
-                1. Escolha
+                1. {copy.choose}
               </h3>
               <p className="text-[10px] text-neutral-300 leading-snug line-clamp-2">
-                Selecione tamanho, cor e itens no carrinho.
+                {copy.chooseText}
               </p>
             </div>
           </div>
@@ -215,7 +222,7 @@ export function Store() {
                 2. WhatsApp
               </h3>
               <p className="text-[10px] text-neutral-300 leading-snug line-clamp-2">
-                Envio automático da lista para a secretaria.
+                {copy.whatsappText}
               </p>
             </div>
           </div>
@@ -226,10 +233,10 @@ export function Store() {
             </div>
             <div className="min-w-0">
               <h3 className="text-[11px] sm:text-xs font-bold text-white uppercase tracking-wider truncate">
-                3. Confirmação
+                3. {copy.confirmation}
               </h3>
               <p className="text-[10px] text-neutral-300 leading-snug line-clamp-2">
-                Equipe confirma estoque e prazos no dojo.
+                {copy.confirmationText}
               </p>
             </div>
           </div>
@@ -240,10 +247,10 @@ export function Store() {
             </div>
             <div className="min-w-0">
               <h3 className="text-[11px] sm:text-xs font-bold text-white uppercase tracking-wider truncate">
-                4. PIX & Retirada
+                4. PIX & {copy.pickup}
               </h3>
               <p className="text-[10px] text-neutral-300 leading-snug line-clamp-2">
-                PIX seguro após confirmação e retirada no treino.
+                {copy.pickupText}
               </p>
             </div>
           </div>
@@ -255,7 +262,7 @@ export function Store() {
             <div className="flex items-start gap-2 text-xs text-amber-300">
               <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
               <span>
-                <strong>Atenção:</strong> Por gentileza, só realize a transferência após a confirmação da disponibilidade do seu tamanho pela secretaria.
+                <strong>{copy.attention}:</strong> {copy.attentionText}
               </span>
             </div>
 
@@ -263,7 +270,7 @@ export function Store() {
               <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-neutral-900 p-3 rounded-lg border border-neutral-700">
                 <div className="space-y-0.5 text-left w-full sm:w-auto">
                   <span className="text-[10px] text-neutral-400 block font-mono uppercase">
-                    Chave PIX Oficial
+                    {copy.officialPix}
                   </span>
                   <span className="text-xs sm:text-sm font-bold text-white font-mono select-all">
                     {config.pix}
@@ -277,19 +284,19 @@ export function Store() {
                   {copiedPix ? (
                     <>
                       <Check className="w-3.5 h-3.5 text-emerald-400" />
-                      <span>Copiada!</span>
+                      <span>{copy.copied}</span>
                     </>
                   ) : (
                     <>
                       <Copy className="w-3.5 h-3.5 text-neutral-300" />
-                      <span>Copiar Chave</span>
+                      <span>{copy.copyKey}</span>
                     </>
                   )}
                 </button>
               </div>
             ) : (
               <div className="bg-neutral-900 p-3 rounded-lg border border-neutral-700 text-xs text-neutral-300">
-                Os dados de pagamento serão fornecidos pela secretaria após a confirmação do pedido e disponibilidade dos itens.
+                {copy.paymentInfo}
               </div>
             )}
           </div>
@@ -305,10 +312,10 @@ export function Store() {
             </div>
             <div>
               <span className="text-[9px] font-bold text-karate-gold uppercase tracking-wider font-mono">
-                Artigos Oficiais JKA
+                {copy.officialArticles}
               </span>
               <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-900 font-jp">
-                Loja Oficial do Dojo
+                {copy.storeTitle}
               </h1>
             </div>
           </div>
@@ -316,11 +323,11 @@ export function Store() {
           <div className="flex items-center gap-4 text-xs text-neutral-500 shrink-0">
             <span className="flex items-center gap-1.5">
               <Smartphone className="w-3.5 h-3.5 text-neutral-400" />
-              <span>Memória local</span>
+              <span>{copy.localMemory}</span>
             </span>
             <span className="flex items-center gap-1.5">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-              <span>PIX seguro</span>
+              <span>{copy.securePix}</span>
             </span>
           </div>
         </div>
@@ -331,7 +338,7 @@ export function Store() {
         <div className="flex flex-wrap items-center gap-2 pb-2">
           <div className="flex items-center gap-1.5 text-xs font-bold text-neutral-500 mr-2">
             <Filter className="w-3.5 h-3.5" />
-            <span>Filtrar:</span>
+            <span>{copy.filter}:</span>
           </div>
 
           <button
@@ -342,7 +349,7 @@ export function Store() {
                 : "bg-white text-neutral-700 border border-neutral-200 hover:border-neutral-300"
             }`}
           >
-            Todos ({products.length})
+            {copy.all} ({products.length})
           </button>
 
           {availableCategories.map((cat) => {
@@ -369,7 +376,7 @@ export function Store() {
         <div className="bg-white rounded-2xl border border-neutral-200 p-12 text-center space-y-3">
           <div className="w-10 h-10 border-3 border-neutral-300 border-t-karate-red rounded-full animate-spin mx-auto" />
           <p className="text-xs text-neutral-500 font-medium">
-            Carregando catálogo da loja oficial...
+            {copy.loading}
           </p>
         </div>
       ) : productsError ? (
@@ -380,10 +387,10 @@ export function Store() {
           </div>
           <div className="space-y-1">
             <h2 className="text-base sm:text-lg font-bold text-neutral-900 font-jp">
-              Não foi possível carregar a loja
+              {copy.loadError}
             </h2>
             <p className="text-xs text-neutral-500 leading-relaxed">
-              Ocorreu uma instabilidade na conexão com a planilha de produtos. Por favor, tente recarregar ou contate a secretaria diretamente pelo WhatsApp.
+              {copy.loadErrorText}
             </p>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
@@ -392,7 +399,7 @@ export function Store() {
               className="px-4 py-2 rounded-xl bg-neutral-900 hover:bg-black text-white text-xs font-bold transition-all flex items-center gap-2"
             >
               <RefreshCw className="w-3.5 h-3.5" />
-              <span>Tentar Novamente</span>
+              <span>{copy.tryAgain}</span>
             </button>
             <a
               href={`https://wa.me/${config.whatsapp}?text=Olá!%20Gostaria%20de%20informações%20sobre%20os%20produtos%20da%20loja%20Madeira%20Karate.`}
@@ -400,7 +407,7 @@ export function Store() {
               rel="noopener noreferrer"
               className="px-4 py-2 rounded-xl bg-karate-red hover:bg-red-700 text-white text-xs font-bold transition-all flex items-center gap-2"
             >
-              <span>Falar com a Secretaria</span>
+              <span>{copy.contactStaff}</span>
               <ExternalLink className="w-3.5 h-3.5" />
             </a>
           </div>
@@ -413,10 +420,10 @@ export function Store() {
           </div>
           <div className="space-y-1.5">
             <h2 className="text-base sm:text-lg font-bold text-neutral-900 font-jp">
-              Nenhum produto disponível no momento
+              {copy.noProducts}
             </h2>
             <p className="text-xs text-neutral-500 leading-relaxed">
-              Estamos atualizando nosso estoque de dogis, faixas e uniformes. Consulte a secretaria do dojo para encomendas especiais ou dúvidas de tamanhos.
+              {copy.noProductsText}
             </p>
           </div>
           <a
@@ -425,7 +432,7 @@ export function Store() {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-neutral-900 hover:bg-black text-white text-xs font-bold transition-all shadow-sm"
           >
-            <span>Consultar Secretaria no WhatsApp</span>
+            <span>{copy.whatsappStaff}</span>
             <ExternalLink className="w-3.5 h-3.5" />
           </a>
         </div>
@@ -433,13 +440,13 @@ export function Store() {
         /* Categoria sem produtos */
         <div className="bg-white rounded-2xl border border-neutral-200 p-8 text-center space-y-3">
           <p className="text-xs text-neutral-500">
-            Nenhum produto cadastrado para a categoria selecionada.
+            {copy.noCategory}
           </p>
           <button
             onClick={() => setSelectedCategory("all")}
             className="text-xs font-bold text-karate-red hover:underline"
           >
-            Ver todos os produtos ({products.length})
+            {copy.viewAll} ({products.length})
           </button>
         </div>
       ) : (
