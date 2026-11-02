@@ -937,6 +937,7 @@ export function StudentArea() {
             </div>
           </div>
         </div>
+        </div>
       )}
 
       {/* ABA 4: CADERNO DE ANOTAÇÕES TÉCNICAS */}
