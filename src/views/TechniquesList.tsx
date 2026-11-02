@@ -3,10 +3,17 @@ import { techniques, belts } from "../data/mockData";
 import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { useAppData } from "../contexts/AppDataContext";
+import { useLanguage } from "../i18n/LanguageContext";
 
 export function TechniquesList() {
   const navigate = useNavigate();
   const { techniqueImages } = useAppData();
+  const { language, t } = useLanguage();
+  const copy = language === "en"
+    ? { subtitle: "Fundamental techniques and core strikes of Karate", all: "All", recommended: "Recommended", belt: "Belt" }
+    : language === "ja"
+    ? { subtitle: "Karate の基本技と主要な攻撃・防御", all: "すべて", recommended: "推奨", belt: "帯" }
+    : { subtitle: "{copy.subtitle}", all: "Todas", recommended: "Recomendado", belt: "Faixa" };
   const [selectedCategory, setSelectedCategory] = useState<string>("Todas");
   
   const categories = Array.from(new Set(techniques.map(t => t.category)));
@@ -21,7 +28,7 @@ export function TechniquesList() {
         onClick={() => navigate(-1)}
         className="flex items-center gap-2 text-sm text-neutral-500 hover:text-karate-red font-medium transition-colors"
       >
-        <ArrowLeft className="w-4 h-4" /> Voltar
+        <ArrowLeft className="w-4 h-4" /> {t("common.back")}
       </button>
 
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -39,7 +46,7 @@ export function TechniquesList() {
                 : "bg-white border border-neutral-200 text-neutral-600 hover:border-karate-red hover:text-karate-red"
             }`}
           >
-            Todas
+            {copy.all}
           </button>
           {categories.map(cat => (
             <button 
@@ -79,7 +86,7 @@ export function TechniquesList() {
               
               <div className="mt-auto">
                 <span className="inline-block bg-neutral-100 text-neutral-600 text-[10px] uppercase font-bold px-2 py-1 rounded">
-                  Recomendado: {belts.find(b => b.id === tech.recommendedBeltId)?.name ? `Faixa ${belts.find(b => b.id === tech.recommendedBeltId)?.name}` : tech.recommendedBeltId}
+                  {copy.recommended}: {belts.find(b => b.id === tech.recommendedBeltId)?.name ? `${copy.belt} ${belts.find(b => b.id === tech.recommendedBeltId)?.name}` : tech.recommendedBeltId}
                 </span>
               </div>
             </div>
