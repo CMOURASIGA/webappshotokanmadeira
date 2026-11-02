@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, BookOpen, Megaphone, Shield, Award, Sparkles } from "lucide-react";
 import { useAppData } from "../../contexts/AppDataContext";
+import { useLanguage } from "../../i18n/LanguageContext";
 
 interface HomeHeroProps {
   totalKatas?: number;
@@ -16,6 +17,12 @@ export function HomeHero({
   onScrollToAnnouncements
 }: HomeHeroProps) {
   const { notices, events } = useAppData();
+  const { language } = useLanguage();
+  const copy = language === "en"
+    ? { traditional: "Traditional JKA Shotokan", digital: "Digital Dojo", title1: "From White to Black:", title2: "Discipline, Tradition and Technique", intro: "Welcome to the official educational portal of Madeira Karate Shotokan. Explore essential Kata, Kihon fundamentals and grading requirements within the principles of JKA Karate-Do.", training: "Explore Training", notices: "News Board", katas: "View Kata Catalog", groups: "Heian, Tekki & Advanced", levels: "Levels", beltPath: "From White Belt to Dan", lineage: "Traditional Lineage", principles: "Principles", dojo: "Fundamental Dojo Kun" }
+    : language === "ja"
+    ? { traditional: "伝統的 JKA Shotokan", digital: "デジタル道場", title1: "白帯から黒帯へ", title2: "規律・伝統・技術", intro: "Madeira Karate Shotokan の公式学習ポータルへようこそ。形、基本（Kihon）、昇級・昇段に関する学習内容を JKA Karate-Do の考え方に沿って確認できます。", training: "稽古内容を見る", notices: "お知らせ", katas: "形一覧を見る", groups: "平安・鉄騎・上級形", levels: "段階", beltPath: "白帯から段位まで", lineage: "伝統の系譜", principles: "原則", dojo: "道場訓" }
+    : { traditional: "{copy.traditional}", digital: "{copy.digital}", title1: "{copy.title1}", title2: "{copy.title2}", intro: "Bem-vindo ao portal educacional oficial do Madeira Karate Shotokan. Explore os katas essenciais, os fundamentos do Kihon e os requisitos de cada graduação sob os preceitos do Karate-Do JKA.", training: "Explorar Treinamento", notices: "Quadro de Avisos", katas: "Ver Catálogo de Katas", groups: "{copy.groups}", levels: "Níveis", beltPath: "{copy.beltPath}", lineage: "{copy.lineage}", principles: "Princípios", dojo: "{copy.dojo}" };
   const totalAnnouncements = notices.length + events.length;
 
   return (
@@ -55,8 +62,7 @@ export function HomeHero({
           </h1>
 
           <p className="text-sm sm:text-base md:text-lg text-neutral-300 leading-relaxed max-w-2xl font-normal">
-            Bem-vindo ao portal educacional oficial do <strong>Madeira Karate Shotokan</strong>. Explore os 
-            katas essenciais, os fundamentos do Kihon e os requisitos de cada graduação sob os preceitos do Karate-Do JKA.
+            {copy.intro}
           </p>
         </div>
 
@@ -66,7 +72,7 @@ export function HomeHero({
             onClick={onScrollToBelts}
             className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-karate-red hover:bg-red-700 text-white font-bold text-sm sm:text-base shadow-lg shadow-karate-red/25 hover:shadow-karate-red/40 transition-all group"
           >
-            <span>Explorar Treinamento</span>
+            <span>{copy.training}</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </button>
 
@@ -75,7 +81,7 @@ export function HomeHero({
             className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-neutral-800/90 hover:bg-neutral-800 text-neutral-200 hover:text-white font-bold text-sm sm:text-base border border-neutral-700/80 transition-all"
           >
             <Megaphone className="w-4 h-4 text-karate-gold" />
-            <span>Quadro de Avisos</span>
+            <span>{copy.notices}</span>
             {totalAnnouncements > 0 && (
               <span className="ml-1 px-2 py-0.5 rounded-full text-xs bg-karate-red text-white font-mono">
                 {totalAnnouncements}
@@ -88,7 +94,7 @@ export function HomeHero({
             className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl text-neutral-400 hover:text-white text-sm font-semibold transition-colors sm:ml-auto"
           >
             <BookOpen className="w-4 h-4" />
-            <span>Ver Catálogo de Katas</span>
+            <span>{copy.katas}</span>
           </Link>
         </div>
 
@@ -99,7 +105,7 @@ export function HomeHero({
             <p className="text-xs text-neutral-300 font-medium">Heian, Tekki & Superiores</p>
           </div>
           <div className="space-y-0.5">
-            <p className="text-xl sm:text-2xl font-black text-karate-gold font-mono">{totalBelts} Níveis</p>
+            <p className="text-xl sm:text-2xl font-black text-karate-gold font-mono">{totalBelts} {copy.levels}</p>
             <p className="text-xs text-neutral-300 font-medium">Da Branca ao Dan</p>
           </div>
           <div className="space-y-0.5">
@@ -107,7 +113,7 @@ export function HomeHero({
             <p className="text-xs text-neutral-300 font-medium">Linhagem Tradicional</p>
           </div>
           <div className="space-y-0.5">
-            <p className="text-xl sm:text-2xl font-black text-karate-red font-mono">5 Princípios</p>
+            <p className="text-xl sm:text-2xl font-black text-karate-red font-mono">5 {copy.principles}</p>
             <p className="text-xs text-neutral-300 font-medium">Dojo Kun Fundamental</p>
           </div>
         </div>
