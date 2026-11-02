@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { Product } from "../../contexts/AppDataContext";
 import { useCart } from "../../contexts/CartContext";
+import { useLanguage } from "../../i18n/LanguageContext";
 
 interface ProductCardV2Props {
   product: Product;
@@ -36,6 +37,12 @@ export function ProductCardV2({ product, onQuickView }: ProductCardV2Props) {
   const [addedAnimation, setAddedAnimation] = useState(false);
 
   const { addItem, setIsCartOpen } = useCart();
+  const { language } = useLanguage();
+  const copy = language === "en"
+    ? { noImage: "Product image unavailable", askStaff: "Contact the dojo staff for details", onRequest: "Check Availability", previous: "Previous image", next: "Next image", goImage: "Go to image", size: "Size", color: "Color", option: "Option", choose: "Choose", customize: "Add a name for embroidery / customization", example: "Example: student name for embroidery", validation: "The dojo staff will confirm customization before production.", added: "Added!", addCart: "Add to Cart", orderTitle: "Add and open cart to send via WhatsApp", orderNow: "Order Now" }
+    : language === "ja"
+    ? { noImage: "商品画像はありません", askStaff: "詳しくは道場スタッフにお問い合わせください", onRequest: "在庫確認", previous: "前の画像", next: "次の画像", goImage: "画像へ", size: "サイズ", color: "色", option: "種類", choose: "選択", customize: "刺繍・カスタマイズ用の名前を追加", example: "例: 刺繍する会員名", validation: "製作前に道場スタッフが内容を確認します。", added: "追加しました", addCart: "カートに追加", orderTitle: "カートに追加して WhatsApp で注文", orderNow: "今すぐ注文" }
+    : { noImage: "Imagem do produto indisponível", askStaff: "Consulte a secretaria para mais detalhes", onRequest: "Sob Consulta", previous: "Imagem anterior", next: "Próxima imagem", goImage: "Ir para foto", size: "Tamanho", color: "Cor", option: "Opção", choose: "Escolha", customize: "Adicionar nome para bordado / personalização", example: "Ex: Nome do aluno no bordado da faixa", validation: "Será validado com a secretaria antes da produção.", added: "Adicionado!", addCart: "Adicionar ao Carrinho", orderTitle: "Adicionar e abrir carrinho para enviar via WhatsApp", orderNow: "Pedir Agora" };
 
   const handleAddToCart = (openDrawer = false) => {
     addItem(product, 1, {
@@ -76,10 +83,10 @@ export function ProductCardV2({ product, onQuickView }: ProductCardV2Props) {
               <ImageOff className="w-6 h-6 text-neutral-400 stroke-[1.5]" />
             </div>
             <span className="text-xs font-medium text-neutral-500">
-              Imagem do produto indisponível
+              {copy.noImage}
             </span>
             <span className="text-[10px] text-neutral-400 mt-0.5">
-              Consulte a secretaria para mais detalhes
+              {copy.askStaff}
             </span>
           </div>
         )}
@@ -94,7 +101,7 @@ export function ProductCardV2({ product, onQuickView }: ProductCardV2Props) {
 
           {product.available === false && (
             <span className="bg-red-600/90 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider ml-auto">
-              Sob Consulta
+              {copy.onRequest}
             </span>
           )}
         </div>
@@ -108,7 +115,7 @@ export function ProductCardV2({ product, onQuickView }: ProductCardV2Props) {
                 setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
               }}
               className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 hover:bg-white text-neutral-800 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
-              aria-label="Imagem anterior"
+              aria-label={copy.previous}
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -118,7 +125,7 @@ export function ProductCardV2({ product, onQuickView }: ProductCardV2Props) {
                 setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
               }}
               className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 hover:bg-white text-neutral-800 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
-              aria-label="Próxima imagem"
+              aria-label={copy.next}
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -131,7 +138,7 @@ export function ProductCardV2({ product, onQuickView }: ProductCardV2Props) {
                   className={`h-1.5 rounded-full transition-all ${
                     currentImageIndex === idx ? "bg-karate-red w-5" : "bg-white/70 w-1.5 hover:bg-white"
                   }`}
-                  aria-label={`Ir para foto ${idx + 1}`}
+                  aria-label={`${copy.goImage} ${idx + 1}`}
                 />
               ))}
             </div>
@@ -162,7 +169,7 @@ export function ProductCardV2({ product, onQuickView }: ProductCardV2Props) {
           {product.sizes && product.sizes.length > 0 && (
             <div>
               <span className="block text-[11px] font-bold text-neutral-700 uppercase tracking-wider mb-1.5">
-                Tamanho: <span className="text-neutral-500 font-normal">{selectedSize || "Escolha"}</span>
+                {copy.size}: <span className="text-neutral-500 font-normal">{selectedSize || copy.choose}</span>
               </span>
               <div className="flex flex-wrap gap-1.5">
                 {product.sizes.map((size) => (
@@ -186,7 +193,7 @@ export function ProductCardV2({ product, onQuickView }: ProductCardV2Props) {
           {product.colors && product.colors.length > 0 && (
             <div>
               <span className="block text-[11px] font-bold text-neutral-700 uppercase tracking-wider mb-1.5">
-                Cor: <span className="text-neutral-500 font-normal">{selectedColor || "Escolha"}</span>
+                {copy.color}: <span className="text-neutral-500 font-normal">{selectedColor || copy.choose}</span>
               </span>
               <div className="flex flex-wrap gap-1.5">
                 {product.colors.map((color) => (
@@ -210,7 +217,7 @@ export function ProductCardV2({ product, onQuickView }: ProductCardV2Props) {
           {product.variations && product.variations.length > 0 && (
             <div>
               <span className="block text-[11px] font-bold text-neutral-700 uppercase tracking-wider mb-1.5">
-                Opção: <span className="text-neutral-500 font-normal">{selectedVariation || "Escolha"}</span>
+                {copy.option}: <span className="text-neutral-500 font-normal">{selectedVariation || copy.choose}</span>
               </span>
               <div className="flex flex-wrap gap-1.5">
                 {product.variations.map((variation) => (
@@ -238,7 +245,7 @@ export function ProductCardV2({ product, onQuickView }: ProductCardV2Props) {
                 className="text-xs text-neutral-600 hover:text-neutral-900 font-semibold flex items-center gap-1.5"
               >
                 <Sparkles className="w-3.5 h-3.5 text-karate-gold" />
-                <span>Adicionar nome para bordado / personalização</span>
+                <span>{copy.customize}</span>
               </button>
 
               {showCustomInput && (
@@ -247,12 +254,12 @@ export function ProductCardV2({ product, onQuickView }: ProductCardV2Props) {
                     type="text"
                     value={customizationText}
                     onChange={(e) => setCustomizationText(e.target.value)}
-                    placeholder="Ex: Nome do aluno no bordado da faixa"
+                    placeholder={copy.example}
                     maxLength={50}
                     className="w-full text-xs p-2 rounded-lg bg-neutral-50 border border-neutral-300 text-neutral-900 focus:outline-none focus:border-karate-red"
                   />
                   <span className="text-[10px] text-neutral-400 block">
-                    Será validado com a secretaria antes da produção.
+                    {copy.validation}
                   </span>
                 </div>
               )}
@@ -276,12 +283,12 @@ export function ProductCardV2({ product, onQuickView }: ProductCardV2Props) {
             {addedAnimation ? (
               <>
                 <Check className="w-4 h-4" />
-                <span>Adicionado!</span>
+                <span>{copy.added}</span>
               </>
             ) : (
               <>
                 <Plus className="w-4 h-4" />
-                <span>Adicionar ao Carrinho</span>
+                <span>{copy.addCart}</span>
               </>
             )}
           </button>
@@ -290,9 +297,9 @@ export function ProductCardV2({ product, onQuickView }: ProductCardV2Props) {
             onClick={() => handleAddToCart(true)}
             disabled={product.available === false}
             className="py-2.5 px-3 rounded-xl font-bold text-xs bg-karate-red/10 hover:bg-karate-red hover:text-white text-karate-red border border-karate-red/20 transition-all active:scale-95 shrink-0"
-            title="Adicionar e abrir carrinho para enviar via WhatsApp"
+            title={copy.orderTitle}
           >
-            Pedir Agora
+            {copy.orderNow}
           </button>
         </div>
       </div>
