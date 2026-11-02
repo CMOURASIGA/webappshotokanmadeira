@@ -1,7 +1,14 @@
 import { Link } from "react-router-dom";
 import { Shield, ArrowRight, Quote, ScrollText } from "lucide-react";
+import { useLanguage } from "../../i18n/LanguageContext";
 
 export function DojoKunSection() {
+  const { language } = useLanguage();
+  const copy = language === "en"
+    ? { ethics: "Martial Ethics", title: "Dojo Kun: Five Core Precepts", intro: "Recited at the end of training, these principles associated with Gichin Funakoshi guide the practitioner's conduct.", study: "Study Dojo Kun and Niju Kun", precept: "Precept", quote: "Karate begins and ends with respect. Never forget this.", founder: "Master Gichin Funakoshi, founder of Shotokan", history: "Learn the History of Shotokan" }
+    : language === "ja"
+    ? { ethics: "武道の倫理", title: "道場訓 五つの心得", intro: "稽古の終わりに唱える道場訓は、船越義珍師範の教えに基づき、日々の行動を導く心得です。", study: "道場訓と二十訓を学ぶ", precept: "心得", quote: "空手は礼に始まり礼に終る。", founder: "Shotokan を築いた船越義珍師範", history: "Shotokan の歴史を学ぶ" }
+    : { ethics: "Código de Ética Marcial", title: "Dojo Kun: Os 5 Preceitos", intro: "Recitados ao final de cada treino, os princípios associados a Gichin Funakoshi orientam a formação e a conduta do praticante.", study: "Estudar Dojo Kun e Niju Kun", precept: "Preceito", quote: "O Karate começa e termina com respeito. Nunca se esqueça disso.", founder: "Mestre Gichin Funakoshi, fundador do Shotokan", history: "Conhecer a História do Shotokan" };
   const dojoKunItems = [
     {
       number: "一",
@@ -52,13 +59,13 @@ export function DojoKunSection() {
         <div>
           <div className="flex items-center gap-2 text-karate-red font-bold text-xs uppercase tracking-wider mb-1">
             <ScrollText className="w-4 h-4" />
-            <span>Código de Ética Marcial</span>
+            <span>{copy.ethics}</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-black font-jp tracking-tight text-neutral-900">
-            Dojo Kun: Os 5 Preceitos Sagrados
+            {copy.title}
           </h2>
           <p className="text-sm text-neutral-600 mt-0.5">
-            Recitados ao final de cada treino no Madeira Karate, os princípios transmitidos por Gichin Funakoshi guiam a formação do praticante.
+            {copy.intro}
           </p>
         </div>
 
@@ -66,7 +73,7 @@ export function DojoKunSection() {
           to="/dojo-kun"
           className="inline-flex items-center gap-1.5 text-sm font-bold text-karate-red hover:text-red-700 transition-colors shrink-0 group"
         >
-          <span>Estudar Dojo Kun e Niju Kun</span>
+          <span>{copy.study}</span>
           <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
         </Link>
       </div>
@@ -85,7 +92,7 @@ export function DojoKunSection() {
                   {item.number}
                 </span>
                 <span className="text-xs font-mono font-bold text-neutral-600">
-                  Preceito {item.numeral}
+                  {copy.precept} {item.numeral}
                 </span>
               </div>
 
@@ -124,11 +131,11 @@ export function DojoKunSection() {
               "Karate wa rei ni hajimari, rei ni owaru koto wo wasuruna."
               <br />
               <strong className="text-white font-sans not-italic text-sm">
-                (O Karate começa e termina com respeito. Nunca se esqueça disso.)
+                ({copy.quote})
               </strong>
             </p>
             <p className="text-xs text-neutral-400 font-mono pt-1">
-              — Mestre Gichin Funakoshi, Fundador do Shotokan
+              — {copy.founder}
             </p>
           </div>
         </div>
@@ -137,7 +144,7 @@ export function DojoKunSection() {
           to="/history"
           className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white text-xs sm:text-sm font-bold border border-neutral-700/80 transition-colors shrink-0 relative z-10"
         >
-          <span>Conhecer a História do Shotokan</span>
+          <span>{copy.history}</span>
           <ArrowRight className="w-4 h-4" />
         </Link>
       </div>
