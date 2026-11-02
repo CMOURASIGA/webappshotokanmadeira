@@ -867,7 +867,7 @@ export function StudentArea() {
 
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                         <div className="bg-white p-3 rounded-xl border border-amber-200/60 shadow-2xs">
-                          <span className="text-neutral-500 block text-[11px]">Graduação anterior:</span>
+                          <span className="text-neutral-500 block text-[11px]">{copy.previousGrade}</span>
                           <strong className="text-neutral-900 font-semibold">{currentDanAdminRule.previousGrade}</strong>
                         </div>
                         <div className="bg-white p-3 rounded-xl border border-amber-200/60 shadow-2xs">
