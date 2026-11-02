@@ -14,7 +14,7 @@ export function ChampionshipPromoBanner({ variant = "home" }: ChampionshipPromoB
     ? { module: "Official Sports Module", notStock: "Athlete registration is not a stock product", storeText: "Championship registration uses its own form, official age calculation and direct PIX confirmation.", access: "Open Championship Page", official: "Official Madeira Karate Competition", fee: "Registration", register: "Register for Championship", consult: "Already registered / Check" }
     : language === "ja"
     ? { module: "公式競技モジュール", notStock: "大会申込は在庫商品ではありません", storeText: "大会申込は専用フォーム、公式年齢計算、PIX 確認の流れで管理されます。", access: "大会ページを開く", official: "Madeira Karate 公式大会", fee: "参加費", register: "大会に申し込む", consult: "申込済み・確認" }
-    : { module: "{copy.module}", notStock: "{copy.notStock}", storeText: "{copy.storeText}", access: "Acessar Página do Campeonato", official: "Competição Oficial Madeira Karate", fee: "Inscrição", register: "Inscrever-se no Campeonato", consult: "Já me inscrevi / Consultar" };
+    : { module: "Módulo Esportivo Oficial", notStock: "Inscrição de atleta não é produto de estoque", storeText: "As inscrições de atletas para o campeonato possuem formulário próprio, cálculo de idade oficial e conferência PIX direta.", access: "Acessar Página do Campeonato", official: "Competição Oficial Madeira Karate", fee: "Inscrição", register: "Inscrever-se no Campeonato", consult: "Já me inscrevi / Consultar" };
   const championship = useMemo(() => {
     const list = championshipService.getChampionships();
     return list.find(c => c.status === "INSCRICOES_ABERTAS") || list[0] || null;
@@ -34,17 +34,17 @@ export function ChampionshipPromoBanner({ variant = "home" }: ChampionshipPromoB
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-bold uppercase tracking-wider bg-karate-gold/20 text-karate-gold px-2 py-0.5 rounded-full">
-                Módulo Esportivo Oficial
+                {copy.module}
               </span>
               <span className="text-[10px] text-neutral-400">
-                Inscrição de atleta não é produto de estoque
+                {copy.notStock}
               </span>
             </div>
             <h3 className="text-sm sm:text-base font-bold font-jp text-white">
               {championship.nome}
             </h3>
             <p className="text-xs text-neutral-300 max-w-xl">
-              As inscrições de atletas para o campeonato possuem formulário próprio, cálculo de idade oficial e conferência PIX direta.
+              {copy.storeText}
             </p>
           </div>
         </div>
