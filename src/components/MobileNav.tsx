@@ -43,7 +43,12 @@ export function MobileNav({ onOpenSearch }: { onOpenSearch?: () => void }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const { config } = useAppData();
   const { totalItems } = useCart();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const adminCopy = language === "en"
+    ? { bottomNav: "Mobile Bottom Navigation", openMenu: "Open Full Menu", closeMenu: "Close menu", championships: "Championship Dashboard (Admin)", store: "Store Dashboard (Admin)" }
+    : language === "ja"
+    ? { bottomNav: "モバイル下部ナビゲーション", openMenu: "全メニューを開く", closeMenu: "メニューを閉じる", championships: "大会管理画面（管理者）", store: "ストア管理画面（管理者）" }
+    : { bottomNav: "Navegação Inferior Mobile", openMenu: "Abrir Menu Completo", closeMenu: "Fechar menu", championships: "Painel de Campeonatos (Admin)", store: "Painel da Loja (Admin)" };
 
   // Fecha o drawer sempre que a rota mudar
   useEffect(() => {
@@ -109,7 +114,7 @@ export function MobileNav({ onOpenSearch }: { onOpenSearch?: () => void }) {
     <>
       {/* Barra Inferior Fixa Mobile & Tablet (< lg) */}
       <nav 
-        aria-label="Navegação Inferior Mobile"
+        aria-label={adminCopy.bottomNav}
         className="lg:hidden fixed bottom-0 left-0 right-0 w-full bg-[#111111]/95 backdrop-blur-md text-white border-t border-[#2B2B2B] flex items-center justify-around z-40 px-2 py-1.5"
         style={{ paddingBottom: "max(0.375rem, env(safe-area-inset-bottom))" }}
       >
@@ -147,7 +152,7 @@ export function MobileNav({ onOpenSearch }: { onOpenSearch?: () => void }) {
         {/* Botão para abrir o menu completo */}
         <button
           onClick={() => setMenuOpen(true)}
-          aria-label="Abrir Menu Completo"
+          aria-label={adminCopy.openMenu}
           className={cn(
             "flex flex-col items-center justify-center gap-1 py-1.5 px-2 flex-1 rounded-lg transition-all min-h-[44px]",
             menuOpen ? "text-red-400 font-bold" : "text-neutral-300 hover:text-white"
@@ -185,7 +190,7 @@ export function MobileNav({ onOpenSearch }: { onOpenSearch?: () => void }) {
           </div>
           <button 
             onClick={() => setMenuOpen(false)} 
-            aria-label="Fechar menu"
+            aria-label={adminCopy.closeMenu}
             className="text-neutral-400 hover:text-white p-2 rounded-lg hover:bg-neutral-800 transition-colors"
           >
             <X className="w-5 h-5" />
@@ -266,14 +271,14 @@ export function MobileNav({ onOpenSearch }: { onOpenSearch?: () => void }) {
             onClick={() => setMenuOpen(false)}
             className="text-[10px] text-neutral-400 hover:text-karate-gold transition-colors font-medium block"
           >
-            ⚙️ Painel de Campeonatos (Admin)
+            ⚙️ {adminCopy.championships}
           </Link>
           <Link
             to="/dashboard_loja"
             onClick={() => setMenuOpen(false)}
             className="text-[10px] text-neutral-400 hover:text-karate-gold transition-colors font-medium block"
           >
-            🛍️ Painel da Loja (Admin)
+            🛍️ {adminCopy.store}
           </Link>
           <p className="text-[10px] text-neutral-500 font-jp tracking-wider">
             空手道 • SHOTOKAN JKA
