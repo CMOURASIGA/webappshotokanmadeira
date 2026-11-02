@@ -2,12 +2,19 @@ import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Trophy, Calendar, MapPin, ArrowRight, ShieldCheck, Clock } from "lucide-react";
 import { championshipService, getEnrollmentPeriodState } from "../../services/championshipService";
+import { useLanguage } from "../../i18n/LanguageContext";
 
 interface ChampionshipPromoBannerProps {
   variant?: "home" | "store";
 }
 
 export function ChampionshipPromoBanner({ variant = "home" }: ChampionshipPromoBannerProps) {
+  const { language, locale } = useLanguage();
+  const copy = language === "en"
+    ? { module: "Official Sports Module", notStock: "Athlete registration is not a stock product", storeText: "Championship registration uses its own form, official age calculation and direct PIX confirmation.", access: "Open Championship Page", official: "Official Madeira Karate Competition", fee: "Registration", register: "Register for Championship", consult: "Already registered / Check" }
+    : language === "ja"
+    ? { module: "公式競技モジュール", notStock: "大会申込は在庫商品ではありません", storeText: "大会申込は専用フォーム、公式年齢計算、PIX 確認の流れで管理されます。", access: "大会ページを開く", official: "Madeira Karate 公式大会", fee: "参加費", register: "大会に申し込む", consult: "申込済み・確認" }
+    : { module: "{copy.module}", notStock: "{copy.notStock}", storeText: "{copy.storeText}", access: "Acessar Página do Campeonato", official: "Competição Oficial Madeira Karate", fee: "Inscrição", register: "Inscrever-se no Campeonato", consult: "Já me inscrevi / Consultar" };
   const championship = useMemo(() => {
     const list = championshipService.getChampionships();
     return list.find(c => c.status === "INSCRICOES_ABERTAS") || list[0] || null;
@@ -46,7 +53,7 @@ export function ChampionshipPromoBanner({ variant = "home" }: ChampionshipPromoB
           to={`/campeonatos/${championship.slug}`}
           className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-karate-red hover:bg-red-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm shrink-0 whitespace-nowrap"
         >
-          <span>Acessar Página do Campeonato</span>
+          <span>{copy.access}</span>
           <ArrowRight className="w-4 h-4" />
         </Link>
       </div>
@@ -62,7 +69,7 @@ export function ChampionshipPromoBanner({ variant = "home" }: ChampionshipPromoB
         <div className="space-y-3 max-w-2xl">
           <div className="flex flex-wrap items-center gap-2">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-karate-red text-white">
-              <Trophy className="w-3.5 h-3.5" /> Competição Oficial Madeira Karate
+              <Trophy className="w-3.5 h-3.5" /> {copy.official}
             </span>
 
             <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
@@ -86,7 +93,7 @@ export function ChampionshipPromoBanner({ variant = "home" }: ChampionshipPromoB
             <div className="flex items-center gap-1.5">
               <Calendar className="w-4 h-4 text-karate-gold" />
               <span>
-                {new Date(championship.dataCampeonato + "T00:00:00").toLocaleDateString("pt-BR", {
+                {new Date(championship.dataCampeonato + "T00:00:00").toLocaleDateString(locale, {
                   day: "2-digit",
                   month: "long",
                   year: "numeric"
@@ -101,7 +108,7 @@ export function ChampionshipPromoBanner({ variant = "home" }: ChampionshipPromoB
 
             <div className="flex items-center gap-1.5">
               <Clock className="w-4 h-4 text-emerald-400" />
-              <span>Inscrição: R$ {championship.valorInscricao.toFixed(2).replace(".", ",")}</span>
+              <span>{copy.fee}: R$ {championship.valorInscricao.toFixed(2).replace(".", ",")}</span>
             </div>
           </div>
         </div>
@@ -111,7 +118,7 @@ export function ChampionshipPromoBanner({ variant = "home" }: ChampionshipPromoB
             to={`/campeonatos/${championship.slug}`}
             className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-karate-red hover:bg-red-700 text-white rounded-2xl text-xs sm:text-sm font-bold font-jp transition-all shadow-lg hover:shadow-xl text-center"
           >
-            <span>Inscrever-se no Campeonato</span>
+            <span>{copy.register}</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
 
@@ -119,7 +126,7 @@ export function ChampionshipPromoBanner({ variant = "home" }: ChampionshipPromoB
             to={`/campeonatos/${championship.slug}/consulta`}
             className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-neutral-900 hover:bg-neutral-800 text-neutral-300 hover:text-white border border-neutral-700 rounded-2xl text-xs font-semibold transition-colors text-center"
           >
-            <span>Já me inscrevi / Consultar</span>
+            <span>{copy.consult}</span>
           </Link>
         </div>
       </div>
