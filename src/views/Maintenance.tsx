@@ -9,7 +9,7 @@ export function Maintenance() {
     ? { title: "Under Maintenance", text: "This area is currently under maintenance or development.", back: "Back", home: "Go to Home" }
     : language === "ja"
     ? { title: "メンテナンス中", text: "このエリアは現在メンテナンスまたは開発中です。", back: "戻る", home: "ホームへ" }
-    : { title: "{copy.title}", text: "Esta área do aplicativo está atualmente em manutenção ou desenvolvimento.", back: "Voltar", home: "Ir para o Início" };
+    : { title: "Em Manutenção", text: "Esta área do aplicativo está atualmente em manutenção ou desenvolvimento.", back: "Voltar", home: "Ir para o Início" };
 
   return (
     <div className="min-h-[60vh] flex flex-col items-center justify-center text-center space-y-6 animate-in fade-in duration-500">
@@ -18,7 +18,7 @@ export function Maintenance() {
       </div>
       
       <div className="space-y-4">
-        <h2 className="text-4xl font-bold font-jp">Em Manutenção</h2>
+        <h2 className="text-4xl font-bold font-jp">{copy.title}</h2>
         <p className="text-neutral-500 max-w-md mx-auto text-lg">
           {copy.text}
         </p>
