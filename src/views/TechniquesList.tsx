@@ -10,10 +10,10 @@ export function TechniquesList() {
   const { techniqueImages } = useAppData();
   const { language, t } = useLanguage();
   const copy = language === "en"
-    ? { subtitle: "Fundamental techniques and core strikes of Karate", all: "All", recommended: "Recommended", belt: "Belt" }
+    ? { title: "Kihon (Techniques)", subtitle: "Fundamental techniques and core strikes of Karate", all: "All", recommended: "Recommended", belt: "Belt" }
     : language === "ja"
-    ? { subtitle: "Karate の基本技と主要な攻撃・防御", all: "すべて", recommended: "推奨", belt: "帯" }
-    : { subtitle: "{copy.subtitle}", all: "Todas", recommended: "Recomendado", belt: "Faixa" };
+    ? { title: "基本 (Kihon)", subtitle: "Karate の基本技と主要な攻撃・防御", all: "すべて", recommended: "推奨", belt: "帯" }
+    : { title: "Kihon (Técnicas)", subtitle: "Fundamentos e golpes base do Karate", all: "Todas", recommended: "Recomendado", belt: "Faixa" };
   const [selectedCategory, setSelectedCategory] = useState<string>("Todas");
   
   const categories = Array.from(new Set(techniques.map(t => t.category)));
@@ -33,8 +33,8 @@ export function TechniquesList() {
 
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold font-jp">Kihon (Técnicas)</h2>
-          <p className="text-neutral-500">Fundamentos e golpes base do Karate</p>
+          <h2 className="text-3xl font-bold font-jp">{copy.title}</h2>
+          <p className="text-neutral-500">{copy.subtitle}</p>
         </div>
         
         <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
