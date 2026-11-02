@@ -30,9 +30,16 @@ import { belts, katas, techniques } from "../data/mockData";
 import { getBeltChecklistGroups } from "../data/graduationRequirements";
 import { getDanExamAdminRule } from "../data/jkaExamRules";
 import { JKA_DISCLAIMER } from "../data/jkaReferences";
+import { useLanguage } from "../i18n/LanguageContext";
 
 export function StudentArea() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { language, locale } = useLanguage();
+  const copy = language === "en"
+    ? { autonomous:"Self-directed Training & Goals", title:"Student Area", intro:"Track your technical development in Shotokan Karate, resume your studies, save favorite Kata and record individual corrections provided by your Sensei during in-person training.", last:"Last Study", none:"None yet", favorites:"Saved Favorites", beltGoal:"Belt Goal", notebook:"Technical Notebook", notes:"notes", local:"Individual Storage on this Device", private:"Private & Offline", localText:"Your notes, favorites and checklists are stored directly on this device. Each student keeps their own data on their own device.", continue:"Continue Studying", fav:"Favorites", exam:"Exam Checklist", notebookTab:"Notes", lastKata:"Last Kata Studied", lastTech:"Last Technique Studied", memorized:"Movements memorized", resume:"Resume Study", noRecent:"No recent study started", noRecentText:"Open any Kata or technique and your progress will be saved here automatically so you can resume it later.", exploreKata:"Explore Kata", exploreTech:"Explore Techniques", recentHistory:"Recent Training History", clearHistory:"Clear History", all:"All", techniques:"Techniques", newNote:"New Note", noFavorites:"No favorites saved yet", noNotes:"No notes recorded yet", sourceNotice:"Official technical and administrative requirements from JKA Brasil are preserved in the source language to avoid altering their meaning. Interface labels are translated.", save:"Save", cancel:"Cancel", noteTitle:"Title", noteText:"Note", related:"Related content", noRelation:"No relation" }
+    : language === "ja"
+    ? { autonomous:"自主稽古・目標", title:"会員エリア", intro:"Shotokan Karate の技術的な進歩を確認し、学習を再開し、お気に入りの形や先生からの個別指導メモを保存できます。", last:"最近の学習", none:"まだありません", favorites:"お気に入り", beltGoal:"帯の目標", notebook:"技術ノート", notes:"件", local:"この端末への個別保存", private:"非公開・オフライン", localText:"メモ、お気に入り、チェックリストはこの端末に保存されます。各会員のデータは、それぞれの端末で管理されます。", continue:"学習を続ける", fav:"お気に入り", exam:"審査チェックリスト", notebookTab:"ノート", lastKata:"最近学習した形", lastTech:"最近学習した技", memorized:"習得した動作", resume:"学習を再開", noRecent:"最近の学習はありません", noRecentText:"形や技術のページを開くと、学習状況が自動的に保存され、後から再開できます。", exploreKata:"形を見る", exploreTech:"技術を見る", recentHistory:"最近の稽古履歴", clearHistory:"履歴を消去", all:"すべて", techniques:"技術", newNote:"新しいノート", noFavorites:"お気に入りはまだありません", noNotes:"ノートはまだありません", sourceNotice:"JKA Brasil の公式な技術・運用要件は、意味を変えないため原文のまま保持しています。画面の操作表示のみ翻訳しています。", save:"保存", cancel:"キャンセル", noteTitle:"タイトル", noteText:"メモ", related:"関連項目", noRelation:"関連なし" }
+    : { autonomous:"{copy.autonomous}", title:"{copy.title}", intro:"{copy.intro}", last:"{copy.last}", none:copy.none, favorites:"{copy.favorites}", beltGoal:"{copy.beltGoal}", notebook:"{copy.notebook}", notes:"notas", local:"{copy.local}", private:"{copy.private}", localText:"Suas anotações, favoritos e checklists ficam gravados diretamente na memória deste dispositivo. Cada aluno mantém seus dados separados usando seu próprio aparelho.", continue:"Continuar Estudando", fav:"Favoritos", exam:"Checklist de Exame", notebookTab:"Caderno de Anotações", lastKata:"Último Kata Estudado", lastTech:"Última Técnica Estudada", memorized:"Movimentos memorizados", resume:"Retomar Estudo", noRecent:"{copy.noRecent}", noRecentText:"{copy.noRecentText}", exploreKata:"Explorar Katas", exploreTech:"Explorar Técnicas", recentHistory:"Histórico de Treino Recente", clearHistory:"{copy.clearHistory}", all:"Todos", techniques:"Técnicas", newNote:"{copy.newNote}", noFavorites:"{copy.noFavorites}", noNotes:"{copy.noNotes}", sourceNotice:"Os requisitos técnicos e administrativos oficiais da JKA Brasil são preservados no idioma da fonte para evitar alteração de sentido. Os rótulos da interface são traduzidos.", save:"Salvar", cancel:"Cancelar", noteTitle:"Título", noteText:"Anotação", related:"Conteúdo relacionado", noRelation:"Sem relação" };
   const initialTab = (searchParams.get("tab") as "continue" | "favorites" | "exam" | "notes") || "continue";
   const [activeTab, setActiveTab] = useState<"continue" | "favorites" | "exam" | "notes">(initialTab);
 
@@ -146,7 +153,7 @@ export function StudentArea() {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-300 pb-12">
-      {/* 1. Header Institucional da Área do Aluno */}
+      {/* 1. Header Institucional da {copy.title} */}
       <div className="bg-gradient-to-br from-neutral-900 via-neutral-950 to-black text-white rounded-2xl p-6 sm:p-10 border border-neutral-800 relative overflow-hidden shadow-sm">
         <div className="absolute right-0 top-0 opacity-5 text-[160px] sm:text-[200px] leading-none font-jp font-black pointer-events-none select-none translate-x-1/4 -translate-y-1/4 text-white">
           修練
@@ -157,27 +164,27 @@ export function StudentArea() {
         <div className="relative z-10 max-w-2xl space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white text-xs font-bold uppercase tracking-wider backdrop-blur-sm border border-white/10">
             <GraduationCap className="w-4 h-4 text-karate-gold" />
-            <span>Treinamento Autônomo & Metas</span>
+            <span>{copy.autonomous}</span>
           </div>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black font-jp tracking-tight text-white">
-            Área do Aluno
+            {copy.title}
           </h1>
           <p className="text-sm sm:text-base text-neutral-300 leading-relaxed">
-            Acompanhe seu avanço técnico no Karate Shotokan, retome de onde parou, marque seus Katas favoritos e registre as correções individuais fornecidas pelo Sensei nos treinos presenciais.
+            {copy.intro}
           </p>
         </div>
 
         {/* Métricas e Resumo Rápido */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mt-8 pt-6 border-t border-neutral-800/80 relative z-10">
           <div className="bg-white/5 rounded-xl p-3 sm:p-4 border border-white/5">
-            <span className="text-xs text-neutral-400 block mb-1">Último Estudo</span>
+            <span className="text-xs text-neutral-400 block mb-1">{copy.last}</span>
             <span className="text-sm sm:text-base font-bold text-white truncate block">
-              {lastStudy ? lastStudy.title : "Nenhum ainda"}
+              {lastStudy ? lastStudy.title : copy.none}
             </span>
           </div>
 
           <div className="bg-white/5 rounded-xl p-3 sm:p-4 border border-white/5">
-            <span className="text-xs text-neutral-400 block mb-1">Favoritos Salvos</span>
+            <span className="text-xs text-neutral-400 block mb-1">{copy.favorites}</span>
             <span className="text-sm sm:text-base font-bold text-karate-gold flex items-center gap-1.5">
               <Star className="w-4 h-4 fill-karate-gold" />
               {favorites.length}
@@ -185,7 +192,7 @@ export function StudentArea() {
           </div>
 
           <div className="bg-white/5 rounded-xl p-3 sm:p-4 border border-white/5">
-            <span className="text-xs text-neutral-400 block mb-1">Meta de Faixa</span>
+            <span className="text-xs text-neutral-400 block mb-1">{copy.beltGoal}</span>
             <span className="text-sm sm:text-base font-bold text-white flex items-center gap-1.5 truncate">
               <span 
                 className="w-3 h-3 rounded-full border border-white/30 shrink-0"
@@ -196,10 +203,10 @@ export function StudentArea() {
           </div>
 
           <div className="bg-white/5 rounded-xl p-3 sm:p-4 border border-white/5">
-            <span className="text-xs text-neutral-400 block mb-1">Caderno Técnico</span>
+            <span className="text-xs text-neutral-400 block mb-1">{copy.notebook}</span>
             <span className="text-sm sm:text-base font-bold text-white flex items-center gap-1.5">
               <StickyNote className="w-4 h-4 text-emerald-400" />
-              {technicalNotes.length} notas
+              {technicalNotes.length} {copy.notes}
             </span>
           </div>
         </div>
@@ -212,21 +219,21 @@ export function StudentArea() {
             </div>
             <div className="space-y-0.5">
               <div className="flex items-center gap-2">
-                <span className="font-bold text-white text-xs">Armazenamento Individual neste Aparelho</span>
+                <span className="font-bold text-white text-xs">{copy.local}</span>
                 <span className="inline-flex items-center gap-1 text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full font-medium">
                   <ShieldCheck className="w-3 h-3" />
-                  Privado & Offline
+                  {copy.private}
                 </span>
               </div>
               <p className="text-neutral-400 text-[11px] sm:text-xs leading-relaxed">
-                Suas anotações, favoritos e checklists ficam gravados diretamente na memória deste dispositivo (celular ou computador). Cada aluno mantém seus dados separados usando seu próprio aparelho.
+                {copy.localText}
               </p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* 2. Seletor de Abas da Área do Aluno */}
+      {/* 2. Seletor de Abas da {copy.title} */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1 border-b border-neutral-200">
         <button
           onClick={() => handleTabChange("continue")}
@@ -237,7 +244,7 @@ export function StudentArea() {
           }`}
         >
           <Play className="w-4 h-4 text-karate-red" />
-          <span>Continuar Estudando</span>
+          <span>{copy.continue}</span>
           {recentStudies.length > 0 && (
             <span className="bg-neutral-800 text-neutral-300 text-[10px] px-1.5 py-0.5 rounded-full">
               {recentStudies.length}
@@ -254,7 +261,7 @@ export function StudentArea() {
           }`}
         >
           <Star className="w-4 h-4 text-karate-gold fill-karate-gold" />
-          <span>Favoritos</span>
+          <span>{copy.fav}</span>
           <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
             activeTab === "favorites" ? "bg-neutral-800 text-neutral-300" : "bg-neutral-100 text-neutral-600"
           }`}>
@@ -271,7 +278,7 @@ export function StudentArea() {
           }`}
         >
           <ListChecks className="w-4 h-4 text-emerald-500" />
-          <span>Checklist de Exame</span>
+          <span>{copy.exam}</span>
           <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
             activeTab === "exam" ? "bg-neutral-800 text-neutral-300" : "bg-neutral-100 text-neutral-600"
           }`}>
@@ -288,7 +295,7 @@ export function StudentArea() {
           }`}
         >
           <StickyNote className="w-4 h-4 text-amber-500" />
-          <span>Caderno de Anotações</span>
+          <span>{copy.notebookTab}</span>
           <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
             activeTab === "notes" ? "bg-neutral-800 text-neutral-300" : "bg-neutral-100 text-neutral-600"
           }`}>
@@ -308,11 +315,11 @@ export function StudentArea() {
                 <div className="space-y-2 max-w-xl">
                   <div className="flex items-center gap-2">
                     <span className="bg-karate-red/10 text-karate-red text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full">
-                      {lastStudy.type === "kata" ? "Último Kata Estudado" : "Última Técnica Estudada"}
+                      {lastStudy.type === "kata" ? copy.lastKata : copy.lastTech}
                     </span>
                     <span className="text-xs text-neutral-400 flex items-center gap-1">
                       <Clock className="w-3.5 h-3.5" />
-                      {new Date(lastStudy.timestamp).toLocaleDateString("pt-BR", {
+                      {new Date(lastStudy.timestamp).toLocaleDateString(locale, {
                         day: "2-digit",
                         month: "short",
                         hour: "2-digit",
@@ -336,7 +343,7 @@ export function StudentArea() {
                         return (
                           <>
                             <div className="flex items-center justify-between text-xs font-semibold text-neutral-600">
-                              <span>Movimentos memorizados: {progress.completed} de {progress.total}</span>
+                              <span>{copy.memorized}: {progress.completed} de {progress.total}</span>
                               <span className="text-karate-red font-bold">{progress.percentage}%</span>
                             </div>
                             <div className="w-full h-2.5 bg-neutral-100 rounded-full overflow-hidden border border-neutral-200">
@@ -357,7 +364,7 @@ export function StudentArea() {
                     to={lastStudy.type === "kata" ? `/katas/${lastStudy.id}` : `/techniques/${lastStudy.id}`}
                     className="inline-flex items-center justify-center gap-2 bg-karate-red hover:bg-red-700 text-white font-bold px-6 py-3 rounded-xl transition-all shadow-md hover:shadow-lg text-sm sm:text-base group"
                   >
-                    <span>Retomar Estudo</span>
+                    <span>{copy.resume}</span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </Link>
                 </div>
@@ -370,10 +377,10 @@ export function StudentArea() {
               </div>
               <div className="space-y-1.5">
                 <h3 className="text-lg font-bold text-neutral-900">
-                  Nenhum estudo recente iniciado
+                  {copy.noRecent}
                 </h3>
                 <p className="text-sm text-neutral-500 max-w-sm mx-auto leading-relaxed">
-                  Ao abrir qualquer Kata ou Técnica para treino, seu progresso será salvo automaticamente aqui para você retomar rapidamente.
+                  {copy.noRecentText}
                 </p>
               </div>
               <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
@@ -382,14 +389,14 @@ export function StudentArea() {
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-neutral-900 text-white text-xs font-bold hover:bg-black transition-colors"
                 >
                   <BookOpen className="w-3.5 h-3.5" />
-                  <span>Explorar Katas</span>
+                  <span>{copy.exploreKata}</span>
                 </Link>
                 <Link
                   to="/techniques"
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-neutral-100 text-neutral-800 text-xs font-bold hover:bg-neutral-200 transition-colors border border-neutral-200"
                 >
                   <Shield className="w-3.5 h-3.5" />
-                  <span>Explorar Técnicas</span>
+                  <span>{copy.exploreTech}</span>
                 </Link>
               </div>
             </div>
@@ -401,13 +408,13 @@ export function StudentArea() {
               <div className="flex items-center justify-between">
                 <h3 className="text-base font-bold text-neutral-900 flex items-center gap-2">
                   <Clock className="w-4 h-4 text-neutral-500" />
-                  <span>Histórico de Treino Recente</span>
+                  <span>{copy.recentHistory}</span>
                 </h3>
                 <button
                   onClick={clearHistory}
                   className="text-xs text-neutral-500 hover:text-karate-red font-medium transition-colors"
                 >
-                  Limpar Histórico
+                  {copy.clearHistory}
                 </button>
               </div>
 
@@ -429,7 +436,7 @@ export function StudentArea() {
                             {item.type === "kata" ? "Kata" : "Técnica"}
                           </span>
                           <span>
-                            {new Date(item.timestamp).toLocaleDateString("pt-BR", {
+                            {new Date(item.timestamp).toLocaleDateString(locale, {
                               day: "2-digit",
                               month: "short"
                             })}
@@ -594,6 +601,10 @@ export function StudentArea() {
 
       {/* ABA 3: CHECKLIST DE EXAME DE GRADUAÇÃO */}
       {activeTab === "exam" && (
+        <div className="space-y-4">
+          {language !== "pt" && (
+            <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-[11px] text-amber-900 leading-relaxed">{copy.sourceNotice}</div>
+          )}
         <div className="space-y-6">
           {/* Seletor de Faixa Pretendida */}
           <div className="bg-white rounded-2xl p-6 border border-neutral-200 shadow-sm space-y-4">
@@ -946,7 +957,7 @@ export function StudentArea() {
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-karate-red hover:bg-red-700 text-white text-xs sm:text-sm font-bold transition-all shadow-sm self-start sm:self-auto shrink-0"
             >
               <Plus className="w-4 h-4" />
-              <span>Nova Anotação</span>
+              <span>{copy.newNote}</span>
             </button>
           </div>
 
@@ -1028,7 +1039,7 @@ export function StudentArea() {
 
                   <div className="pt-3 border-t border-neutral-100 text-[10px] text-neutral-400 flex items-center justify-between">
                     <span>
-                      Registrado em: {new Date(note.createdAt).toLocaleDateString("pt-BR", {
+                      Registrado em: {new Date(note.createdAt).toLocaleDateString(locale, {
                         day: "2-digit",
                         month: "short",
                         year: "numeric"
@@ -1051,7 +1062,7 @@ export function StudentArea() {
           <div className="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-xl border border-neutral-200 animate-in fade-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
               <h3 className="text-base font-bold text-neutral-900 font-jp">
-                {editingNoteId ? "Editar Anotação do Sensei" : "Nova Anotação Técnica"}
+                {editingNoteId ? "Editar Anotação do Sensei" : "{copy.newNote} Técnica"}
               </h3>
               <button
                 onClick={() => setIsNoteModalOpen(false)}
