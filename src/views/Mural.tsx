@@ -12,14 +12,14 @@ export function Mural() {
     ? { loading: "Loading news board...", empty: "No announcements at the moment.", title: "News Board", subtitle: "Stay up to date with news and events.", instagram: "Instagram Post", noImageRegistered: "No image registered", noImage: "No image", featured: "Featured" }
     : language === "ja"
     ? { loading: "お知らせを読み込み中...", empty: "現在お知らせはありません。", title: "お知らせ", subtitle: "最新のお知らせやイベント情報をご確認ください。", instagram: "Instagram 投稿", noImageRegistered: "画像未登録", noImage: "画像なし", featured: "注目" }
-    : { loading: "{copy.loading}", empty: "{copy.empty}", title: "{copy.title}", subtitle: "{copy.subtitle}", instagram: "{copy.instagram}", noImageRegistered: "{copy.noImageRegistered}", noImage: "{copy.noImage}", featured: "{copy.featured}" };
+    : { loading: "Carregando mural...", empty: "Nenhum aviso no momento.", title: "Mural de Avisos", subtitle: "Fique por dentro das novidades e eventos.", instagram: "Publicação do Instagram", noImageRegistered: "Nenhuma imagem cadastrada", noImage: "Sem imagem", featured: "Destaque" };
   const [selectedNoticeIndex, setSelectedNoticeIndex] = useState<number | null>(null);
 
   if (loading) {
     return (
       <div className="p-8 text-center text-neutral-500 flex flex-col items-center">
         <Megaphone className="w-12 h-12 mb-4 opacity-20" />
-        <p>Carregando mural...</p>
+        <p>{copy.loading}</p>
       </div>
     );
   }
@@ -28,7 +28,7 @@ export function Mural() {
     return (
       <div className="p-8 text-center text-neutral-500 flex flex-col items-center">
         <Megaphone className="w-12 h-12 mb-4 opacity-20" />
-        <p>Nenhum aviso no momento.</p>
+        <p>{copy.empty}</p>
       </div>
     );
   }
@@ -39,8 +39,8 @@ export function Mural() {
         <div className="flex items-center gap-3 border-b border-neutral-200 pb-4">
           <Megaphone className="w-8 h-8 text-karate-red" />
           <div>
-            <h2 className="text-2xl font-black uppercase tracking-tight">Mural de Avisos</h2>
-            <p className="text-neutral-500 text-sm">Fique por dentro das novidades e eventos.</p>
+            <h2 className="text-2xl font-black uppercase tracking-tight">{copy.title}</h2>
+            <p className="text-neutral-500 text-sm">{copy.subtitle}</p>
           </div>
         </div>
 
