@@ -39,7 +39,7 @@ export function MadeiraStoreProductCard({ product }: MadeiraStoreProductCardProp
     ? { noPhoto: "Product photo unavailable", ask: "Contact the staff for details", unavailable: "Unavailable", previous: "Previous image", next: "Next image", go: "Go to image", noStock: "Out of stock for this option", unit: "unit available", units: "units available", size: "Size", color: "Color", option: "Option / Flavor", select: "Select", customize: "Add a name for engraving / customization", example: "Example: name for identification", asEntered: "It will be produced exactly as entered.", added: "Added!", add: "Add to Cart", out: "Out of stock", buy: "Buy Now", checkout: "Buy and proceed to checkout" }
     : language === "ja"
     ? { noPhoto: "商品画像はありません", ask: "詳しくはスタッフにお問い合わせください", unavailable: "在庫なし", previous: "前の画像", next: "次の画像", go: "画像へ", noStock: "この選択肢は在庫切れです", unit: "点在庫あり", units: "点在庫あり", size: "サイズ", color: "色", option: "種類 / フレーバー", select: "選択", customize: "名入れ・カスタマイズを追加", example: "例: 識別用の名前", asEntered: "入力内容のとおりに作成されます。", added: "追加しました", add: "カートに追加", out: "在庫なし", buy: "今すぐ購入", checkout: "購入して決済へ進む" }
-    : { noPhoto: "{copy.noPhoto}", ask: "{copy.ask}", unavailable: "{copy.unavailable}", previous: "Imagem anterior", next: "Próxima imagem", go: "Ir para foto", noStock: "Sem estoque para esta opção", unit: "unidade disponível", units: "unidades disponíveis", size: "Tamanho", color: "Cor", option: "Opção / Sabor", select: "Selecione", customize: "Adicionar nome para gravação / personalização", example: "Ex: Nome para identificação", asEntered: "{copy.asEntered}", added: "Adicionado!", add: "Adicionar ao Carrinho", out: "Sem estoque", buy: "{copy.buy}", checkout: "Comprar e ir para o checkout" };
+    : { noPhoto: "Foto do item indisponível", ask: "Consulte a recepção para mais detalhes", unavailable: "Indisponível", previous: "Imagem anterior", next: "Próxima imagem", go: "Ir para foto", noStock: "Sem estoque para esta opção", unit: "unidade disponível", units: "unidades disponíveis", size: "Tamanho", color: "Cor", option: "Opção / Sabor", select: "Selecione", customize: "Adicionar nome para gravação / personalização", example: "Ex: Nome para identificação", asEntered: "Será gravado conforme informado.", added: "Adicionado!", add: "Adicionar ao Carrinho", out: "Sem estoque", buy: "Comprar Agora", checkout: "Comprar e ir para o checkout" };
 
   const selectedStock = (() => {
     if (!product.stockControlled) return null;
@@ -94,10 +94,10 @@ export function MadeiraStoreProductCard({ product }: MadeiraStoreProductCardProp
               <ImageOff className="w-6 h-6 text-neutral-400 stroke-[1.5]" />
             </div>
             <span className="text-xs font-medium text-neutral-500">
-              Foto do item indisponível
+              {copy.noPhoto}
             </span>
             <span className="text-[10px] text-neutral-400 mt-0.5">
-              Consulte a recepção para mais detalhes
+              {copy.ask}
             </span>
           </div>
         )}
@@ -112,7 +112,7 @@ export function MadeiraStoreProductCard({ product }: MadeiraStoreProductCardProp
 
           {!canBuy && (
             <span className="bg-red-600/90 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider ml-auto">
-              Indisponível
+              {copy.unavailable}
             </span>
           )}
         </div>
@@ -285,7 +285,7 @@ export function MadeiraStoreProductCard({ product }: MadeiraStoreProductCardProp
                     className="w-full text-xs p-2 rounded-lg bg-neutral-50 border border-neutral-300 text-neutral-900 focus:outline-none focus:border-karate-red"
                   />
                   <span className="text-[10px] text-neutral-400 block">
-                    Será gravado conforme informado.
+                    {copy.asEntered}
                   </span>
                 </div>
               )}
@@ -331,7 +331,7 @@ export function MadeiraStoreProductCard({ product }: MadeiraStoreProductCardProp
             }`}
             title={copy.checkout}
           >
-            Comprar Agora
+            {copy.buy}
           </button>
         </div>
       </div>
