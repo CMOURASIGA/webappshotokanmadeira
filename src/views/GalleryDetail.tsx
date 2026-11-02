@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, ChevronLeft, ChevronRight, Images, Loader2, X, AlertCircle } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, Images, Loader2, X, AlertCircle, PlayCircle } from "lucide-react";
 import { useLanguage } from "../i18n/LanguageContext";
 
 type GalleryPhoto = {
@@ -9,6 +9,9 @@ type GalleryPhoto = {
   thumbnailUrl: string;
   url: string;
   viewUrl?: string;
+  previewUrl?: string;
+  mimeType?: string;
+  mediaType?: "image" | "video";
 };
 
 type GalleryPayload = {
@@ -30,10 +33,10 @@ export function GalleryDetail() {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const { language } = useLanguage();
   const copy = language === "en"
-    ? { load: "Loading photos from Google Drive...", loadError: "Unable to open this gallery", back: "Back to Events & Photos", events: "Events & Photos", photos: "photos", gallery: "Gallery", empty: "This folder does not have published photos yet.", close: "Close photo", previous: "Previous photo", next: "Next photo", of: "of", error: "Error loading gallery." }
+    ? { load: "Loading media from Google Drive...", loadError: "Unable to open this gallery", back: "Back to Events & Photos", events: "Events & Photos", photos: "items", gallery: "Gallery", empty: "This folder does not have published photos or videos yet.", close: "Close media", previous: "Previous item", next: "Next item", of: "of", error: "Error loading gallery." }
     : language === "ja"
-    ? { load: "Google Drive から写真を読み込み中...", loadError: "このギャラリーを開けませんでした", back: "イベント・写真に戻る", events: "イベント・写真", photos: "枚", gallery: "ギャラリー", empty: "このフォルダにはまだ公開写真がありません。", close: "写真を閉じる", previous: "前の写真", next: "次の写真", of: "/", error: "ギャラリーの読み込みに失敗しました。" }
-    : { load: "Carregando fotos do Google Drive...", loadError: "Não foi possível abrir esta galeria", back: "Voltar para Eventos & Fotos", events: "Eventos & Fotos", photos: "fotos", gallery: "Galeria", empty: "Esta pasta ainda não possui fotos publicadas.", close: "Fechar foto", previous: "Foto anterior", next: "Próxima foto", of: "de", error: "Erro ao carregar galeria." };
+    ? { load: "Google Drive から写真・動画を読み込み中...", loadError: "このギャラリーを開けませんでした", back: "イベント・写真に戻る", events: "イベント・写真", photos: "件", gallery: "ギャラリー", empty: "このフォルダにはまだ公開写真・動画がありません。", close: "メディアを閉じる", previous: "前へ", next: "次へ", of: "/", error: "ギャラリーの読み込みに失敗しました。" }
+    : { load: "Carregando fotos e vídeos do Google Drive...", loadError: "Não foi possível abrir esta galeria", back: "Voltar para Eventos & Fotos", events: "Eventos & Fotos", photos: "itens", gallery: "Galeria", empty: "Esta pasta ainda não possui fotos ou vídeos publicados.", close: "Fechar mídia", previous: "Item anterior", next: "Próximo item", of: "de", error: "Erro ao carregar galeria." };
 
   useEffect(() => {
     if (!id) return;
@@ -134,12 +137,19 @@ export function GalleryDetail() {
                 onClick={() => setSelectedIndex(index)}
                 className="w-full block break-inside-avoid overflow-hidden rounded-xl bg-neutral-100 border border-neutral-200 group cursor-zoom-in"
               >
-                <img
-                  src={photo.thumbnailUrl}
-                  alt={photo.name || `Foto ${index + 1}`}
-                  className="w-full h-auto object-cover group-hover:scale-[1.02] transition-transform duration-300"
-                  loading="lazy"
-                />
+                <div className="relative">
+                  <img
+                    src={photo.thumbnailUrl}
+                    alt={photo.name || `Mídia ${index + 1}`}
+                    className="w-full h-auto object-cover group-hover:scale-[1.02] transition-transform duration-300"
+                    loading="lazy"
+                  />
+                  {(photo.mediaType === "video" || photo.mimeType?.startsWith("video/")) && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                      <PlayCircle className="w-12 h-12 text-white drop-shadow-lg" />
+                    </div>
+                  )}
+                </div>
               </button>
             ))}
           </div>
@@ -179,11 +189,21 @@ export function GalleryDetail() {
           )}
 
           <div className="max-w-6xl max-h-[90vh] w-full flex flex-col items-center gap-3 px-10">
-            <img
-              src={selected.url}
-              alt={selected.name}
-              className="max-w-full max-h-[82vh] object-contain rounded-lg"
-            />
+            {(selected.mediaType === "video" || selected.mimeType?.startsWith("video/")) ? (
+              <iframe
+                src={selected.previewUrl || selected.url}
+                title={selected.name}
+                className="w-full max-w-5xl aspect-video rounded-lg bg-black"
+                allow="autoplay; encrypted-media; picture-in-picture"
+                allowFullScreen
+              />
+            ) : (
+              <img
+                src={selected.url}
+                alt={selected.name}
+                className="max-w-full max-h-[82vh] object-contain rounded-lg"
+              />
+            )}
             <span className="text-xs text-white/70">
               {selectedIndex + 1} {copy.of} {data.photos.length}
             </span>
