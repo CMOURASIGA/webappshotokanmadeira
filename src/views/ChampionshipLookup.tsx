@@ -24,11 +24,33 @@ import { AthleteRegistration, Championship } from "../types/championship";
 import { generatePixCopiaECola, generatePixQrCodeDataUrl } from "../lib/pixUtils";
 import { formatModalidadesList } from "../lib/utils";
 import { useAppData } from "../contexts/AppDataContext";
+import { useLanguage } from "../i18n/LanguageContext";
 
 export function ChampionshipLookup() {
   const { slug } = useParams<{ slug?: string }>();
   const [searchParams] = useSearchParams();
   const { config } = useAppData();
+  const { language } = useLanguage();
+  const copy = language === "en"
+    ? {
+        required: "Enter the registration code and validation information.", notFound: "No registration was found with this code and validation information. Check the code, email, phone or date of birth.", lookupError: "Unable to retrieve the registration from the official system.", invalidWeight: "Invalid body weight.", saveError: "Unable to save changes.", receiptError: "Unable to record receipt submission.",
+        whatsappIntro: "Hello! I am sending the payment receipt for my championship registration.", whatsappAttachment: "The PIX payment receipt is attached for verification.", registration: "Registration", athlete: "Athlete", participation: "Participation", allModalities: "All championship modalities", eventModalities: "Event modalities", value: "Amount",
+        backChampionship: "Back to Championship", title: "Registration Lookup", subtitle: "Access your registration, check payment status or update permitted information while registration is open.", registrationCode: "Registration Code", validationData: "Validation Data (Email, Phone or Date of Birth)", validationExample: "Example: registered email or phone", lookup: "Look Up Registration", saved: "Registration information updated and saved successfully.", payment: "Payment",
+        athleteData: "Athlete Information", edit: "Edit Information", fullName: "Full Name", grade: "Grade", weight: "Reported Weight", ageAtEvent: "Age on Event Date", years: "years", minor: "Minor", sex: "Sex", phone: "Phone", email: "Email", officialCategory: "Official Category", toBeAssigned: "To be assigned by the technical committee", guardian: "Legal Guardian", cancelNote: "* To cancel a registration, contact the Madeira Karate dojo administration directly. Only the organizing committee can cancel registrations.", editing: "Editing Registration", cancel: "Cancel", weightKg: "Weight (kg)", saveChanges: "Save Changes", payPix: "Pay with PIX", pixCopied: "PIX Code Copied!", copyPix: "Copy PIX Code", sendReceipt: "Send receipt via WhatsApp", receiptSent: "I have sent the receipt"
+      }
+    : language === "ja"
+    ? {
+        required: "申込コードと確認情報を入力してください。", notFound: "このコードと確認情報に一致する申込が見つかりません。コード、メール、電話番号、生年月日をご確認ください。", lookupError: "公式システムから申込情報を取得できませんでした。", invalidWeight: "体重の入力が正しくありません。", saveError: "変更を保存できませんでした。", receiptError: "支払証明の送付記録を保存できませんでした。",
+        whatsappIntro: "こんにちは。大会申込の支払証明を送付します。", whatsappAttachment: "確認用の PIX 支払証明を添付します。", registration: "申込", athlete: "選手", participation: "参加", allModalities: "大会の全種目", eventModalities: "大会種目", value: "金額",
+        backChampionship: "大会ページに戻る", title: "申込確認", subtitle: "申込内容、支払状況を確認し、申込期間中に許可された情報を更新できます。", registrationCode: "申込コード", validationData: "確認情報（メール、電話、生年月日）", validationExample: "例: 登録メールまたは電話番号", lookup: "申込を確認", saved: "申込情報を更新し、履歴に保存しました。", payment: "支払い",
+        athleteData: "選手情報", edit: "情報を編集", fullName: "氏名", grade: "級・段位", weight: "登録体重", ageAtEvent: "大会当日の年齢", years: "歳", minor: "未成年", sex: "性別", phone: "電話", email: "メール", officialCategory: "公式カテゴリ", toBeAssigned: "技術委員会が決定します", guardian: "法定保護者", cancelNote: "* 申込のキャンセルは Madeira Karate 道場管理者へ直接ご連絡ください。キャンセル操作は大会運営委員会のみが行えます。", editing: "申込情報を編集中", cancel: "キャンセル", weightKg: "体重 (kg)", saveChanges: "変更を保存", payPix: "PIX で支払う", pixCopied: "PIX コードをコピーしました", copyPix: "PIX コードをコピー", sendReceipt: "WhatsApp で支払証明を送る", receiptSent: "支払証明を送付しました"
+      }
+    : {
+        required: "Informe o código da inscrição e o dado de validação.", notFound: "Nenhuma inscrição encontrada com este código e dados de validação. Verifique seu código, e-mail, telefone ou data de nascimento.", lookupError: "Erro ao consultar inscrição no sistema oficial.", invalidWeight: "Peso corporal inválido.", saveError: "Erro ao salvar alterações.", receiptError: "Erro ao registrar envio de comprovante.",
+        whatsappIntro: "Olá! Estou enviando o comprovante da inscrição do campeonato.", whatsappAttachment: "Segue em anexo o comprovante de pagamento PIX para conferência.", registration: "Inscrição", athlete: "Atleta", participation: "Participação", allModalities: "Todas as modalidades do campeonato", eventModalities: "Modalidades do evento", value: "Valor",
+        backChampionship: "Voltar ao Campeonato", title: "Consulta de Inscrição", subtitle: "Acesse os dados da sua inscrição, verifique o status do pagamento ou atualize suas informações durante o período de inscrições abertas.", registrationCode: "Código da Inscrição", validationData: "Dado de Validação (E-mail, Telefone ou Data de Nasc.)", validationExample: "Ex: seu e-mail cadastrado ou telefone", lookup: "Consultar Inscrição", saved: "Dados da inscrição atualizados com sucesso e salvos no histórico!", payment: "Pagamento",
+        athleteData: "Dados do Atleta", edit: "Editar Informações", fullName: "Nome Completo", grade: "Graduação", weight: "Peso Informado", ageAtEvent: "Idade no Campeonato", years: "anos", minor: "Menor", sex: "Sexo", phone: "Telefone", email: "E-mail", officialCategory: "Categoria Oficial", toBeAssigned: "A ser designada pela comissão técnica", guardian: "Responsável Legal", cancelNote: "* Para cancelamento de inscrição, entre em contato direto com a administração do Dojo Madeira Karate. Apenas a comissão organizadora possui autorização para cancelar inscrições.", editing: "Editando Inscrição", cancel: "Cancelar", weightKg: "Peso (kg)", saveChanges: "Salvar Alterações", payPix: "Efetuar Pagamento PIX", pixCopied: "Código PIX Copiado!", copyPix: "Copiar Código PIX", sendReceipt: "Enviar comprovante pelo WhatsApp", receiptSent: "Já enviei o comprovante"
+      };
 
   const [code, setCode] = useState(searchParams.get("code") || "");
   const [validationKey, setValidationKey] = useState("");
@@ -84,14 +106,14 @@ export function ChampionshipLookup() {
     setSaveSuccess(false);
 
     if (!code.trim() || !validationKey.trim()) {
-      setErrorMsg("Informe o código da inscrição e o dado de validação.");
+      setErrorMsg(copy.required);
       return;
     }
 
     try {
       const reg = await championshipService.lookupRegistration(code.trim(), validationKey.trim());
       if (!reg) {
-        setErrorMsg("Nenhuma inscrição encontrada com este código e dados de validação. Verifique seu código, e-mail ou data de nascimento digitados.");
+        setErrorMsg(copy.notFound);
         setRegistration(null);
         return;
       }
@@ -108,7 +130,7 @@ export function ChampionshipLookup() {
       setEditNomeResp(reg.nomeResponsavel || "");
       setEditTelResp(reg.telefoneResponsavel || "");
     } catch (err: any) {
-      setErrorMsg(err.message || "Erro ao consultar inscrição no sistema oficial.");
+      setErrorMsg(err.message || copy.lookupError);
     }
   };
 
@@ -119,7 +141,7 @@ export function ChampionshipLookup() {
     try {
       const numericWeight = parseFloat(editPeso.replace(",", "."));
       if (isNaN(numericWeight) || numericWeight <= 0) {
-        throw new Error("Peso corporal inválido.");
+        throw new Error(copy.invalidWeight);
       }
 
       const updated = await championshipService.updateRegistrationByAthlete(
@@ -139,7 +161,7 @@ export function ChampionshipLookup() {
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 4000);
     } catch (err: any) {
-      setErrorMsg(err.message || "Erro ao salvar alterações.");
+      setErrorMsg(err.message || copy.saveError);
     }
   };
 
@@ -157,7 +179,7 @@ export function ChampionshipLookup() {
       setRegistration(updated);
       setReceiptMarked(true);
     } catch (err: any) {
-      setErrorMsg(err.message || "Erro ao registrar envio de comprovante.");
+      setErrorMsg(err.message || copy.receiptError);
     }
   };
 
@@ -169,13 +191,13 @@ export function ChampionshipLookup() {
       ? formatModalidadesList(championship.modalidades)
       : (registration.modalidade || "Kata e Kumite");
 
-    const message = "Olá! Estou enviando o comprovante da inscrição do campeonato.\n\n" +
-      `Inscrição: ${registration.id}\n` +
-      `Atleta: ${registration.nomeCompleto}\n` +
-      "Participação: Todas as modalidades do campeonato\n" +
-      `Modalidades do evento: ${modalidadesEvento}\n` +
-      `Valor: R$ ${registration.valorInscricao.toFixed(2).replace(".", ",")}\n\n` +
-      "Segue em anexo o comprovante de pagamento PIX para conferência.";
+    const message = copy.whatsappIntro + "\n\n" +
+      `${copy.registration}: ${registration.id}\n` +
+      `${copy.athlete}: ${registration.nomeCompleto}\n` +
+      `${copy.participation}: ${copy.allModalities}\n` +
+      `${copy.eventModalities}: ${modalidadesEvento}\n` +
+      `${copy.value}: R$ ${registration.valorInscricao.toFixed(2).replace(".", ",")}\n\n` +
+      copy.whatsappAttachment;
 
     return `https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`;
   };
@@ -190,7 +212,7 @@ export function ChampionshipLookup() {
           to={championship ? `/campeonatos/${championship.slug}` : "/"} 
           className="inline-flex items-center gap-1 hover:text-neutral-800 transition-colors"
         >
-          <ArrowLeft className="w-3.5 h-3.5" /> Voltar ao Campeonato
+          <ArrowLeft className="w-3.5 h-3.5" /> {copy.backChampionship}
         </Link>
       </div>
 
@@ -198,9 +220,9 @@ export function ChampionshipLookup() {
         <div className="w-12 h-12 rounded-2xl bg-karate-red/10 text-karate-red flex items-center justify-center mx-auto">
           <Search className="w-6 h-6" />
         </div>
-        <h1 className="text-2xl font-bold font-jp text-neutral-900">Consulta de Inscrição</h1>
+        <h1 className="text-2xl font-bold font-jp text-neutral-900">{copy.title}</h1>
         <p className="text-xs text-neutral-600 max-w-md mx-auto">
-          Acesse os dados da sua inscrição, verifique o status do pagamento ou atualize suas informações durante o período de inscrições abertas.
+          {copy.subtitle}
         </p>
       </div>
 
@@ -209,7 +231,7 @@ export function ChampionshipLookup() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-xs font-semibold text-neutral-700 mb-1">
-              Código da Inscrição *
+              {copy.registrationCode} *
             </label>
             <input
               type="text"
@@ -223,12 +245,12 @@ export function ChampionshipLookup() {
 
           <div>
             <label className="block text-xs font-semibold text-neutral-700 mb-1">
-              Dado de Validação (E-mail, Telefone ou Data de Nasc.) *
+              {copy.validationData} *
             </label>
             <input
               type="text"
               required
-              placeholder="Ex: seu e-mail cadastrado ou telefone"
+              placeholder={copy.validationExample}
               value={validationKey}
               onChange={(e) => setValidationKey(e.target.value)}
               className="w-full px-3.5 py-2.5 bg-neutral-50 border border-neutral-300 rounded-xl text-sm text-neutral-900 focus:outline-none focus:ring-2 focus:ring-karate-red"
@@ -247,7 +269,7 @@ export function ChampionshipLookup() {
           type="submit"
           className="w-full py-3 bg-neutral-900 hover:bg-neutral-800 text-white rounded-xl text-xs font-bold transition-colors cursor-pointer shadow-sm flex items-center justify-center gap-2"
         >
-          <Search className="w-4 h-4" /> Consultar Inscrição
+          <Search className="w-4 h-4" /> {copy.lookup}
         </button>
       </form>
 
@@ -257,14 +279,14 @@ export function ChampionshipLookup() {
           {saveSuccess && (
             <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-              <span>Dados da inscrição atualizados com sucesso e salvos no histórico!</span>
+              <span>{copy.saved}</span>
             </div>
           )}
 
           {/* Cabeçalho da Inscrição */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-neutral-100 gap-3">
             <div>
-              <span className="text-[11px] font-mono text-neutral-400 block uppercase">Código de Inscrição</span>
+              <span className="text-[11px] font-mono text-neutral-400 block uppercase">{copy.registrationCode}</span>
               <h2 className="text-2xl font-bold font-mono text-neutral-900">{registration.id}</h2>
               <span className="text-xs text-neutral-600 block mt-0.5">{registration.championshipName}</span>
             </div>
@@ -278,7 +300,7 @@ export function ChampionshipLookup() {
                   ? "bg-red-50 text-red-700 border-red-200"
                   : "bg-blue-50 text-blue-700 border-blue-200"
               }`}>
-                Inscrição: {registration.status}
+                {copy.registration}: {registration.status}
               </span>
 
               {/* Status Pagamento */}
@@ -291,12 +313,12 @@ export function ChampionshipLookup() {
                   ? "bg-purple-50 text-purple-700 border-purple-200"
                   : "bg-amber-50 text-amber-700 border-amber-200"
               }`}>
-                Pagamento: {registration.paymentStatus}
+                {copy.payment}: {registration.paymentStatus}
               </span>
             </div>
           </div>
 
-          {/* Dados do Atleta */}
+          {/* {copy.athleteData} */}
           {!isEditing ? (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
@@ -306,53 +328,53 @@ export function ChampionshipLookup() {
                     onClick={() => setIsEditing(true)}
                     className="inline-flex items-center gap-1.5 text-xs text-karate-red font-semibold hover:underline cursor-pointer"
                   >
-                    <Edit3 className="w-3.5 h-3.5" /> Editar Informações
+                    <Edit3 className="w-3.5 h-3.5" /> {copy.edit}
                   </button>
                 )}
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-neutral-50 p-4 rounded-2xl border border-neutral-100">
-                <p><strong>Nome Completo:</strong> {registration.nomeCompleto}</p>
-                <p><strong>Participação:</strong> <span className="text-karate-red font-bold">Todas as modalidades do campeonato</span></p>
-                <p><strong>Modalidades do evento:</strong> <span className="font-semibold text-neutral-800">{championship?.modalidades && championship.modalidades.length > 0 ? formatModalidadesList(championship.modalidades) : (registration.modalidade || "Kata e Kumite")}</span></p>
-                <p><strong>Graduação:</strong> {registration.graduacao}</p>
-                <p><strong>Peso Informado:</strong> {registration.peso} kg</p>
-                <p><strong>Idade no Campeonato:</strong> {registration.idadeNaDataCampeonato} anos {registration.isMenor ? "(Menor)" : ""}</p>
-                <p><strong>Sexo:</strong> {registration.sexo}</p>
-                <p><strong>Telefone:</strong> {registration.telefone}</p>
-                <p><strong>E-mail:</strong> {registration.email}</p>
+                <p><strong>{copy.fullName}:</strong> {registration.nomeCompleto}</p>
+                <p><strong>{copy.participation}:</strong> <span className="text-karate-red font-bold">{copy.allModalities}</span></p>
+                <p><strong>{copy.eventModalities}:</strong> <span className="font-semibold text-neutral-800">{championship?.modalidades && championship.modalidades.length > 0 ? formatModalidadesList(championship.modalidades) : (registration.modalidade || "Kata e Kumite")}</span></p>
+                <p><strong>{copy.grade}:</strong> {registration.graduacao}</p>
+                <p><strong>{copy.weight}:</strong> {registration.peso} kg</p>
+                <p><strong>{copy.ageAtEvent}:</strong> {registration.idadeNaDataCampeonato} {copy.years} {registration.isMenor ? `(${copy.minor})` : ""}</p>
+                <p><strong>{copy.sex}:</strong> {registration.sexo}</p>
+                <p><strong>{copy.phone}:</strong> {registration.telefone}</p>
+                <p><strong>{copy.email}:</strong> {registration.email}</p>
                 <p className="col-span-1 sm:col-span-2">
-                  <strong>Categoria Oficial:</strong> {registration.categoriaNome || "A ser designada pela comissão técnica"}
+                  <strong>{copy.officialCategory}:</strong> {registration.categoriaNome || copy.toBeAssigned}
                 </p>
                 {registration.nomeResponsavel && (
                   <p className="col-span-1 sm:col-span-2 pt-2 border-t border-neutral-200/60">
-                    <strong>Responsável Legal:</strong> {registration.nomeResponsavel} — Tel: {registration.telefoneResponsavel}
+                    <strong>{copy.guardian}:</strong> {registration.nomeResponsavel} — Tel: {registration.telefoneResponsavel}
                   </p>
                 )}
               </div>
 
               {/* Informação sobre cancelamento */}
               <p className="text-[11px] text-neutral-400 italic">
-                * Para cancelamento de inscrição, entre em contato direto com a administração do Dojo Madeira Karate. Apenas a comissão organizadora possui autorização para cancelar inscrições.
+                {copy.cancelNote}
               </p>
             </div>
           ) : (
             /* Formulário de Edição pelo Atleta */
             <form onSubmit={handleSaveEdit} className="space-y-4 bg-neutral-50 p-5 rounded-2xl border border-neutral-200">
               <div className="flex items-center justify-between pb-2 border-b border-neutral-200">
-                <span className="text-xs font-bold text-neutral-800">Editando Inscrição</span>
+                <span className="text-xs font-bold text-neutral-800">{copy.editing}</span>
                 <button
                   type="button"
                   onClick={() => setIsEditing(false)}
                   className="text-neutral-500 hover:text-neutral-800 text-xs font-semibold cursor-pointer"
                 >
-                  Cancelar
+                  {copy.cancel}
                 </button>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-700 mb-1">Peso (kg) *</label>
+                  <label className="block text-xs font-semibold text-neutral-700 mb-1">{copy.weightKg} *</label>
                   <input
                     type="text"
                     required
@@ -427,7 +449,7 @@ export function ChampionshipLookup() {
                   type="submit"
                   className="px-4 py-2 bg-karate-red hover:bg-red-700 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-sm"
                 >
-                  <Save className="w-3.5 h-3.5" /> Salvar Alterações
+                  <Save className="w-3.5 h-3.5" /> {copy.saveChanges}
                 </button>
               </div>
             </form>
