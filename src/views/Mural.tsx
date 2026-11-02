@@ -3,9 +3,16 @@ import { useAppData } from "../contexts/AppDataContext";
 import { Megaphone, Calendar } from "lucide-react";
 import { NoticeModal } from "../components/NoticeModal";
 import { InstagramEmbed } from "../components/InstagramEmbed";
+import { useLanguage } from "../i18n/LanguageContext";
 
 export function Mural() {
   const { notices, loading } = useAppData();
+  const { language } = useLanguage();
+  const copy = language === "en"
+    ? { loading: "Loading news board...", empty: "No announcements at the moment.", title: "News Board", subtitle: "Stay up to date with news and events.", instagram: "Instagram Post", noImageRegistered: "No image registered", noImage: "No image", featured: "Featured" }
+    : language === "ja"
+    ? { loading: "お知らせを読み込み中...", empty: "現在お知らせはありません。", title: "お知らせ", subtitle: "最新のお知らせやイベント情報をご確認ください。", instagram: "Instagram 投稿", noImageRegistered: "画像未登録", noImage: "画像なし", featured: "注目" }
+    : { loading: "{copy.loading}", empty: "{copy.empty}", title: "{copy.title}", subtitle: "{copy.subtitle}", instagram: "{copy.instagram}", noImageRegistered: "{copy.noImageRegistered}", noImage: "{copy.noImage}", featured: "{copy.featured}" };
   const [selectedNoticeIndex, setSelectedNoticeIndex] = useState<number | null>(null);
 
   if (loading) {
