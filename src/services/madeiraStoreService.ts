@@ -88,8 +88,10 @@ export const madeiraStoreService = {
   /**
    * Busca um pedido específico por ID ou Código
    */
-  async getOrder(id: string): Promise<StoreOrder> {
-    const res = await fetch(`/api/store/orders?ts=${Date.now()}`, { headers: { "x-admin-pin": "1926" } });
+  async getOrder(id: string, adminPin?: string): Promise<StoreOrder> {
+    const headers: Record<string, string> = {};
+    if (adminPin) headers["x-admin-pin"] = adminPin;
+    const res = await fetch(`/api/store/orders?ts=${Date.now()}`, { headers });
     if (!res.ok) {
       throw new Error("Pedido não encontrado.");
     }
@@ -174,13 +176,13 @@ export const madeiraStoreService = {
    */
   async verifyAdminPin(pin: string): Promise<boolean> {
     try {
-      const res = await fetch("/api/store/orders?action=verify-admin", {
+      const res = await fetch("/api/admin-auth", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "x-admin-pin": pin.trim()
         },
-        body: JSON.stringify({ action: "verify-admin" })
+        body: JSON.stringify({ pin: pin.trim() })
       });
       return res.ok;
     } catch {

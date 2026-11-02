@@ -76,9 +76,7 @@ export function ChampionshipDashboard() {
   const { config } = useAppData();
 
   // Authentication State
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
-    return sessionStorage.getItem("madeira_admin_authenticated") === "true";
-  });
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [pinInput, setPinInput] = useState("");
   const [pinError, setPinError] = useState(false);
 
@@ -92,7 +90,7 @@ export function ChampionshipDashboard() {
   // Edit Drawer State
   const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
 
-  // General Settings Modal State (Google Apps Script & Admin PIN)
+  // General Settings Modal State
   const [showGeneralSettingsModal, setShowGeneralSettingsModal] = useState(false);
 
   // Championships & Registrations Data
@@ -158,9 +156,8 @@ export function ChampionshipDashboard() {
   const [pixIncluirValor, setPixIncluirValor] = useState(true);
   const [pixInstrucoes, setPixInstrucoes] = useState("");
 
-  // Google Sheets integration state
+  // Google Sheets integration state. O PIN é controlado somente por MADEIRA_ADMIN_PIN no servidor.
   const [sheetWebhookUrl, setSheetWebhookUrl] = useState("");
-  const [newAdminPin, setNewAdminPin] = useState("");
   const [showScriptModal, setShowScriptModal] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
 
@@ -296,7 +293,6 @@ export function ChampionshipDashboard() {
       const ok = await championshipService.verifyAdminPin(pinInput);
       if (ok) {
         setIsAuthenticated(true);
-        sessionStorage.setItem("madeira_admin_authenticated", "true");
         setPinError(false);
         setPinInput("");
       } else {
@@ -311,7 +307,6 @@ export function ChampionshipDashboard() {
 
   const handleLogout = () => {
     setIsAuthenticated(false);
-    sessionStorage.removeItem("madeira_admin_authenticated");
   };
 
   const isDateToday = (dateStr?: string) => {
@@ -949,11 +944,10 @@ export function ChampionshipDashboard() {
       const updatedSettings: ChampionshipSettings = {
         ...settings,
         googleAppsScriptUrl: sheetWebhookUrl.trim(),
-        adminPin: newAdminPin.trim() ? newAdminPin.trim() : settings.adminPin
+        adminPin: ""
       };
       await championshipService.saveSettings(updatedSettings);
       setSettings(updatedSettings);
-      setNewAdminPin("");
       showToast("Configurações do sistema e Google Sheets atualizadas!");
     } catch (err: any) {
       showToast(`Erro ao salvar configurações: ${err.message}`);
@@ -1072,7 +1066,7 @@ export function ChampionshipDashboard() {
               />
               <div className="mt-2 text-left space-y-1">
                 <span className="text-[11px] text-neutral-500 block">
-                  * PIN administrativo padrão: <strong>1926</strong> (alterável no painel).
+                  * O PIN administrativo é controlado pela variável segura <strong>MADEIRA_ADMIN_PIN</strong>.
                 </span>
                 <p className="text-[10px] text-neutral-400 bg-neutral-50 p-2 rounded-lg border border-neutral-200 leading-relaxed">
                   Aviso de Segurança (SPEC 08): Autenticação operacional validada pelo backend do Dojo (modo administrativo para gestão técnica e conferência manual).
@@ -3529,7 +3523,7 @@ export function ChampionshipDashboard() {
       )}
 
       {/* ======================================================== */}
-      {/* MODAL GOOGLE SHEETS & PIN DO SENSEI                      */}
+      {/* MODAL GOOGLE SHEETS                                      */}
       {/* ======================================================== */}
       {showGeneralSettingsModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
@@ -3601,19 +3595,6 @@ export function ChampionshipDashboard() {
                   <Plus className="w-3.5 h-3.5 text-amber-700" />
                   Inicializar Abas na Planilha
                 </button>
-              </div>
-
-              <div className="pt-3 border-t border-neutral-100">
-                <label className="block text-xs font-bold text-neutral-700 mb-1">
-                  Alterar PIN de Acesso Administrativo (Atual: {settings.adminPin})
-                </label>
-                <input
-                  type="password"
-                  placeholder="Novo PIN (ou deixe em branco para manter)"
-                  value={newAdminPin}
-                  onChange={(e) => setNewAdminPin(e.target.value)}
-                  className="w-full px-3.5 py-2 bg-neutral-50 border border-neutral-300 rounded-xl text-xs font-mono"
-                />
               </div>
 
               <div className="flex justify-end gap-2 pt-3 border-t border-neutral-100">
