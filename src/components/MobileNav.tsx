@@ -66,7 +66,7 @@ export function MobileNav({ onOpenSearch }: { onOpenSearch?: () => void }) {
   const bottomBarLinks = [
     { name: t("nav.home"), path: "/", icon: Home },
     { name: t("nav.wall"), path: "/mural", icon: Megaphone },
-    { name: "Katas", path: "/katas", icon: BookOpen },
+    { name: t("nav.katas"), path: "/katas", icon: BookOpen },
     { name: t("nav.officialStore"), path: "/store", icon: ShoppingBag },
   ];
 
@@ -75,20 +75,20 @@ export function MobileNav({ onOpenSearch }: { onOpenSearch?: () => void }) {
     {
       title: t("nav.main"),
       items: [
-        { name: "Início", path: "/", icon: Home },
-        { name: "Mural", path: "/mural", icon: Megaphone },
+        { name: t("nav.home"), path: "/", icon: Home },
+        { name: t("nav.wall"), path: "/mural", icon: Megaphone },
         { name: t("nav.events"), path: "/events", icon: Camera },
         { name: t("nav.championships"), path: "/campeonatos", icon: Trophy },
         { name: t("nav.schedule"), path: "/schedule", icon: Calendar },
         { name: t("nav.officialStore"), path: "/store", icon: ShoppingBag },
-        { name: "MadeiraStore", path: "/madeirastore", icon: ShoppingBag },
+        { name: t("nav.madeiraStore"), path: "/madeirastore", icon: ShoppingBag },
       ]
     },
     {
       title: t("nav.training"),
       items: [
         { name: t("nav.studentArea"), path: "/student-area", icon: GraduationCap },
-        { name: "Katas", path: "/katas", icon: BookOpen },
+        { name: t("nav.katas"), path: "/katas", icon: BookOpen },
         { name: t("nav.techniques"), path: "/techniques", icon: Shield },
         { name: t("nav.belts"), path: "/belts", icon: List },
         { name: t("nav.kataSeries"), path: "/kata-series", icon: Layers },
@@ -99,7 +99,7 @@ export function MobileNav({ onOpenSearch }: { onOpenSearch?: () => void }) {
       items: [
         { name: t("nav.vocabulary"), path: "/vocabulary", icon: Sparkles },
         { name: t("nav.whatIsKata"), path: "/what-is-kata", icon: HelpCircle },
-        { name: "Dojo Kun", path: "/dojo-kun", icon: ScrollText },
+        { name: t("nav.dojoKun"), path: "/dojo-kun", icon: ScrollText },
         { name: t("nav.history"), path: "/history", icon: History },
       ]
     }
