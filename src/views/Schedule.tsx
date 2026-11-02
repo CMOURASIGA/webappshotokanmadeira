@@ -2,6 +2,7 @@ import { ArrowLeft, Calendar, MoveHorizontal } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAppData } from "../contexts/AppDataContext";
+import { useLanguage, type Language } from "../i18n/LanguageContext";
 
 type ClassSession = {
   name: string;
@@ -18,6 +19,23 @@ type ScheduleRow = {
   fri?: ClassSession;
   sat?: ClassSession;
 };
+
+
+function translateScheduleDesc(desc: string | undefined, language: Language): string | undefined {
+  if (!desc) return desc;
+  const table: Record<string, Record<Language, string>> = {
+    "(Iniciante/Fundamentos)": { pt: "(Iniciante/Fundamentos)", en: "(Beginner/Fundamentals)", ja: "(初心者・基本)" },
+    "(Livre)": { pt: "(Livre)", en: "(Open Class)", ja: "(一般)" },
+    "(A partir dos 14 anos)": { pt: "(A partir dos 14 anos)", en: "(Ages 14+)", ja: "(14歳以上)" },
+    "(Kids)": { pt: "(Kids)", en: "(Kids)", ja: "(キッズ)" },
+    "(04 a 09 anos)": { pt: "(04 a 09 anos)", en: "(Ages 4–9)", ja: "(4〜9歳)" },
+    "(Feminino)": { pt: "(Feminino)", en: "(Women)", ja: "(女性)" },
+    "(10 a 14 anos)": { pt: "(10 a 14 anos)", en: "(Ages 10–14)", ja: "(10〜14歳)" },
+    "(2 a 4 anos)": { pt: "(2 a 4 anos)", en: "(Ages 2–4)", ja: "(2〜4歳)" },
+    "(Kata)": { pt: "(Kata)", en: "(Kata)", ja: "(形)" }
+  };
+  return table[desc]?.[language] || desc;
+}
 
 const scheduleData: ScheduleRow[] = [
   {
@@ -117,6 +135,7 @@ const scheduleData: ScheduleRow[] = [
 ];
 
 function ClassCell({ session }: { session?: ClassSession }) {
+  const { language } = useLanguage();
   if (!session) {
     return <td className="border border-[#333333] bg-[#484848] p-2 min-w-[120px] h-20"></td>;
   }
@@ -124,7 +143,7 @@ function ClassCell({ session }: { session?: ClassSession }) {
     <td className={`border border-[#333333] p-2 text-center text-xs font-bold leading-tight min-w-[120px] h-20 ${session.bg}`}>
       <div className="flex flex-col items-center justify-center h-full">
         <span>{session.name}</span>
-        {session.desc && <span className="text-[10px] font-normal mt-1">{session.desc}</span>}
+        {session.desc && <span className="text-[10px] font-normal mt-1">{translateScheduleDesc(session.desc, language)}</span>}
       </div>
     </td>
   );
@@ -134,14 +153,15 @@ export function Schedule() {
   const navigate = useNavigate();
   const [selectedDay, setSelectedDay] = useState<"mon" | "tue" | "wed" | "thu" | "fri" | "sat">("mon");
   const { config } = useAppData();
+  const { t, language } = useLanguage();
 
   const days = [
-    { key: "mon", label: "Segunda" },
-    { key: "tue", label: "Terça" },
-    { key: "wed", label: "Quarta" },
-    { key: "thu", label: "Quinta" },
-    { key: "fri", label: "Sexta" },
-    { key: "sat", label: "Sábado" },
+    { key: "mon", label: t("day.mon") },
+    { key: "tue", label: t("day.tue") },
+    { key: "wed", label: t("day.wed") },
+    { key: "thu", label: t("day.thu") },
+    { key: "fri", label: t("day.fri") },
+    { key: "sat", label: t("day.sat") },
   ] as const;
 
   return (
@@ -150,15 +170,15 @@ export function Schedule() {
         onClick={() => navigate(-1)}
         className="flex items-center gap-2 text-sm text-neutral-500 hover:text-karate-red font-medium transition-colors"
       >
-        <ArrowLeft className="w-4 h-4" /> Voltar
+        <ArrowLeft className="w-4 h-4" /> {t("common.back")}
       </button>
 
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 className="text-3xl font-bold font-jp flex items-center gap-3">
-            <Calendar className="w-8 h-8 text-karate-red" /> Grade de Horários
+            <Calendar className="w-8 h-8 text-karate-red" /> {t("schedule.title")}
           </h2>
-          <p className="text-neutral-500 mt-2">Confira as turmas e horários disponíveis na Madeira Artes Marciais</p>
+          <p className="text-neutral-500 mt-2">{t("schedule.subtitle")}</p>
         </div>
       </div>
 
@@ -182,7 +202,7 @@ export function Schedule() {
                       </div>
                       <div className={`flex-1 p-3 flex flex-col justify-center ${session.bg}`}>
                         <span className="font-bold text-sm leading-tight">{session.name}</span>
-                        {session.desc && <span className="text-[11px] mt-0.5 opacity-90">{session.desc}</span>}
+                        {session.desc && <span className="text-[11px] mt-0.5 opacity-90">{translateScheduleDesc(session.desc, language)}</span>}
                       </div>
                     </div>
                   );
@@ -196,11 +216,11 @@ export function Schedule() {
           <img src={config.logo || undefined} alt="Madeira Artes Marciais Logo" className="w-16 h-16 object-contain" />
           <div>
             <p className="font-bold text-lg">Madeira Artes Marciais</p>
-            <p className="text-sm text-neutral-600">INFORMAÇÕES: {config.whatsapp}</p>
+            <p className="text-sm text-neutral-600">{t("schedule.info")}: {config.whatsapp}</p>
             <p className="text-sm text-neutral-600">@madeirakarateshotokan</p>
           </div>
           <div className="text-xs text-neutral-500 italic mt-2">
-            * PLANOS NA RECEPÇÃO.
+            * {t("schedule.plans")}
           </div>
         </div>
       </div>
@@ -211,13 +231,13 @@ export function Schedule() {
           <table className="w-full border-collapse min-w-[1000px]">
             <thead>
               <tr>
-                <th className="bg-[#e43a3a] text-black font-bold border border-[#333333] p-3 w-20 sticky left-0 z-20 shadow-[2px_0_4px_-1px_rgba(0,0,0,0.2)]">HORÁRIO</th>
-                <th className="bg-[#e43a3a] text-black font-bold border border-[#333333] p-3 min-w-[140px]">SEGUNDA</th>
-                <th className="bg-[#e43a3a] text-black font-bold border border-[#333333] p-3 min-w-[140px]">TERÇA</th>
-                <th className="bg-[#e43a3a] text-black font-bold border border-[#333333] p-3 min-w-[140px]">QUARTA</th>
-                <th className="bg-[#e43a3a] text-black font-bold border border-[#333333] p-3 min-w-[140px]">QUINTA</th>
-                <th className="bg-[#e43a3a] text-black font-bold border border-[#333333] p-3 min-w-[140px]">SEXTA</th>
-                <th className="bg-[#e43a3a] text-black font-bold border border-[#333333] p-3 min-w-[140px]">SÁBADO</th>
+                <th className="bg-[#e43a3a] text-black font-bold border border-[#333333] p-3 w-20 sticky left-0 z-20 shadow-[2px_0_4px_-1px_rgba(0,0,0,0.2)]">{t("day.time")}</th>
+                <th className="bg-[#e43a3a] text-black font-bold border border-[#333333] p-3 min-w-[140px]">{t("day.mon")}</th>
+                <th className="bg-[#e43a3a] text-black font-bold border border-[#333333] p-3 min-w-[140px]">{t("day.tue")}</th>
+                <th className="bg-[#e43a3a] text-black font-bold border border-[#333333] p-3 min-w-[140px]">{t("day.wed")}</th>
+                <th className="bg-[#e43a3a] text-black font-bold border border-[#333333] p-3 min-w-[140px]">{t("day.thu")}</th>
+                <th className="bg-[#e43a3a] text-black font-bold border border-[#333333] p-3 min-w-[140px]">{t("day.fri")}</th>
+                <th className="bg-[#e43a3a] text-black font-bold border border-[#333333] p-3 min-w-[140px]">{t("day.sat")}</th>
               </tr>
             </thead>
             <tbody>
