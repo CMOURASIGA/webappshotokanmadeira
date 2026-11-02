@@ -16,25 +16,13 @@ import {
 } from "lucide-react";
 import { searchAllData, SearchResultItem, SearchCategory } from "../lib/searchIndex";
 import { useAppData } from "../contexts/AppDataContext";
+import { useLanguage } from "../i18n/LanguageContext";
 
 interface GlobalSearchModalProps {
   isOpen: boolean;
   onClose: () => void;
   initialQuery?: string;
 }
-
-const CATEGORY_TABS: { key: "all" | SearchCategory; label: string }[] = [
-  { key: "all", label: "Todos" },
-  { key: "student", label: "Área do Aluno" },
-  { key: "kata", label: "Katas" },
-  { key: "technique", label: "Técnicas" },
-  { key: "vocabulary", label: "Vocabulário" },
-  { key: "belt", label: "Faixas" },
-  { key: "dojokun", label: "Dojo Kun" },
-  { key: "history", label: "História" },
-  { key: "notice", label: "Avisos" },
-  { key: "event", label: "Eventos" }
-];
 
 export function GlobalSearchModal({ isOpen, onClose, initialQuery = "" }: GlobalSearchModalProps) {
   const [query, setQuery] = useState(initialQuery);
@@ -43,6 +31,76 @@ export function GlobalSearchModal({ isOpen, onClose, initialQuery = "" }: Global
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const { notices, events } = useAppData();
+  const { language } = useLanguage();
+  const copy = language === "en"
+    ? {
+        dialog: "Madeira Karate Global Search",
+        placeholder: "Search techniques, Kata, belts, Dojo Kun, vocabulary...",
+        clear: "Clear search",
+        tabs: { all: "All", student: "Student Area", kata: "Kata", technique: "Techniques", vocabulary: "Vocabulary", belt: "Belts", dojokun: "Dojo Kun", history: "History", notice: "Announcements", event: "Events" },
+        title: "Digital Dojo Search",
+        intro: "Find Kata, Kihon techniques, belts, traditional vocabulary, Dojo Kun, history and announcements instantly.",
+        suggestions: "Quick suggestions:",
+        noResult: "No results for",
+        noResultHint: "Check the spelling or try broader terms such as",
+        navigate: "Navigate",
+        open: "Open",
+        close: "Close",
+        result: "result",
+        results: "results",
+        popularTerms: ["Heian Shodan", "Bassai Dai", "Zenkutsu", "Gedan Barai", "Sensei", "Black Belt", "Dojo Kun", "Funakoshi"]
+      }
+    : language === "ja"
+    ? {
+        dialog: "Madeira Karate 全体検索",
+        placeholder: "技、形、帯、道場訓、用語を検索...",
+        clear: "検索をクリア",
+        tabs: { all: "すべて", student: "会員エリア", kata: "形", technique: "技術", vocabulary: "用語集", belt: "帯", dojokun: "道場訓", history: "歴史", notice: "お知らせ", event: "イベント" },
+        title: "デジタル道場検索",
+        intro: "形、基本技、帯、伝統用語、道場訓、歴史、お知らせをまとめて検索できます。",
+        suggestions: "検索候補:",
+        noResult: "検索結果がありません:",
+        noResultHint: "入力を確認するか、次のような一般的な語句をお試しください",
+        navigate: "移動",
+        open: "開く",
+        close: "閉じる",
+        result: "件",
+        results: "件",
+        popularTerms: ["Heian Shodan", "Bassai Dai", "Zenkutsu", "Gedan Barai", "Sensei", "黒帯", "Dojo Kun", "Funakoshi"]
+      }
+    : {
+        dialog: "Busca Global Madeira Karate",
+        placeholder: "Buscar por técnica, kata, faixa, dojo kun, vocabulário...",
+        clear: "Limpar busca",
+        tabs: { all: "Todos", student: "Área do Aluno", kata: "Katas", technique: "Técnicas", vocabulary: "Vocabulário", belt: "Faixas", dojokun: "Dojo Kun", history: "História", notice: "Avisos", event: "Eventos" },
+        title: "Busca no Dojo Digital",
+        intro: "Encontre instantaneamente Katas, Técnicas de Kihon, Faixas, Vocabulário tradicional, Dojo Kun, História e Avisos.",
+        suggestions: "Sugestões rápidas:",
+        noResult: "Nenhum resultado para",
+        noResultHint: "Verifique a digitação ou tente buscar por termos mais genéricos, como",
+        navigate: "Navegar",
+        open: "Abrir",
+        close: "Fechar",
+        result: "resultado",
+        results: "resultados",
+        popularTerms: ["Heian Shodan", "Bassai Dai", "Zenkutsu", "Gedan Barai", "Sensei", "Faixa Preta", "Dojo Kun", "Funakoshi"]
+      };
+
+  const categoryTabs: { key: "all" | SearchCategory; label: string }[] = [
+    { key: "all", label: copy.tabs.all },
+    { key: "student", label: copy.tabs.student },
+    { key: "kata", label: copy.tabs.kata },
+    { key: "technique", label: copy.tabs.technique },
+    { key: "vocabulary", label: copy.tabs.vocabulary },
+    { key: "belt", label: copy.tabs.belt },
+    { key: "dojokun", label: copy.tabs.dojokun },
+    { key: "history", label: copy.tabs.history },
+    { key: "notice", label: copy.tabs.notice },
+    { key: "event", label: copy.tabs.event }
+  ];
+
+  const categoryLabel = (category: SearchCategory) =>
+    categoryTabs.find(tab => tab.key === category)?.label || category;
 
   // Todos os resultados indexados em tempo real
   const allResults = useMemo(() => {
@@ -147,7 +205,7 @@ export function GlobalSearchModal({ isOpen, onClose, initialQuery = "" }: Global
         className="w-full max-w-2xl bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] transition-all"
         role="dialog"
         aria-modal="true"
-        aria-label="Busca Global Madeira Karate"
+        aria-label={copy.dialog}
       >
         {/* Cabeçalho do Modal de Busca */}
         <div className="p-3 sm:p-4 border-b border-neutral-800 flex items-center gap-3 bg-neutral-900/90 sticky top-0 z-10">
@@ -165,7 +223,7 @@ export function GlobalSearchModal({ isOpen, onClose, initialQuery = "" }: Global
               setQuery(e.target.value);
               setSelectedIndex(0);
             }}
-            placeholder="Buscar por técnica, kata, faixa, dojo kun, vocabulário..."
+            placeholder={copy.placeholder}
             className="flex-1 bg-transparent text-white placeholder-neutral-500 text-sm sm:text-base outline-none pr-2 font-medium"
           />
           {query && (
@@ -176,7 +234,7 @@ export function GlobalSearchModal({ isOpen, onClose, initialQuery = "" }: Global
                 inputRef.current?.focus();
               }}
               className="p-1.5 text-neutral-400 hover:text-white rounded-full hover:bg-neutral-800 transition-colors"
-              aria-label="Limpar busca"
+              aria-label={copy.clear}
             >
               <X className="w-4 h-4" />
             </button>
@@ -192,7 +250,7 @@ export function GlobalSearchModal({ isOpen, onClose, initialQuery = "" }: Global
         {/* Abas de Categorias (visíveis quando há query ou quando há resultados) */}
         {query.trim().length >= 2 && allResults.length > 0 && (
           <div className="flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-neutral-950/60 border-b border-neutral-800/80 overflow-x-auto no-scrollbar shrink-0">
-            {CATEGORY_TABS.map(tab => {
+            {categoryTabs.map(tab => {
               const count = tab.key === "all" 
                 ? allResults.length 
                 : allResults.filter(i => i.category === tab.key).length;
@@ -232,17 +290,17 @@ export function GlobalSearchModal({ isOpen, onClose, initialQuery = "" }: Global
                 <Command className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-white font-semibold text-sm sm:text-base">Busca no Dojo Digital</h3>
+                <h3 className="text-white font-semibold text-sm sm:text-base">{copy.title}</h3>
                 <p className="text-xs text-neutral-400 mt-1 max-w-sm mx-auto">
-                  Encontre instantaneamente Katas, Técnicas de Kihon, Faixas, Vocabulário tradicional, Dojo Kun, História e Avisos.
+                  {copy.intro}
                 </p>
               </div>
 
               {/* Termos Populares para clique direto */}
               <div className="pt-2">
-                <p className="text-[11px] uppercase tracking-wider text-neutral-500 font-bold mb-2">Sugestões rápidas:</p>
+                <p className="text-[11px] uppercase tracking-wider text-neutral-500 font-bold mb-2">{copy.suggestions}</p>
                 <div className="flex flex-wrap gap-2 justify-center">
-                  {["Heian Shodan", "Bassai Dai", "Zenkutsu", "Gedan Barai", "Sensei", "Faixa Preta", "Dojo Kun", "Funakoshi"].map((term) => (
+                  {copy.popularTerms.map((term) => (
                     <button
                       key={term}
                       onClick={() => setQuery(term)}
@@ -261,13 +319,13 @@ export function GlobalSearchModal({ isOpen, onClose, initialQuery = "" }: Global
                 <Search className="w-6 h-6" />
               </div>
               <h3 className="text-white font-medium text-sm sm:text-base">
-                Nenhum resultado para "{query}"
+                {copy.noResult} "{query}"
               </h3>
               <p className="text-xs text-neutral-400 max-w-sm mx-auto">
-                Verifique a digitação ou tente buscar por termos mais genéricos, como 
-                <span className="text-karate-gold font-medium"> kata</span>, 
-                <span className="text-karate-gold font-medium"> soco</span>, 
-                <span className="text-karate-gold font-medium"> faixa</span> ou 
+                {copy.noResultHint}
+                <span className="text-karate-gold font-medium"> kata</span>,
+                <span className="text-karate-gold font-medium"> kihon</span>,
+                <span className="text-karate-gold font-medium"> JKA</span>,
                 <span className="text-karate-gold font-medium"> oss</span>.
               </p>
             </div>
@@ -306,7 +364,7 @@ export function GlobalSearchModal({ isOpen, onClose, initialQuery = "" }: Global
                             {item.title}
                           </span>
                           <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full border ${item.badgeClass}`}>
-                            {item.categoryLabel}
+                            {categoryLabel(item.category)}
                           </span>
                         </div>
                         {item.subtitle && (
@@ -345,19 +403,19 @@ export function GlobalSearchModal({ isOpen, onClose, initialQuery = "" }: Global
             <span className="flex items-center gap-1">
               <kbd className="bg-neutral-800 px-1.5 py-0.5 rounded text-neutral-300 text-[10px] font-mono">↑</kbd>
               <kbd className="bg-neutral-800 px-1.5 py-0.5 rounded text-neutral-300 text-[10px] font-mono">↓</kbd>
-              <span className="text-neutral-500">Navegar</span>
+              <span className="text-neutral-500">{copy.navigate}</span>
             </span>
             <span className="flex items-center gap-1">
               <kbd className="bg-neutral-800 px-1.5 py-0.5 rounded text-neutral-300 text-[10px] font-mono">↵ Enter</kbd>
-              <span className="text-neutral-500">Abrir</span>
+              <span className="text-neutral-500">{copy.open}</span>
             </span>
             <span className="flex items-center gap-1">
               <kbd className="bg-neutral-800 px-1.5 py-0.5 rounded text-neutral-300 text-[10px] font-mono">ESC</kbd>
-              <span className="text-neutral-500">Fechar</span>
+              <span className="text-neutral-500">{copy.close}</span>
             </span>
           </div>
           <span className="text-neutral-500">
-            {filteredResults.length} {filteredResults.length === 1 ? "resultado" : "resultados"}
+            {filteredResults.length} {filteredResults.length === 1 ? copy.result : copy.results}
           </span>
         </div>
       </div>
