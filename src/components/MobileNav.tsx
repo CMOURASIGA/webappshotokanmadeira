@@ -24,6 +24,8 @@ import {
 import { useState, useEffect } from "react";
 import { useAppData } from "../contexts/AppDataContext";
 import { useCart } from "../contexts/CartContext";
+import { useLanguage } from "../i18n/LanguageContext";
+import { LanguageSelector } from "./LanguageSelector";
 
 interface NavItem {
   name: string;
@@ -41,6 +43,7 @@ export function MobileNav({ onOpenSearch }: { onOpenSearch?: () => void }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const { config } = useAppData();
   const { totalItems } = useCart();
+  const { t } = useLanguage();
 
   // Fecha o drawer sempre que a rota mudar
   useEffect(() => {
@@ -61,43 +64,43 @@ export function MobileNav({ onOpenSearch }: { onOpenSearch?: () => void }) {
 
   // Barra inferior enxuta (4 atalhos principais + botão Menu)
   const bottomBarLinks = [
-    { name: "Início", path: "/", icon: Home },
-    { name: "Mural", path: "/mural", icon: Megaphone },
+    { name: t("nav.home"), path: "/", icon: Home },
+    { name: t("nav.wall"), path: "/mural", icon: Megaphone },
     { name: "Katas", path: "/katas", icon: BookOpen },
-    { name: "Loja", path: "/store", icon: ShoppingBag },
+    { name: t("nav.officialStore"), path: "/store", icon: ShoppingBag },
   ];
 
   // Estrutura completa das seções no Drawer
   const sections: NavSection[] = [
     {
-      title: "PRINCIPAL",
+      title: t("nav.main"),
       items: [
         { name: "Início", path: "/", icon: Home },
         { name: "Mural", path: "/mural", icon: Megaphone },
-        { name: "Eventos", path: "/events", icon: Camera },
-        { name: "Campeonatos", path: "/campeonatos", icon: Trophy },
-        { name: "Grade de Horários", path: "/schedule", icon: Calendar },
-        { name: "Loja Oficial", path: "/store", icon: ShoppingBag },
+        { name: t("nav.events"), path: "/events", icon: Camera },
+        { name: t("nav.championships"), path: "/campeonatos", icon: Trophy },
+        { name: t("nav.schedule"), path: "/schedule", icon: Calendar },
+        { name: t("nav.officialStore"), path: "/store", icon: ShoppingBag },
         { name: "MadeiraStore", path: "/madeirastore", icon: ShoppingBag },
       ]
     },
     {
-      title: "TREINAMENTO",
+      title: t("nav.training"),
       items: [
-        { name: "Área do Aluno", path: "/student-area", icon: GraduationCap },
+        { name: t("nav.studentArea"), path: "/student-area", icon: GraduationCap },
         { name: "Katas", path: "/katas", icon: BookOpen },
-        { name: "Técnicas", path: "/techniques", icon: Shield },
-        { name: "Faixas", path: "/belts", icon: List },
-        { name: "Série de Katas", path: "/kata-series", icon: Layers },
+        { name: t("nav.techniques"), path: "/techniques", icon: Shield },
+        { name: t("nav.belts"), path: "/belts", icon: List },
+        { name: t("nav.kataSeries"), path: "/kata-series", icon: Layers },
       ]
     },
     {
-      title: "CONHECIMENTO",
+      title: t("nav.knowledge"),
       items: [
-        { name: "Vocabulário", path: "/vocabulary", icon: Sparkles },
-        { name: "O que é Kata?", path: "/what-is-kata", icon: HelpCircle },
+        { name: t("nav.vocabulary"), path: "/vocabulary", icon: Sparkles },
+        { name: t("nav.whatIsKata"), path: "/what-is-kata", icon: HelpCircle },
         { name: "Dojo Kun", path: "/dojo-kun", icon: ScrollText },
-        { name: "História", path: "/history", icon: History },
+        { name: t("nav.history"), path: "/history", icon: History },
       ]
     }
   ];
@@ -151,7 +154,7 @@ export function MobileNav({ onOpenSearch }: { onOpenSearch?: () => void }) {
           )}
         >
           <Menu className="w-5 h-5" />
-          <span className="text-[10px] font-medium leading-none">Menu</span>
+          <span className="text-[10px] font-medium leading-none">{t("nav.menu")}</span>
         </button>
       </nav>
 
@@ -177,7 +180,7 @@ export function MobileNav({ onOpenSearch }: { onOpenSearch?: () => void }) {
             </div>
             <div>
               <h2 className="text-white text-xs font-bold tracking-widest uppercase leading-tight">Madeira Karate</h2>
-              <span className="text-[10px] text-karate-gold font-medium">Menu do Dojo</span>
+              <span className="text-[10px] text-karate-gold font-medium">{t("nav.dojoMenu")}</span>
             </div>
           </div>
           <button 
@@ -200,10 +203,15 @@ export function MobileNav({ onOpenSearch }: { onOpenSearch?: () => void }) {
               className="w-full bg-neutral-900 hover:bg-neutral-800 text-neutral-400 text-xs px-3 py-2.5 rounded-xl border border-neutral-800 flex items-center gap-2 transition-colors"
             >
               <Search className="w-4 h-4 text-karate-gold" />
-              <span>Buscar técnica, kata, faixa...</span>
+              <span>{t("nav.searchPlaceholder")}</span>
             </button>
           </div>
         )}
+
+        <div className="px-4 pt-4">
+          <div className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider mb-2">{t("language.label")}</div>
+          <LanguageSelector />
+        </div>
 
         {/* Lista de Seções */}
         <div className="flex-1 overflow-y-auto p-4 space-y-6">
