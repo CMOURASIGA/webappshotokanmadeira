@@ -15,6 +15,7 @@ import { NoticePopup } from "./components/NoticePopup";
 import { Analytics } from "./components/Analytics";
 import { Analytics as VercelAnalytics } from "@vercel/analytics/react";
 import { OfflineIndicator } from "./components/pwa/OfflineIndicator";
+import { LanguageProvider } from "./i18n/LanguageContext";
 
 // Lazy loading & Code-splitting das views para otimização de FCP, LCP e bundle size
 const Home = lazy(() => import("./views/Home").then(m => ({ default: m.Home })));
@@ -68,7 +69,8 @@ export default function App() {
   }, []);
 
   return (
-    <AppDataProvider>
+    <LanguageProvider>
+      <AppDataProvider>
       <StudentProvider>
         <CartProvider>
           <MadeiraStoreCartProvider>
@@ -116,5 +118,6 @@ export default function App() {
         </CartProvider>
       </StudentProvider>
     </AppDataProvider>
+      </LanguageProvider>
   );
 }
