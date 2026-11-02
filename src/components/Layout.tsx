@@ -8,6 +8,8 @@ import { useAppData } from "../contexts/AppDataContext";
 import { useCart } from "../contexts/CartContext";
 import { Link, useLocation } from "react-router-dom";
 import { PWAInstallButton } from "./pwa/PWAInstallButton";
+import { LanguageSelector } from "./LanguageSelector";
+import { useLanguage } from "../i18n/LanguageContext";
 
 export function Layout({ children }: { children: ReactNode }) {
   const { config } = useAppData();
@@ -15,6 +17,7 @@ export function Layout({ children }: { children: ReactNode }) {
   const location = useLocation();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchInitialQuery, setSearchInitialQuery] = useState("");
+  const { t } = useLanguage();
 
   const whatsappUrl = `https://wa.me/${config.whatsapp}?text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20a%20academia.`;
 
@@ -48,11 +51,11 @@ export function Layout({ children }: { children: ReactNode }) {
           <div className="flex items-center gap-3 sm:gap-4 min-w-0">
             {/* Tag Dojo Digital para Desktop */}
             <span className="text-[#BC002D] font-bold text-xs sm:text-sm tracking-[0.2em] uppercase italic hidden lg:block shrink-0">
-              Dojo Digital
+              {t("header.digitalDojo")}
             </span>
             <div className="hidden lg:block h-4 w-[1px] bg-gray-300"></div>
             <span className="text-gray-600 text-xs hidden lg:block truncate">
-              Estudo e Disciplina
+              {t("header.studyDiscipline")}
             </span>
             
             {/* Marca Madeira Karate para Mobile e Tablet */}
@@ -77,6 +80,10 @@ export function Layout({ children }: { children: ReactNode }) {
 
           {/* Área de Busca e Ações */}
           <div className="flex items-center gap-2 sm:gap-3">
+            <div className="hidden sm:block">
+              <LanguageSelector compact />
+            </div>
+
             {/* Botão de Carrinho / Loja */}
             <Link
               to="/store"
@@ -91,7 +98,7 @@ export function Layout({ children }: { children: ReactNode }) {
               className="flex items-center gap-1.5 text-xs font-bold text-neutral-700 hover:text-karate-red bg-[#F4F4F4] hover:bg-gray-200/80 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-full border border-transparent hover:border-gray-300 transition-all shrink-0 relative"
             >
               <ShoppingBag className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-neutral-700" />
-              <span className="hidden sm:inline">Carrinho</span>
+              <span className="hidden sm:inline">{t("header.cart")}</span>
               {totalItems > 0 && (
                 <span className="bg-karate-red text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center -ml-0.5">
                   {totalItems}
@@ -107,7 +114,7 @@ export function Layout({ children }: { children: ReactNode }) {
               className="flex items-center gap-1.5 text-xs font-bold text-neutral-700 hover:text-karate-red bg-[#F4F4F4] hover:bg-gray-200/80 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-full border border-transparent hover:border-gray-300 transition-all shrink-0"
             >
               <GraduationCap className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-karate-gold" />
-              <span className="hidden sm:inline">Área do Aluno</span>
+              <span className="hidden sm:inline">{t("header.studentArea")}</span>
             </Link>
 
             {/* Botão de Instalação PWA Header */}
@@ -121,9 +128,9 @@ export function Layout({ children }: { children: ReactNode }) {
             >
               <Search className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-500 group-hover:text-karate-red transition-colors shrink-0" />
               <span className="hidden sm:inline-block text-gray-600 group-hover:text-gray-900 truncate max-w-[140px] md:max-w-[200px]">
-                Buscar técnica ou kata...
+                {t("header.search")}
               </span>
-              <span className="sm:hidden text-xs text-gray-600">Buscar</span>
+              <span className="sm:hidden text-xs text-gray-600">{t("nav.search")}</span>
               <kbd className="hidden md:inline-flex items-center gap-0.5 text-[10px] bg-white border border-gray-300 px-1.5 py-0.5 rounded text-gray-600 font-mono">
                 ⌘K
               </kbd>
@@ -148,7 +155,7 @@ export function Layout({ children }: { children: ReactNode }) {
         <footer className="bg-[#111111] shrink-0 px-4 py-4 lg:py-3 border-t border-neutral-800 mb-[64px] lg:mb-0">
           <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-3">
             <p className="text-[9px] sm:text-[10px] text-neutral-400 tracking-[0.18em] lg:tracking-[0.25em] uppercase text-center lg:text-left">
-              O conteúdo educativo não substitui a orientação presencial de um sensei qualificado.
+              {t("footer.educationDisclaimer")}
             </p>
 
             <a
@@ -169,7 +176,7 @@ export function Layout({ children }: { children: ReactNode }) {
                 }}
               />
               <span className="text-[9px] sm:text-[10px] text-neutral-400 whitespace-nowrap">
-                Desenvolvido por <strong className="font-semibold text-neutral-300">Consult Services</strong>
+                {t("footer.developedBy")} <strong className="font-semibold text-neutral-300">Consult Services</strong>
               </span>
             </a>
           </div>
