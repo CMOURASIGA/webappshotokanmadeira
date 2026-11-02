@@ -9,7 +9,7 @@ import {
 } from "../types/championship";
 
 const DEFAULT_SETTINGS: ChampionshipSettings = {
-  adminPin: "1926",
+  adminPin: "",
   googleSheetId: "1cqiHLjSY7tCKnur0FMH8s5lU2EUbSGB4vC6g2ABTjCM",
   googleAppsScriptUrl: "https://script.google.com/macros/s/AKfycbzii8AcyaBTOUDiDW60pubiuxNgSS5ldXcZaIFsFyAUMwIURQJn62z9JPVlg8iUIzU/exec"
 };
@@ -25,7 +25,7 @@ function loadLocalValidationSettings(): ChampionshipSettings {
     return {
       ...DEFAULT_SETTINGS,
       ...parsed,
-      adminPin: parsed.adminPin || DEFAULT_SETTINGS.adminPin,
+      adminPin: "",
       googleSheetId: parsed.googleSheetId || DEFAULT_SETTINGS.googleSheetId,
       googleAppsScriptUrl: parsed.googleAppsScriptUrl || DEFAULT_SETTINGS.googleAppsScriptUrl
     };
@@ -697,8 +697,7 @@ export const championshipService = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          googleAppsScriptUrl: settings.googleAppsScriptUrl,
-          newAdminPin: settings.adminPin
+          googleAppsScriptUrl: settings.googleAppsScriptUrl
         })
       });
     } catch (e) {
@@ -707,8 +706,19 @@ export const championshipService = {
   },
 
   async verifyAdminPin(enteredPin: string): Promise<boolean> {
-    const localSettings = loadLocalValidationSettings();
-    return enteredPin.trim() === String(localSettings.adminPin || DEFAULT_SETTINGS.adminPin).trim();
+    try {
+      const res = await fetch("/api/admin-auth", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-pin": enteredPin.trim()
+        },
+        body: JSON.stringify({ pin: enteredPin.trim() })
+      });
+      return res.ok;
+    } catch {
+      return false;
+    }
   },
 
   // --- Integração com Google Sheets (CSV & Apps Script Webhook Seguro) ---
