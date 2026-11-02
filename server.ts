@@ -11,6 +11,7 @@ const __dirname = path.dirname(__filename);
 const DATA_FILE = path.resolve(__dirname, 'data', 'championships_store.json');
 const GOOGLE_SHEET_ID = '1cqiHLjSY7tCKnur0FMH8s5lU2EUbSGB4vC6g2ABTjCM';
 const DEFAULT_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzlvJ68P0WmpFeWiqeZ9lu26mskgkgmoLN4Rz5AVrZA8NaILcc_RBtffmsjQmiRucU/exec';
+const ADMIN_PIN = String(process.env.MADEIRA_ADMIN_PIN || '').trim();
 
 interface StoreData {
   championships: any[];
@@ -38,7 +39,7 @@ function loadStore(): StoreData {
         storeOrders: Array.isArray(parsed.storeOrders) ? parsed.storeOrders : [],
         storeOrderItems: Array.isArray(parsed.storeOrderItems) ? parsed.storeOrderItems : [],
         settings: {
-          adminPin: parsed.settings?.adminPin || '1926',
+          adminPin: ADMIN_PIN,
           googleSheetId: parsed.settings?.googleSheetId || GOOGLE_SHEET_ID,
           googleAppsScriptUrl: parsed.settings?.googleAppsScriptUrl || DEFAULT_APPS_SCRIPT_URL,
           webhookSecret: parsed.settings?.webhookSecret || 'madeira_sensei_secret_2026'
@@ -56,7 +57,7 @@ function loadStore(): StoreData {
     storeOrders: [],
     storeOrderItems: [],
     settings: {
-      adminPin: '1926',
+      adminPin: ADMIN_PIN,
       googleSheetId: GOOGLE_SHEET_ID,
       googleAppsScriptUrl: DEFAULT_APPS_SCRIPT_URL,
       webhookSecret: 'madeira_sensei_secret_2026'
@@ -419,21 +420,31 @@ async function startServer() {
   // ----------------------------------------------------
   // API: Admin Authentication
   // ----------------------------------------------------
-  app.post('/api/admin/auth', (req, res) => {
-    const { pin } = req.body;
-    const store = loadStore();
-    const correctPin = store.settings.adminPin || '1926';
+  const handleAdminAuth = (req: any, res: any) => {
+    const enteredPin = String(req.headers['x-admin-pin'] || req.body?.pin || '').trim();
 
-    if (String(pin).trim() === String(correctPin).trim()) {
-      return res.json({ 
-        success: true, 
-        token: `madeira_session_${Date.now()}`,
-        disclaimer: 'Acesso operacional: autenticação por PIN administrativo do Dojo.' 
+    if (!ADMIN_PIN) {
+      return res.status(503).json({
+        success: false,
+        message: 'PIN administrativo não configurado no ambiente.'
       });
     }
 
-    return res.status(401).json({ success: false, message: 'PIN incorreto. Verifique com a comissão técnica.' });
-  });
+    if (enteredPin === ADMIN_PIN) {
+      return res.json({
+        success: true,
+        disclaimer: 'Acesso operacional: autenticação por PIN administrativo do Dojo.'
+      });
+    }
+
+    return res.status(401).json({
+      success: false,
+      message: 'PIN incorreto. Verifique com a comissão técnica.'
+    });
+  };
+
+  app.post('/api/admin/auth', handleAdminAuth);
+  app.post('/api/admin-auth', handleAdminAuth);
 
   // ----------------------------------------------------
   // API: Settings
@@ -450,15 +461,11 @@ async function startServer() {
 
   app.post('/api/settings', (req, res) => {
     const store = loadStore();
-    const { googleAppsScriptUrl, newAdminPin } = req.body;
+    const { googleAppsScriptUrl } = req.body;
 
     if (googleAppsScriptUrl !== undefined) {
       store.settings.googleAppsScriptUrl = String(googleAppsScriptUrl).trim();
     }
-    if (newAdminPin && String(newAdminPin).trim().length >= 4) {
-      store.settings.adminPin = String(newAdminPin).trim();
-    }
-
     saveStore(store);
     res.json({ success: true, message: 'Configurações atualizadas com sucesso!' });
   });
