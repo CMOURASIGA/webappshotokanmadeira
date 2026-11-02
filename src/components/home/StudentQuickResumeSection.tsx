@@ -2,8 +2,15 @@ import { Link } from "react-router-dom";
 import { GraduationCap, Play, Star, ListChecks, ArrowRight, Clock, Award, Smartphone, ShieldCheck } from "lucide-react";
 import { useStudent } from "../../contexts/StudentContext";
 import { belts } from "../../data/mockData";
+import { useLanguage } from "../../i18n/LanguageContext";
 
 export function StudentQuickResumeSection() {
+  const { language } = useLanguage();
+  const copy = language === "en"
+    ? { continueStudy: "Continue Studying", recent: "Recently viewed", movements: "movements memorized", resume: "Resume", technique: "Technique", student: "Student Area", favorites: "favorites", exam: "Exam", saved: "Saved on this device", title: "Student Area & Individual Training", new: "New", intro: "Save favorite Kata, track memorized movements and keep Sensei notes on your device.", access: "Open Student Area" }
+    : language === "ja"
+    ? { continueStudy: "学習を続ける", recent: "最近見た内容", movements: "動作を記憶済み", resume: "再開", technique: "技術", student: "会員エリア", favorites: "お気に入り", exam: "審査", saved: "この端末に保存", title: "会員エリア・個人稽古", new: "新機能", intro: "お気に入りの形、覚えた動作、先生からのメモをこの端末に保存できます。", access: "会員エリアを開く" }
+    : { continueStudy: "{copy.continueStudy}", recent: "{copy.recent}", movements: "{copy.movements}", resume: "Retomar", technique: "Técnica", student: "Área do Aluno", favorites: "favoritos", exam: "Exame", saved: "{copy.saved}", title: "{copy.title}", new: "{copy.new}", intro: "{copy.intro}", access: "Acessar Área do Aluno" };
   const { 
     lastStudy, 
     getKataProgress, 
@@ -74,7 +81,7 @@ export function StudentQuickResumeSection() {
                 to={lastStudy.type === "kata" ? `/katas/${lastStudy.id}` : `/techniques/${lastStudy.id}`}
                 className="inline-flex items-center justify-center gap-2 bg-karate-red hover:bg-red-700 text-white font-bold px-5 py-2.5 rounded-xl transition-all shadow-sm text-xs sm:text-sm flex-1 sm:flex-initial"
               >
-                <span>Retomar {lastStudy.type === "kata" ? "Kata" : "Técnica"}</span>
+                <span>{copy.resume} {lastStudy.type === "kata" ? "Kata" : copy.technique}</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
 
@@ -83,7 +90,7 @@ export function StudentQuickResumeSection() {
                 className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border border-neutral-200 hover:bg-neutral-50 text-neutral-700 font-bold text-xs transition-colors"
               >
                 <GraduationCap className="w-4 h-4 text-karate-gold" />
-                <span>Área do Aluno</span>
+                <span>{copy.student}</span>
               </Link>
             </div>
 
@@ -91,12 +98,12 @@ export function StudentQuickResumeSection() {
               <div className="flex items-center gap-3">
                 <Link to="/student-area?tab=favorites" className="hover:text-karate-gold transition-colors flex items-center gap-1">
                   <Star className="w-3.5 h-3.5 fill-karate-gold text-karate-gold" />
-                  <span>{favorites.length} favoritos</span>
+                  <span>{favorites.length} {copy.favorites}</span>
                 </Link>
                 <span>•</span>
                 <Link to="/student-area?tab=exam" className="hover:text-emerald-600 transition-colors flex items-center gap-1">
                   <ListChecks className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>Exame {currentExamBelt.name} ({examProgress.percentage}%)</span>
+                  <span>{copy.exam} {currentExamBelt.name} ({examProgress.percentage}%)</span>
                 </Link>
               </div>
 
@@ -134,7 +141,7 @@ export function StudentQuickResumeSection() {
               to="/student-area"
               className="inline-flex items-center gap-1.5 bg-neutral-900 hover:bg-black text-white px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-sm"
             >
-              <span>Acessar Área do Aluno</span>
+              <span>{copy.access}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
