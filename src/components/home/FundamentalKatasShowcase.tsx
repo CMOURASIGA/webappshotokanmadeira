@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { BookOpen, ArrowRight, Play, Layers, Compass } from "lucide-react";
 import { Kata } from "../../types";
+import { useLanguage } from "../../i18n/LanguageContext";
 
 interface FundamentalKatasShowcaseProps {
   katas: Kata[];
@@ -8,6 +9,12 @@ interface FundamentalKatasShowcaseProps {
 }
 
 export function FundamentalKatasShowcase({ katas, totalKatas }: FundamentalKatasShowcaseProps) {
+  const { language } = useLanguage();
+  const copy = language === "en"
+    ? { foundation: "Style Foundations", title: "Fundamental Kata", intro: "The technical foundation of Shotokan: the five Heian Kata and Tekki Shodan, emphasizing posture, movement and embusen.", video: "Heian Series on Video", all: "View all", movements: "JKA mov.", updating: "Sequence being updated", study: "Study Kata and Movements", details: "View Kata details" }
+    : language === "ja"
+    ? { foundation: "流派の基礎", title: "基本の形", intro: "Shotokan の技術的な基礎となる平安五段階と鉄騎初段。立ち方、移動、演武線を学びます。", video: "平安シリーズ動画", all: "すべて見る", movements: "JKA 動作", updating: "動作順を更新中", study: "形と動作を学ぶ", details: "形の詳細を見る" }
+    : { foundation: "Fundamentos do Estilo", title: "{copy.title}", intro: "A base técnica do Shotokan. Os 5 Katas da série Heian e o Tekki Shodan para fortalecimento de postura, deslocamento e embusen.", video: "{copy.video}", all: "Ver todos os", movements: "mov. JKA", updating: "{copy.updating}", study: "Estudar Kata e Movimentos", details: "Ver detalhes do Kata" };
   // Fundamental katas for foundational study: Heian 1-5 + Tekki Shodan
   const fundamentalIds = [
     "heian-shodan",
@@ -31,13 +38,13 @@ export function FundamentalKatasShowcase({ katas, totalKatas }: FundamentalKatas
         <div>
           <div className="flex items-center gap-2 text-karate-red font-bold text-xs uppercase tracking-wider mb-1">
             <Compass className="w-4 h-4" />
-            <span>Fundamentos do Estilo</span>
+            <span>{copy.foundation}</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-black font-jp tracking-tight text-neutral-900">
             Katas Fundamentais
           </h2>
           <p className="text-sm text-neutral-600 mt-0.5">
-            A base técnica do Shotokan. Os 5 Katas da série Heian e o Tekki Shodan para fortalecimento de postura e embusen.
+            {copy.intro}
           </p>
         </div>
 
@@ -53,7 +60,7 @@ export function FundamentalKatasShowcase({ katas, totalKatas }: FundamentalKatas
             to="/katas"
             className="inline-flex items-center gap-1.5 text-sm font-bold text-karate-red hover:text-red-700 transition-colors group"
           >
-            <span>Ver todos os {displayedTotalKatas} Katas</span>
+            <span>{copy.all} {displayedTotalKatas} Katas</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
           </Link>
         </div>
@@ -78,7 +85,7 @@ export function FundamentalKatasShowcase({ katas, totalKatas }: FundamentalKatas
                   {kata.movementsCount > 0 && (
                     <span className="flex items-center gap-1 font-mono" title="Quantidade oficial de movimentos segundo JKA Headquarters">
                       <Layers className="w-3.5 h-3.5 text-neutral-400" />
-                      {kata.movementsCount} mov. JKA
+                      {kata.movementsCount} {copy.movements}
                     </span>
                   )}
                   {(!kata.movements || kata.movements.length === 0) && (
@@ -110,7 +117,7 @@ export function FundamentalKatasShowcase({ katas, totalKatas }: FundamentalKatas
             <div className="pt-5 mt-5 border-t border-neutral-100 flex items-center justify-between text-xs font-bold text-neutral-700 group-hover:text-karate-red transition-colors">
               <span className="flex items-center gap-1.5">
                 <Play className="w-3.5 h-3.5 fill-current text-karate-red" />
-                <span>{kata.movements && kata.movements.length > 0 ? "Estudar Kata e Movimentos" : "Ver detalhes do Kata"}</span>
+                <span>{kata.movements && kata.movements.length > 0 ? copy.study : copy.details}</span>
               </span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </div>
