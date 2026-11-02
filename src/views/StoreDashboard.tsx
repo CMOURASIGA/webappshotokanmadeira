@@ -28,10 +28,10 @@ const emptyProduct = (): StoreProductAdmin => ({
 });
 
 export function StoreDashboard() {
-  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(() => sessionStorage.getItem("madeira_admin_auth") === "true");
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
   const [enteredPin, setEnteredPin] = useState("");
   const [pinError, setPinError] = useState("");
-  const adminPin = enteredPin || "1926";
+  const adminPin = enteredPin.trim();
 
   const [tab, setTab] = useState<Tab>("pedidos");
   const [orders, setOrders] = useState<StoreOrder[]>([]);
@@ -76,7 +76,6 @@ export function StoreDashboard() {
     e.preventDefault();
     setPinError("");
     if (await madeiraStoreService.verifyAdminPin(enteredPin)) {
-      sessionStorage.setItem("madeira_admin_auth", "true");
       setIsAdminAuthenticated(true);
     } else {
       setPinError("PIN incorreto. Tente novamente.");
