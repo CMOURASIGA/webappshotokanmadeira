@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, ChevronLeft, ChevronRight, Images, Loader2, X, AlertCircle } from "lucide-react";
+import { useLanguage } from "../i18n/LanguageContext";
 
 type GalleryPhoto = {
   id: string;
@@ -27,6 +28,12 @@ export function GalleryDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const { language } = useLanguage();
+  const copy = language === "en"
+    ? { load: "Loading photos from Google Drive...", loadError: "Unable to open this gallery", back: "Back to Events & Photos", events: "Events & Photos", photos: "photos", gallery: "Gallery", empty: "This folder does not have published photos yet.", close: "Close photo", previous: "Previous photo", next: "Next photo", of: "of", error: "Error loading gallery." }
+    : language === "ja"
+    ? { load: "Google Drive から写真を読み込み中...", loadError: "このギャラリーを開けませんでした", back: "イベント・写真に戻る", events: "イベント・写真", photos: "枚", gallery: "ギャラリー", empty: "このフォルダにはまだ公開写真がありません。", close: "写真を閉じる", previous: "前の写真", next: "次の写真", of: "/", error: "ギャラリーの読み込みに失敗しました。" }
+    : { load: "{copy.load}", loadError: "{copy.loadError}", back: "{copy.back}", events: "{copy.events}", photos: "fotos", gallery: "{copy.gallery}", empty: "{copy.empty}", close: "Fechar foto", previous: "Foto anterior", next: "Próxima foto", of: "de", error: copy.error };
 
   useEffect(() => {
     if (!id) return;
@@ -36,11 +43,11 @@ export function GalleryDetail() {
     fetch(`/api/gallery-photos?galleryId=${encodeURIComponent(id)}`)
       .then(async res => {
         const payload = await res.json();
-        if (!res.ok) throw new Error(payload?.error || "Erro ao carregar galeria.");
+        if (!res.ok) throw new Error(payload?.error || copy.error);
         return payload;
       })
       .then(setData)
-      .catch(err => setError(err.message || "Erro ao carregar galeria."))
+      .catch(err => setError(err.message || copy.error))
       .finally(() => setLoading(false));
   }, [id]);
 
@@ -101,7 +108,7 @@ export function GalleryDetail() {
           </Link>
           <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-500">
             <Images className="w-4 h-4" />
-            {data.total} fotos
+            {data.total} {copy.photos}
           </span>
         </div>
 
@@ -145,7 +152,7 @@ export function GalleryDetail() {
             type="button"
             onClick={() => setSelectedIndex(null)}
             className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center"
-            aria-label="Fechar foto"
+            aria-label={copy.close}
           >
             <X className="w-6 h-6" />
           </button>
@@ -156,7 +163,7 @@ export function GalleryDetail() {
                 type="button"
                 onClick={() => setSelectedIndex((selectedIndex - 1 + data.photos.length) % data.photos.length)}
                 className="absolute left-3 sm:left-6 w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center"
-                aria-label="Foto anterior"
+                aria-label={copy.previous}
               >
                 <ChevronLeft className="w-7 h-7" />
               </button>
@@ -164,7 +171,7 @@ export function GalleryDetail() {
                 type="button"
                 onClick={() => setSelectedIndex((selectedIndex + 1) % data.photos.length)}
                 className="absolute right-3 sm:right-6 w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center"
-                aria-label="Próxima foto"
+                aria-label={copy.next}
               >
                 <ChevronRight className="w-7 h-7" />
               </button>
@@ -178,7 +185,7 @@ export function GalleryDetail() {
               className="max-w-full max-h-[82vh] object-contain rounded-lg"
             />
             <span className="text-xs text-white/70">
-              {selectedIndex + 1} de {data.photos.length}
+              {selectedIndex + 1} {copy.of} {data.photos.length}
             </span>
           </div>
         </div>
