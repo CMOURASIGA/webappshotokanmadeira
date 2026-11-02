@@ -1,5 +1,6 @@
 import { Image as ImageIcon } from "lucide-react";
 import { GalleriesSection } from "../components/gallery/GalleriesSection";
+import { useLanguage } from "../i18n/LanguageContext";
 
 // Helper to parse YYYY-MM-DD or DD/MM/YYYY
 function parseDateToTimestamp(dateStr?: string): number | null {
@@ -39,15 +40,14 @@ function formatEventDisplayDate(dateStr?: string, formattedDateFallback?: string
 }
 
 export function Events() {
+  const { t } = useLanguage();
   return (
     <div className="space-y-8 animate-in fade-in duration-500 max-w-6xl mx-auto w-full pb-24">
       <div className="flex items-center gap-3 border-b border-neutral-200 pb-4">
         <ImageIcon className="w-8 h-8 text-karate-red" />
         <div>
-          <h2 className="text-2xl font-black uppercase tracking-tight">Eventos & Fotos</h2>
-          <p className="text-neutral-500 text-sm">
-            Galerias gerais e fotos dos eventos da Madeira Karate.
-          </p>
+          <h2 className="text-2xl font-black uppercase tracking-tight">{t("events.title")}</h2>
+          <p className="text-neutral-500 text-sm">{t("events.subtitle")}</p>
         </div>
       </div>
 
