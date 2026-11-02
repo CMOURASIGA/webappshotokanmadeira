@@ -1,15 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- 
-    Arquitetura SPA com HashRouter:
-    Rotas internas utilizam fragmentos de hash (#/...) e não representam 
-    documentos HTTP independentes para indexação por crawlers tradicionais.
-    A URL canônica indexável e acessível via requisições HTTP é a raiz da aplicação.
-  -->
-  <url>
-    <loc>https://www.madeirakarate.com.br/</loc>
-    <lastmod>2026-09-19</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
-  </url>
+  <url><loc>https://www.madeirakarate.com.br/</loc><lastmod>2026-11-02</lastmod></url>
+  <url><loc>https://www.madeirakarate.com.br/historia-karate-shotokan/</loc><lastmod>2026-11-02</lastmod></url>
+  <url><loc>https://www.madeirakarate.com.br/fundamentos-karate/</loc><lastmod>2026-11-02</lastmod></url>
+  <url><loc>https://www.madeirakarate.com.br/faixas-graduacao-karate/</loc><lastmod>2026-11-02</lastmod></url>
+  <url><loc>https://www.madeirakarate.com.br/modalidades-artes-marciais/</loc><lastmod>2026-11-02</lastmod></url>
 </urlset>
