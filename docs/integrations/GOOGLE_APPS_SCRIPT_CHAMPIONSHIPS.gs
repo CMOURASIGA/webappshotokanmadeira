@@ -398,7 +398,9 @@ function doPost(e) {
       while (files.hasNext()) {
         var file = files.next();
         var mimeType = String(file.getMimeType() || "");
-        if (mimeType.indexOf("image/") !== 0) continue;
+        var isImage = mimeType.indexOf("image/") === 0;
+        var isVideo = mimeType.indexOf("video/") === 0;
+        if (!isImage && !isVideo) continue;
 
         total++;
         if (photos.length >= requestedLimit) continue;
@@ -408,8 +410,12 @@ function doPost(e) {
           id: fileId,
           name: file.getName(),
           mimeType: mimeType,
+          mediaType: isVideo ? "video" : "image",
           thumbnailUrl: "https://drive.google.com/thumbnail?id=" + encodeURIComponent(fileId) + "&sz=w1200",
-          url: "https://drive.google.com/thumbnail?id=" + encodeURIComponent(fileId) + "&sz=w2400",
+          url: isVideo
+            ? "https://drive.google.com/file/d/" + encodeURIComponent(fileId) + "/preview"
+            : "https://drive.google.com/thumbnail?id=" + encodeURIComponent(fileId) + "&sz=w2400",
+          previewUrl: "https://drive.google.com/file/d/" + encodeURIComponent(fileId) + "/preview",
           viewUrl: "https://drive.google.com/file/d/" + encodeURIComponent(fileId) + "/view",
           updatedAt: file.getLastUpdated().toISOString()
         });
