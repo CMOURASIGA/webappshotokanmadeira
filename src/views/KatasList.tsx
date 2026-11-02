@@ -1,16 +1,23 @@
 import { Link, useNavigate } from "react-router-dom";
 import { katas } from "../data/mockData";
 import { Search, ArrowLeft } from "lucide-react";
+import { useLanguage } from "../i18n/LanguageContext";
 
 export function KatasList() {
   const navigate = useNavigate();
+  const { language, t } = useLanguage();
+  const copy = language === "en"
+    ? { subtitle: "Fundamental forms of Shotokan Karate", allLevels: "All Levels", beginner: "Beginner", intermediate: "Intermediate", advanced: "Advanced", allGroups: "All Groups", movements: "official JKA movements", updating: "Sequence being updated" }
+    : language === "ja"
+    ? { subtitle: "Shotokan Karate の基本となる形", allLevels: "すべてのレベル", beginner: "初級", intermediate: "中級", advanced: "上級", allGroups: "すべてのグループ", movements: "JKA公式動作", updating: "動作順を更新中" }
+    : { subtitle: "{copy.subtitle}", allLevels: "Todos os Níveis", beginner: "Iniciante", intermediate: "Intermediário", advanced: "Avançado", allGroups: "Todos os Grupos", movements: "mov. oficiais JKA", updating: "{copy.updating}" };
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       <button 
         onClick={() => navigate(-1)}
         className="flex items-center gap-2 text-sm text-neutral-500 hover:text-karate-red font-medium transition-colors"
       >
-        <ArrowLeft className="w-4 h-4" /> Voltar
+        <ArrowLeft className="w-4 h-4" /> {t("common.back")}
       </button>
 
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -21,13 +28,13 @@ export function KatasList() {
         
         <div className="flex gap-2">
           <select className="bg-white border border-neutral-200 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-karate-red">
-            <option>Todos os Níveis</option>
-            <option>Iniciante</option>
-            <option>Intermediário</option>
-            <option>Avançado</option>
+            <option>{copy.allLevels}</option>
+            <option>{copy.beginner}</option>
+            <option>{copy.intermediate}</option>
+            <option>{copy.advanced}</option>
           </select>
           <select className="bg-white border border-neutral-200 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-karate-red">
-            <option>Todos os Grupos</option>
+            <option>{copy.allGroups}</option>
             <option>Heian</option>
             <option>Tekki</option>
           </select>
@@ -53,7 +60,7 @@ export function KatasList() {
                 <span className="bg-karate-light text-karate-dark px-2 py-1 rounded font-medium">{kata.group}</span>
                 {kata.movementsCount > 0 && (
                   <span className="bg-karate-light text-karate-dark px-2 py-1 rounded font-medium">
-                    {kata.movementsCount} mov. oficiais JKA
+                    {kata.movementsCount} {copy.movements}
                   </span>
                 )}
                 {(!kata.movements || kata.movements.length === 0) && (
