@@ -4,10 +4,17 @@ import { techniques } from "../data/mockData";
 import { ArrowLeft, CheckCircle2, XCircle, Info, Star, GraduationCap } from "lucide-react";
 import { useAppData } from "../contexts/AppDataContext";
 import { useStudent } from "../contexts/StudentContext";
+import { useLanguage } from "../i18n/LanguageContext";
 
 export function TechniqueDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { language } = useLanguage();
+  const copy = language === "en"
+    ? { notFound: "Technique not found.", back: "Back", studentArea: "View in Student Area", removeFavorite: "Remove from Favorites", addFavorite: "Add to Favorites", favorited: "Favorited", favorite: "Favorite", imageUnavailable: "Image temporarily unavailable", video: "Technique video", steps: "Step by Step", commonErrors: "Common Errors", application: "Practical Application" }
+    : language === "ja"
+    ? { notFound: "技が見つかりません。", back: "戻る", studentArea: "会員エリアで見る", removeFavorite: "お気に入りから削除", addFavorite: "お気に入りに追加", favorited: "お気に入り済み", favorite: "お気に入り", imageUnavailable: "画像は一時的に表示できません", video: "技の動画", steps: "手順", commonErrors: "よくある誤り", application: "実践での応用" }
+    : { notFound: "Técnica não encontrada.", back: "Voltar", studentArea: "Ver na Área do Aluno", removeFavorite: "Remover dos Favoritos", addFavorite: "Adicionar aos Favoritos", favorited: "Favoritado", favorite: "Favoritar", imageUnavailable: "Imagem temporariamente indisponível", video: "Vídeo da Técnica", steps: "Passo a Passo", commonErrors: "Erros Comuns", application: "Aplicação Prática" };
   const { techniqueVideos, techniqueImages } = useAppData();
   const { recordStudy, isFavorite, toggleFavorite } = useStudent();
   
@@ -26,7 +33,7 @@ export function TechniqueDetail() {
   }, [tech?.id, recordStudy]);
 
   if (!tech) {
-    return <div className="p-8 text-center">Técnica não encontrada.</div>;
+    return <div className="p-8 text-center">{copy.notFound}</div>;
   }
 
   const videoUrl = techniqueVideos[tech.id] || tech.videoUrl;
@@ -40,7 +47,7 @@ export function TechniqueDetail() {
           onClick={() => navigate(-1)}
           className="flex items-center gap-2 text-sm text-neutral-500 hover:text-karate-red font-medium transition-colors"
         >
-          <ArrowLeft className="w-4 h-4" /> Voltar
+          <ArrowLeft className="w-4 h-4" /> {copy.back}
         </button>
 
         <Link
@@ -48,7 +55,7 @@ export function TechniqueDetail() {
           className="inline-flex items-center gap-1.5 text-xs font-bold text-neutral-600 hover:text-neutral-900 bg-white border border-neutral-200 px-3 py-1.5 rounded-lg transition-colors"
         >
           <GraduationCap className="w-3.5 h-3.5 text-karate-gold" />
-          <span>Ver na Área do Aluno</span>
+          <span>{copy.studentArea}</span>
         </Link>
       </div>
 
@@ -77,10 +84,10 @@ export function TechniqueDetail() {
                     ? "bg-karate-gold text-neutral-950 shadow-md"
                     : "bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm border border-white/20"
                 }`}
-                title={isFav ? "Remover dos Favoritos" : "Adicionar aos Favoritos"}
+                title={isFav ? copy.removeFavorite : copy.addFavorite}
               >
                 <Star className={`w-3.5 h-3.5 ${isFav ? "fill-neutral-950 text-neutral-950" : "text-white"}`} />
-                <span>{isFav ? "Favoritado" : "Favoritar"}</span>
+                <span>{isFav ? copy.favorited : copy.favorite}</span>
               </button>
             </div>
 
@@ -104,7 +111,7 @@ export function TechniqueDetail() {
                       if (parent) {
                         const fallback = document.createElement('div');
                         fallback.className = 'py-12 text-center text-neutral-400 text-sm';
-                        fallback.innerText = 'Imagem temporariamente indisponível';
+                        fallback.innerText = copy.imageUnavailable;
                         parent.appendChild(fallback);
                       }
                     }} 
@@ -119,7 +126,7 @@ export function TechniqueDetail() {
                     width="100%" 
                     height="100%" 
                     src={videoUrl} 
-                    title={`Vídeo da Técnica ${tech.nameJp}`}
+                    title={`${copy.video} ${tech.nameJp}`}
                     frameBorder="0" 
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                     allowFullScreen
@@ -136,7 +143,7 @@ export function TechniqueDetail() {
             <section>
               <h2 className="text-2xl font-bold mb-4 font-jp border-b border-neutral-100 pb-2 flex items-center gap-2">
                 <CheckCircle2 className="text-green-600 w-6 h-6" />
-                Passo a Passo
+                {copy.steps}
               </h2>
               <div className="space-y-4">
                 {tech.steps.map((step, i) => (
@@ -155,7 +162,7 @@ export function TechniqueDetail() {
             <section className="bg-red-50 p-6 rounded-xl border border-red-100">
               <h2 className="text-xl font-bold mb-4 font-jp text-red-900 flex items-center gap-2">
                 <XCircle className="text-red-600 w-5 h-5" />
-                Erros Comuns
+                {copy.commonErrors}
               </h2>
               <ul className="space-y-3">
                 {tech.commonErrors.map((err, i) => (
@@ -170,7 +177,7 @@ export function TechniqueDetail() {
             <section className="bg-karate-gold/10 p-6 rounded-xl border border-karate-gold/20">
               <h2 className="text-xl font-bold mb-3 font-jp text-karate-dark flex items-center gap-2">
                 <Info className="text-karate-gold w-5 h-5" />
-                Aplicação Prática
+                {copy.application}
               </h2>
               <p className="text-sm text-neutral-700">{tech.application}</p>
             </section>
