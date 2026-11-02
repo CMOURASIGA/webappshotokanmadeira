@@ -36,10 +36,10 @@ export function StudentArea() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { language, locale } = useLanguage();
   const copy = language === "en"
-    ? { autonomous:"Self-directed Training & Goals", title:"Student Area", intro:"Track your technical development in Shotokan Karate, resume your studies, save favorite Kata and record individual corrections provided by your Sensei during in-person training.", last:"Last Study", none:"None yet", favorites:"Saved Favorites", beltGoal:"Belt Goal", notebook:"Technical Notebook", notes:"notes", local:"Individual Storage on this Device", private:"Private & Offline", localText:"Your notes, favorites and checklists are stored directly on this device. Each student keeps their own data on their own device.", continue:"Continue Studying", fav:"Favorites", exam:"Exam Checklist", notebookTab:"Notes", lastKata:"Last Kata Studied", lastTech:"Last Technique Studied", memorized:"Movements memorized", resume:"Resume Study", noRecent:"No recent study started", noRecentText:"Open any Kata or technique and your progress will be saved here automatically so you can resume it later.", exploreKata:"Explore Kata", exploreTech:"Explore Techniques", recentHistory:"Recent Training History", clearHistory:"Clear History", all:"All", techniques:"Techniques", newNote:"New Note", noFavorites:"No favorites saved yet", noNotes:"No notes recorded yet", sourceNotice:"Official technical and administrative requirements from JKA Brasil are preserved in the source language to avoid altering their meaning. Interface labels are translated.", save:"Save", cancel:"Cancel", noteTitle:"Title", noteText:"Note", related:"Related content", noRelation:"No relation" }
+    ? { autonomous:"Self-directed Training & Goals", title:"Student Area", intro:"Track your technical development in Shotokan Karate, resume your studies, save favorite Kata and record individual corrections provided by your Sensei during in-person training.", last:"Last Study", none:"None yet", favorites:"Saved Favorites", beltGoal:"Belt Goal", notebook:"Technical Notebook", notes:"notes", local:"Individual Storage on this Device", private:"Private & Offline", localText:"Your notes, favorites and checklists are stored directly on this device. Each student keeps their own data on their own device.", continue:"Continue Studying", fav:"Favorites", exam:"Exam Checklist", notebookTab:"Notes", lastKata:"Last Kata Studied", lastTech:"Last Technique Studied", memorized:"Movements memorized", resume:"Resume Study", noRecent:"No recent study started", noRecentText:"Open any Kata or technique and your progress will be saved here automatically so you can resume it later.", exploreKata:"Explore Kata", exploreTech:"Explore Techniques", recentHistory:"Recent Training History", clearHistory:"Clear History", all:"All", techniques:"Techniques", newNote:"New Note", noFavorites:"No favorites saved yet", noNotes:"No notes recorded yet", sourceNotice:"Official technical and administrative requirements from JKA Brasil are preserved in the source language to avoid altering their meaning. Interface labels are translated.", save:"Save", cancel:"Cancel", noteTitle:"Title", noteText:"Note", related:"Related content", noRelation:"No relation", viewTech:"View Techniques", openSheet:"Open Sheet", previousGrade:"Previous grade:", noneGeneral:"None (General)", techniqueOption:"Technique", senseiNote:"Sensei Note", examReadiness:"Exam Readiness" }
     : language === "ja"
-    ? { autonomous:"自主稽古・目標", title:"会員エリア", intro:"Shotokan Karate の技術的な進歩を確認し、学習を再開し、お気に入りの形や先生からの個別指導メモを保存できます。", last:"最近の学習", none:"まだありません", favorites:"お気に入り", beltGoal:"帯の目標", notebook:"技術ノート", notes:"件", local:"この端末への個別保存", private:"非公開・オフライン", localText:"メモ、お気に入り、チェックリストはこの端末に保存されます。各会員のデータは、それぞれの端末で管理されます。", continue:"学習を続ける", fav:"お気に入り", exam:"審査チェックリスト", notebookTab:"ノート", lastKata:"最近学習した形", lastTech:"最近学習した技", memorized:"習得した動作", resume:"学習を再開", noRecent:"最近の学習はありません", noRecentText:"形や技術のページを開くと、学習状況が自動的に保存され、後から再開できます。", exploreKata:"形を見る", exploreTech:"技術を見る", recentHistory:"最近の稽古履歴", clearHistory:"履歴を消去", all:"すべて", techniques:"技術", newNote:"新しいノート", noFavorites:"お気に入りはまだありません", noNotes:"ノートはまだありません", sourceNotice:"JKA Brasil の公式な技術・運用要件は、意味を変えないため原文のまま保持しています。画面の操作表示のみ翻訳しています。", save:"保存", cancel:"キャンセル", noteTitle:"タイトル", noteText:"メモ", related:"関連項目", noRelation:"関連なし" }
-    : { autonomous:"{copy.autonomous}", title:"{copy.title}", intro:"{copy.intro}", last:"{copy.last}", none:copy.none, favorites:"{copy.favorites}", beltGoal:"{copy.beltGoal}", notebook:"{copy.notebook}", notes:"notas", local:"{copy.local}", private:"{copy.private}", localText:"Suas anotações, favoritos e checklists ficam gravados diretamente na memória deste dispositivo. Cada aluno mantém seus dados separados usando seu próprio aparelho.", continue:"Continuar Estudando", fav:"Favoritos", exam:"Checklist de Exame", notebookTab:"Caderno de Anotações", lastKata:"Último Kata Estudado", lastTech:"Última Técnica Estudada", memorized:"Movimentos memorizados", resume:"Retomar Estudo", noRecent:"{copy.noRecent}", noRecentText:"{copy.noRecentText}", exploreKata:"Explorar Katas", exploreTech:"Explorar Técnicas", recentHistory:"Histórico de Treino Recente", clearHistory:"{copy.clearHistory}", all:"Todos", techniques:"Técnicas", newNote:"{copy.newNote}", noFavorites:"{copy.noFavorites}", noNotes:"{copy.noNotes}", sourceNotice:"Os requisitos técnicos e administrativos oficiais da JKA Brasil são preservados no idioma da fonte para evitar alteração de sentido. Os rótulos da interface são traduzidos.", save:"Salvar", cancel:"Cancelar", noteTitle:"Título", noteText:"Anotação", related:"Conteúdo relacionado", noRelation:"Sem relação" };
+    ? { autonomous:"自主稽古・目標", title:"会員エリア", intro:"Shotokan Karate の技術的な進歩を確認し、学習を再開し、お気に入りの形や先生からの個別指導メモを保存できます。", last:"最近の学習", none:"まだありません", favorites:"お気に入り", beltGoal:"帯の目標", notebook:"技術ノート", notes:"件", local:"この端末への個別保存", private:"非公開・オフライン", localText:"メモ、お気に入り、チェックリストはこの端末に保存されます。各会員のデータは、それぞれの端末で管理されます。", continue:"学習を続ける", fav:"お気に入り", exam:"審査チェックリスト", notebookTab:"ノート", lastKata:"最近学習した形", lastTech:"最近学習した技", memorized:"習得した動作", resume:"学習を再開", noRecent:"最近の学習はありません", noRecentText:"形や技術のページを開くと、学習状況が自動的に保存され、後から再開できます。", exploreKata:"形を見る", exploreTech:"技術を見る", recentHistory:"最近の稽古履歴", clearHistory:"履歴を消去", all:"すべて", techniques:"技術", newNote:"新しいノート", noFavorites:"お気に入りはまだありません", noNotes:"ノートはまだありません", sourceNotice:"JKA Brasil の公式な技術・運用要件は、意味を変えないため原文のまま保持しています。画面の操作表示のみ翻訳しています。", save:"保存", cancel:"キャンセル", noteTitle:"タイトル", noteText:"メモ", related:"関連項目", noRelation:"関連なし", viewTech:"技術を見る", openSheet:"詳細を開く", previousGrade:"前段階:", noneGeneral:"なし（一般）", techniqueOption:"技術", senseiNote:"先生のメモ", examReadiness:"審査準備度" }
+    : { autonomous:"Treino Autônomo & Metas", title:"Área do Aluno", intro:"Acompanhe seu desenvolvimento técnico no Karate Shotokan, retome seus estudos, salve Katas favoritos e registre correções individuais recebidas do Sensei durante o treino presencial.", last:"Último Estudo", none:"Nenhum ainda", favorites:"Favoritos Salvos", beltGoal:"Meta de Faixa", notebook:"Caderno Técnico", notes:"notas", local:"Armazenamento Individual neste Dispositivo", private:"Privado & Offline", localText:"Suas anotações, favoritos e checklists ficam gravados diretamente na memória deste dispositivo. Cada aluno mantém seus dados separados usando seu próprio aparelho.", continue:"Continuar Estudando", fav:"Favoritos", exam:"Checklist de Exame", notebookTab:"Caderno de Anotações", lastKata:"Último Kata Estudado", lastTech:"Última Técnica Estudada", memorized:"Movimentos memorizados", resume:"Retomar Estudo", noRecent:"Nenhum estudo recente iniciado", noRecentText:"Abra qualquer Kata ou técnica e seu progresso será salvo aqui automaticamente para você retomar depois.", exploreKata:"Explorar Katas", exploreTech:"Explorar Técnicas", recentHistory:"Histórico de Treino Recente", clearHistory:"Limpar Histórico", all:"Todos", techniques:"Técnicas", newNote:"Nova Anotação", noFavorites:"Nenhum favorito salvo ainda", noNotes:"Nenhuma anotação registrada ainda", sourceNotice:"Os requisitos técnicos e administrativos oficiais da JKA Brasil são preservados no idioma da fonte para evitar alteração de sentido. Os rótulos da interface são traduzidos.", save:"Salvar", cancel:"Cancelar", noteTitle:"Título", noteText:"Anotação", related:"Conteúdo relacionado", noRelation:"Sem relação", viewTech:"Ver Técnicas", openSheet:"Abrir Ficha", previousGrade:"Graduação anterior:", noneGeneral:"Nenhum (Geral)", techniqueOption:"Técnica", senseiNote:"Anotação do Sensei", examReadiness:"Prontidão para Exame" };
   const initialTab = (searchParams.get("tab") as "continue" | "favorites" | "exam" | "notes") || "continue";
   const [activeTab, setActiveTab] = useState<"continue" | "favorites" | "exam" | "notes">(initialTab);
 
@@ -140,7 +140,7 @@ export function StudentArea() {
       });
     } else {
       addTechnicalNote({
-        title: noteTitle || "Anotação do Sensei",
+        title: noteTitle || copy.senseiNote,
         content: noteContent,
         relatedItemType: noteRelatedType === "none" ? undefined : noteRelatedType,
         relatedItemId: noteRelatedType === "none" ? undefined : noteRelatedId,
@@ -544,7 +544,7 @@ export function StudentArea() {
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-neutral-100 text-neutral-800 text-xs font-bold hover:bg-neutral-200 transition-colors border border-neutral-200"
                 >
                   <Shield className="w-3.5 h-3.5" />
-                  <span>Ver Técnicas</span>
+                  <span>{copy.viewTech}</span>
                 </Link>
               </div>
             </div>
@@ -588,7 +588,7 @@ export function StudentArea() {
                       to={fav.type === "kata" ? `/katas/${fav.id}` : `/techniques/${fav.id}`}
                       className="inline-flex items-center gap-1.5 text-xs font-bold text-karate-red hover:text-red-700 transition-colors"
                     >
-                      <span>Abrir Ficha</span>
+                      <span>{copy.openSheet}</span>
                       <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                     </Link>
                   </div>
@@ -684,7 +684,7 @@ export function StudentArea() {
 
               {/* Status do Progresso da Faixa */}
               <div className="bg-neutral-50 p-4 rounded-xl border border-neutral-200/80 sm:min-w-[180px] text-right">
-                <span className="text-xs text-neutral-500 block mb-0.5">Prontidão para Exame</span>
+                <span className="text-xs text-neutral-500 block mb-0.5">{copy.examReadiness}</span>
                 <span className="text-2xl font-black text-neutral-900 font-mono">
                   {examChecklistData.totalCheckable > 0 ? `${examProgress.percentage}%` : "—"}
                 </span>
@@ -724,7 +724,7 @@ export function StudentArea() {
 
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                         <div className="bg-white p-3 rounded-xl border border-amber-200/60 shadow-2xs">
-                          <span className="text-neutral-500 block text-[11px]">Graduação anterior:</span>
+                          <span className="text-neutral-500 block text-[11px]">{copy.previousGrade}</span>
                           <strong className="text-neutral-900 font-semibold">{currentDanAdminRule.previousGrade}</strong>
                         </div>
                         <div className="bg-white p-3 rounded-xl border border-amber-200/60 shadow-2xs">
@@ -867,7 +867,7 @@ export function StudentArea() {
 
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                         <div className="bg-white p-3 rounded-xl border border-amber-200/60 shadow-2xs">
-                          <span className="text-neutral-500 block text-[11px]">Graduação anterior:</span>
+                          <span className="text-neutral-500 block text-[11px]">{copy.previousGrade}</span>
                           <strong className="text-neutral-900 font-semibold">{currentDanAdminRule.previousGrade}</strong>
                         </div>
                         <div className="bg-white p-3 rounded-xl border border-amber-200/60 shadow-2xs">
@@ -1100,9 +1100,9 @@ export function StudentArea() {
                     }}
                     className="w-full bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-2 text-xs text-neutral-800 focus:outline-none focus:border-karate-red"
                   >
-                    <option value="none">Nenhum (Geral)</option>
+                    <option value="none">{copy.noneGeneral}</option>
                     <option value="kata">Kata</option>
-                    <option value="technique">Técnica</option>
+                    <option value="technique">{copy.techniqueOption}</option>
                   </select>
                 </div>
 

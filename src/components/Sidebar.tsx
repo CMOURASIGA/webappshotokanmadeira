@@ -37,7 +37,12 @@ export function Sidebar() {
   const location = useLocation();
   const { config } = useAppData();
   const { totalItems } = useCart();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const adminCopy = language === "en"
+    ? { nav: "Main Desktop Navigation", championships: "Championship Dashboard (Admin)", store: "Store Dashboard (Admin)" }
+    : language === "ja"
+    ? { nav: "デスクトップメインナビゲーション", championships: "大会管理画面（管理者）", store: "ストア管理画面（管理者）" }
+    : { nav: "Navegação Principal Desktop", championships: "Painel de Campeonatos (Admin)", store: "Painel da Loja (Admin)" };
 
   const sections: NavSection[] = [
     {
@@ -75,7 +80,7 @@ export function Sidebar() {
 
   return (
     <aside 
-      aria-label="Navegação Principal Desktop"
+      aria-label={adminCopy.nav}
       className="hidden lg:flex flex-col w-64 bg-[#111111] h-screen fixed top-0 left-0 border-r border-[#2B2B2B] z-30 select-none"
     >
       {/* Cabeçalho com Identidade Visual */}
@@ -150,13 +155,13 @@ export function Sidebar() {
           to="/dashboard_campeonato"
           className="text-[10px] text-neutral-400 hover:text-karate-gold transition-colors font-medium block"
         >
-          ⚙️ Painel de Campeonatos (Admin)
+          ⚙️ {adminCopy.championships}
         </Link>
         <Link 
           to="/dashboard_loja"
           className="text-[10px] text-neutral-400 hover:text-karate-gold transition-colors font-medium block"
         >
-          🛍️ Painel da Loja (Admin)
+          🛍️ {adminCopy.store}
         </Link>
         <span className="text-[10px] font-jp text-neutral-500 tracking-widest block">
           空手道 • JKA SHOTOKAN

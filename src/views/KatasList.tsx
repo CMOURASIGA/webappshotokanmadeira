@@ -10,7 +10,7 @@ export function KatasList() {
     ? { subtitle: "Fundamental forms of Shotokan Karate", allLevels: "All Levels", beginner: "Beginner", intermediate: "Intermediate", advanced: "Advanced", allGroups: "All Groups", movements: "official JKA movements", updating: "Sequence being updated" }
     : language === "ja"
     ? { subtitle: "Shotokan Karate の基本となる形", allLevels: "すべてのレベル", beginner: "初級", intermediate: "中級", advanced: "上級", allGroups: "すべてのグループ", movements: "JKA公式動作", updating: "動作順を更新中" }
-    : { subtitle: "{copy.subtitle}", allLevels: "Todos os Níveis", beginner: "Iniciante", intermediate: "Intermediário", advanced: "Avançado", allGroups: "Todos os Grupos", movements: "mov. oficiais JKA", updating: "{copy.updating}" };
+    : { subtitle: "Formas fundamentais do Karate Shotokan", allLevels: "Todos os Níveis", beginner: "Iniciante", intermediate: "Intermediário", advanced: "Avançado", allGroups: "Todos os Grupos", movements: "mov. oficiais JKA", updating: "Sequência em atualização" };
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       <button 
@@ -23,7 +23,7 @@ export function KatasList() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 className="text-3xl font-bold font-jp">Katas</h2>
-          <p className="text-neutral-500">Formas fundamentais do Karate Shotokan</p>
+          <p className="text-neutral-500">{copy.subtitle}</p>
         </div>
         
         <div className="flex gap-2">
@@ -65,7 +65,7 @@ export function KatasList() {
                 )}
                 {(!kata.movements || kata.movements.length === 0) && (
                   <span className="bg-amber-50 text-amber-800 px-2 py-1 rounded font-medium border border-amber-200">
-                    Sequência em atualização
+                    {copy.updating}
                   </span>
                 )}
                 <span className="bg-karate-red/10 text-karate-red px-2 py-1 rounded font-medium">{kata.level}</span>

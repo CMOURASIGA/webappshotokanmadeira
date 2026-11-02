@@ -36,20 +36,20 @@ export function ChampionshipLookup() {
         required: "Enter the registration code and validation information.", notFound: "No registration was found with this code and validation information. Check the code, email, phone or date of birth.", lookupError: "Unable to retrieve the registration from the official system.", invalidWeight: "Invalid body weight.", saveError: "Unable to save changes.", receiptError: "Unable to record receipt submission.",
         whatsappIntro: "Hello! I am sending the payment receipt for my championship registration.", whatsappAttachment: "The PIX payment receipt is attached for verification.", registration: "Registration", athlete: "Athlete", participation: "Participation", allModalities: "All championship modalities", eventModalities: "Event modalities", value: "Amount",
         backChampionship: "Back to Championship", title: "Registration Lookup", subtitle: "Access your registration, check payment status or update permitted information while registration is open.", registrationCode: "Registration Code", validationData: "Validation Data (Email, Phone or Date of Birth)", validationExample: "Example: registered email or phone", lookup: "Look Up Registration", saved: "Registration information updated and saved successfully.", payment: "Payment",
-        athleteData: "Athlete Information", edit: "Edit Information", fullName: "Full Name", grade: "Grade", weight: "Reported Weight", ageAtEvent: "Age on Event Date", years: "years", minor: "Minor", sex: "Sex", phone: "Phone", email: "Email", officialCategory: "Official Category", toBeAssigned: "To be assigned by the technical committee", guardian: "Legal Guardian", cancelNote: "* To cancel a registration, contact the Madeira Karate dojo administration directly. Only the organizing committee can cancel registrations.", editing: "Editing Registration", cancel: "Cancel", weightKg: "Weight (kg)", saveChanges: "Save Changes", payPix: "Pay with PIX", pixCopied: "PIX Code Copied!", copyPix: "Copy PIX Code", sendReceipt: "Send receipt via WhatsApp", receiptSent: "I have sent the receipt"
+        athleteData: "Athlete Information", edit: "Edit Information", fullName: "Full Name", grade: "Grade", weight: "Reported Weight", ageAtEvent: "Age on Event Date", years: "years", minor: "Minor", sex: "Sex", phone: "Phone", email: "Email", officialCategory: "Official Category", toBeAssigned: "To be assigned by the technical committee", guardian: "Legal Guardian", cancelNote: "* To cancel a registration, contact the Madeira Karate dojo administration directly. Only the organizing committee can cancel registrations.", editing: "Editing Registration", cancel: "Cancel", weightKg: "Weight (kg)", saveChanges: "Save Changes", payPix: "Pay with PIX", pixCopied: "PIX Code Copied!", copyPix: "Copy PIX Code", sendReceipt: "Send receipt via WhatsApp", receiptSent: "I have sent the receipt", pixTitle:"Registration PIX Payment", amount:"Amount", key:"Key"
       }
     : language === "ja"
     ? {
         required: "申込コードと確認情報を入力してください。", notFound: "このコードと確認情報に一致する申込が見つかりません。コード、メール、電話番号、生年月日をご確認ください。", lookupError: "公式システムから申込情報を取得できませんでした。", invalidWeight: "体重の入力が正しくありません。", saveError: "変更を保存できませんでした。", receiptError: "支払証明の送付記録を保存できませんでした。",
         whatsappIntro: "こんにちは。大会申込の支払証明を送付します。", whatsappAttachment: "確認用の PIX 支払証明を添付します。", registration: "申込", athlete: "選手", participation: "参加", allModalities: "大会の全種目", eventModalities: "大会種目", value: "金額",
         backChampionship: "大会ページに戻る", title: "申込確認", subtitle: "申込内容、支払状況を確認し、申込期間中に許可された情報を更新できます。", registrationCode: "申込コード", validationData: "確認情報（メール、電話、生年月日）", validationExample: "例: 登録メールまたは電話番号", lookup: "申込を確認", saved: "申込情報を更新し、履歴に保存しました。", payment: "支払い",
-        athleteData: "選手情報", edit: "情報を編集", fullName: "氏名", grade: "級・段位", weight: "登録体重", ageAtEvent: "大会当日の年齢", years: "歳", minor: "未成年", sex: "性別", phone: "電話", email: "メール", officialCategory: "公式カテゴリ", toBeAssigned: "技術委員会が決定します", guardian: "法定保護者", cancelNote: "* 申込のキャンセルは Madeira Karate 道場管理者へ直接ご連絡ください。キャンセル操作は大会運営委員会のみが行えます。", editing: "申込情報を編集中", cancel: "キャンセル", weightKg: "体重 (kg)", saveChanges: "変更を保存", payPix: "PIX で支払う", pixCopied: "PIX コードをコピーしました", copyPix: "PIX コードをコピー", sendReceipt: "WhatsApp で支払証明を送る", receiptSent: "支払証明を送付しました"
+        athleteData: "選手情報", edit: "情報を編集", fullName: "氏名", grade: "級・段位", weight: "登録体重", ageAtEvent: "大会当日の年齢", years: "歳", minor: "未成年", sex: "性別", phone: "電話", email: "メール", officialCategory: "公式カテゴリ", toBeAssigned: "技術委員会が決定します", guardian: "法定保護者", cancelNote: "* 申込のキャンセルは Madeira Karate 道場管理者へ直接ご連絡ください。キャンセル操作は大会運営委員会のみが行えます。", editing: "申込情報を編集中", cancel: "キャンセル", weightKg: "体重 (kg)", saveChanges: "変更を保存", payPix: "PIX で支払う", pixCopied: "PIX コードをコピーしました", copyPix: "PIX コードをコピー", sendReceipt: "WhatsApp で支払証明を送る", receiptSent: "支払証明を送付しました", pixTitle:"申込の PIX 支払い", amount:"金額", key:"キー"
       }
     : {
         required: "Informe o código da inscrição e o dado de validação.", notFound: "Nenhuma inscrição encontrada com este código e dados de validação. Verifique seu código, e-mail, telefone ou data de nascimento.", lookupError: "Erro ao consultar inscrição no sistema oficial.", invalidWeight: "Peso corporal inválido.", saveError: "Erro ao salvar alterações.", receiptError: "Erro ao registrar envio de comprovante.",
         whatsappIntro: "Olá! Estou enviando o comprovante da inscrição do campeonato.", whatsappAttachment: "Segue em anexo o comprovante de pagamento PIX para conferência.", registration: "Inscrição", athlete: "Atleta", participation: "Participação", allModalities: "Todas as modalidades do campeonato", eventModalities: "Modalidades do evento", value: "Valor",
         backChampionship: "Voltar ao Campeonato", title: "Consulta de Inscrição", subtitle: "Acesse os dados da sua inscrição, verifique o status do pagamento ou atualize suas informações durante o período de inscrições abertas.", registrationCode: "Código da Inscrição", validationData: "Dado de Validação (E-mail, Telefone ou Data de Nasc.)", validationExample: "Ex: seu e-mail cadastrado ou telefone", lookup: "Consultar Inscrição", saved: "Dados da inscrição atualizados com sucesso e salvos no histórico!", payment: "Pagamento",
-        athleteData: "Dados do Atleta", edit: "Editar Informações", fullName: "Nome Completo", grade: "Graduação", weight: "Peso Informado", ageAtEvent: "Idade no Campeonato", years: "anos", minor: "Menor", sex: "Sexo", phone: "Telefone", email: "E-mail", officialCategory: "Categoria Oficial", toBeAssigned: "A ser designada pela comissão técnica", guardian: "Responsável Legal", cancelNote: "* Para cancelamento de inscrição, entre em contato direto com a administração do Dojo Madeira Karate. Apenas a comissão organizadora possui autorização para cancelar inscrições.", editing: "Editando Inscrição", cancel: "Cancelar", weightKg: "Peso (kg)", saveChanges: "Salvar Alterações", payPix: "Efetuar Pagamento PIX", pixCopied: "Código PIX Copiado!", copyPix: "Copiar Código PIX", sendReceipt: "Enviar comprovante pelo WhatsApp", receiptSent: "Já enviei o comprovante"
+        athleteData: "Dados do Atleta", edit: "Editar Informações", fullName: "Nome Completo", grade: "Graduação", weight: "Peso Informado", ageAtEvent: "Idade no Campeonato", years: "anos", minor: "Menor", sex: "Sexo", phone: "Telefone", email: "E-mail", officialCategory: "Categoria Oficial", toBeAssigned: "A ser designada pela comissão técnica", guardian: "Responsável Legal", cancelNote: "* Para cancelamento de inscrição, entre em contato direto com a administração do Dojo Madeira Karate. Apenas a comissão organizadora possui autorização para cancelar inscrições.", editing: "Editando Inscrição", cancel: "Cancelar", weightKg: "Peso (kg)", saveChanges: "Salvar Alterações", payPix: "Efetuar Pagamento PIX", pixCopied: "Código PIX Copiado!", copyPix: "Copiar Código PIX", sendReceipt: "Enviar comprovante pelo WhatsApp", receiptSent: "Já enviei o comprovante", pixTitle:"Pagamento PIX da Inscrição", amount:"Valor", key:"Chave"
       };
 
   const [code, setCode] = useState(searchParams.get("code") || "");
@@ -433,7 +433,7 @@ export function ChampionshipLookup() {
 
                 <div className="sm:col-span-2 bg-neutral-100 p-3 rounded-xl text-neutral-600 text-[11px] space-y-0.5">
                   <div><strong>Participação:</strong> Todas as modalidades do campeonato</div>
-                  <div><strong>Modalidades do evento:</strong> {championship?.modalidades && championship.modalidades.length > 0 ? formatModalidadesList(championship.modalidades) : (registration.modalidade || "Kata e Kumite")}</div>
+                  <div><strong>{copy.eventModalities}:</strong> {championship?.modalidades && championship.modalidades.length > 0 ? formatModalidadesList(championship.modalidades) : (registration.modalidade || "Kata e Kumite")}</div>
                 </div>
               </div>
 
@@ -460,7 +460,7 @@ export function ChampionshipLookup() {
             <div className="p-5 bg-neutral-50 rounded-2xl border border-neutral-200 space-y-4">
               <div className="flex items-center gap-2 text-neutral-900">
                 <QrCode className="w-5 h-5 text-karate-red" />
-                <h4 className="text-sm font-bold font-jp">Pagamento PIX da Inscrição</h4>
+                <h4 className="text-sm font-bold font-jp">{copy.pixTitle}</h4>
               </div>
 
               <div className="flex flex-col sm:flex-row items-center gap-5 justify-center">
@@ -476,10 +476,10 @@ export function ChampionshipLookup() {
 
                 <div className="space-y-2 text-center sm:text-left flex-1 max-w-sm">
                   <p className="text-xs text-neutral-600">
-                    Valor: <strong className="text-neutral-900 font-mono text-sm">R$ {registration.valorInscricao.toFixed(2).replace(".", ",")}</strong>
+                    {copy.amount}: <strong className="text-neutral-900 font-mono text-sm">R$ {registration.valorInscricao.toFixed(2).replace(".", ",")}</strong>
                   </p>
                   <p className="text-xs text-neutral-600">
-                    Chave: <span className="font-mono bg-white p-1 rounded border border-neutral-200 text-neutral-800 text-[11px] break-all">{championship.configuracaoPix.chave}</span>
+                    {copy.key}: <span className="font-mono bg-white p-1 rounded border border-neutral-200 text-neutral-800 text-[11px] break-all">{championship.configuracaoPix.chave}</span>
                   </p>
                   <button
                     type="button"
@@ -487,7 +487,7 @@ export function ChampionshipLookup() {
                     className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-neutral-900 hover:bg-neutral-800 text-white rounded-lg text-xs font-semibold transition-colors cursor-pointer"
                   >
                     {copiedPix ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                    {copiedPix ? "Código Pix Copiado!" : "Copiar PIX Copia e Cola"}
+                    {copiedPix ? copy.pixCopied : copy.copyPix}
                   </button>
                 </div>
               </div>

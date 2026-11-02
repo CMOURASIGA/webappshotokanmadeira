@@ -13,7 +13,100 @@ export function BeltsList() {
     ? { back:"Back", official:"Official JKA Brazil Guideline", title:"Belts and Grades (Obi)", intro:"Official progression from 10th Kyu to 5th Dan. Technical Kihon, Kata and Kumite requirements follow the JKA Brasil Kyu/Dan grading guide, while administrative exam rules and competition references are governed separately.", techProgram:"Technical Program", guide:"Official guide", adminRules:"Dan Administrative Rules", notice:"For accuracy, detailed technical requirements and official administrative excerpts below are preserved in Portuguese exactly as published by JKA Brasil. We translate the navigation and explanatory interface, but do not alter official source wording without a validated translation.", belt:"Belt", source:"Source", program:"Technical Program", unavailable:"Technical content is not registered in this version.", fundamentals:"Fundamentals", form:"Form", combat:"Sparring", examinerNotes:"Examiner Notes" }
     : language === "ja"
     ? { back:"戻る", official:"JKA Brasil 公式指針", title:"帯・級段位 (Obi)", intro:"10級から五段までの公式な進級体系です。Kihon、Kata、Kumite の技術要件は JKA Brasil の級・段審査ガイドに基づき、審査運用規定や大会規定とは分けて管理しています。", techProgram:"技術課程", guide:"公式ガイド", adminRules:"段審査の運用規定", notice:"正確性を優先し、以下の詳細な技術要件と公式な運用文書の引用は、JKA Brasil が公開したポルトガル語原文のまま表示します。操作画面と説明部分は翻訳しますが、検証されていない翻訳で公式文言を変更しません。", belt:"帯", source:"出典", program:"技術課程", unavailable:"この版には技術内容が登録されていません。", fundamentals:"基本", form:"形", combat:"組手", examinerNotes:"審査員向け注記" }
-    : { back:"Voltar", official:"Diretriz Oficial JKA Brasil", title:"{copy.title}", intro:"Sequência oficial de 10º Kyu ao 5º Dan. Programa técnico de Kihon, Kata e Kumite alinhado ao Guia para Graduação Kyu/Dan da JKA Brasil, com governança separada para regras administrativas de exame e referências de competição.", techProgram:"Programa Técnico", guide:"{copy.guide}", adminRules:"Regras Administrativas de Dan", notice:"", belt:"Faixa", source:"Fonte", program:"Programa Técnico", unavailable:"Conteúdo técnico não cadastrado nesta versão.", fundamentals:"Fundamentos", form:"Forma", combat:"Combate", examinerNotes:"Observações da Banca Examinadora" };
+    : { back:"Voltar", official:"Diretriz Oficial JKA Brasil", title:"Faixas e Graduações (Obi)", intro:"Sequência oficial de 10º Kyu ao 5º Dan. Programa técnico de Kihon, Kata e Kumite alinhado ao Guia para Graduação Kyu/Dan da JKA Brasil, com governança separada para regras administrativas de exame e referências de competição.", techProgram:"Programa Técnico", guide:"Guia oficial", adminRules:"Regras Administrativas de Dan", notice:"", belt:"Faixa", source:"Fonte", program:"Programa Técnico", unavailable:"Conteúdo técnico não cadastrado nesta versão.", fundamentals:"Fundamentos", form:"Forma", combat:"Combate", examinerNotes:"Observações da Banca Examinadora" };
+
+  const ui = language === "en"
+    ? {
+        notice2026: "Official notice 2026",
+        adminTitle: "Administrative Rules for Dan Examination",
+        adminRef: "Official JKA Brasil administrative reference. Always check the current notice before registering.",
+        previousGrade: "Minimum Previous Grade:",
+        minimumTime: "Required Minimum Interval:",
+        minimumAge: "Published Minimum Age:",
+        notPublished: "Not stated in the published official table",
+        courses: "Official Technical Update Courses",
+        hours: "hours",
+        courseHint: "* Administrative eligibility requirement for registration. It is not a technical Kihon/Kata/Kumite requirement.",
+        documents: "Registration Documents and Conditions:",
+        kyuRegularization: "Kyu Regularization:",
+        crossFederation: "Candidates from other federations",
+        governanceBadge: "Technical Governance & Metadata",
+        governanceTitle: "Official JKA Brasil References & Domain Governance",
+        governanceIntro: "Madeira Karate Digital Dojo keeps three domains clearly separated to preserve authenticity and avoid confusion between training requirements, administrative exam rules and competition regulations:",
+        domainTechnical: "1. Technical Domain",
+        technicalTitle: "Grading Program",
+        technicalText: "Official Kihon, Kata and Kumite content for each Kyu/Dan, defining what the karateka should practice and master.",
+        domainAdmin: "2. Administrative Domain",
+        valid2026: "Valid for 2026",
+        examTitle: "JKA Grading Examination",
+        adminText: "Time requirements, published minimum age, endorsed course hours and documentation, according to the current annual notice.",
+        domainSport: "3. Competition Domain",
+        competitionTitle: "Competition Rules",
+        competitionText: "Tournament regulations have their own eligibility rules and must not be confused with grading requirements.",
+        feesTitle: "Note on fees and costs:",
+        feesText: "In line with SPEC 07 governance, the Digital Dojo does not store financial fees as fixed rules because registration and diploma amounts may vary by city, year and official JKA Brasil notice."
+      }
+    : language === "ja"
+    ? {
+        notice2026: "2026年公式要項",
+        adminTitle: "段審査の運用規定",
+        adminRef: "JKA Brasil の公式運用資料です。申込前に必ず最新の要項をご確認ください。",
+        previousGrade: "必要な前段階:",
+        minimumTime: "必要な最低期間:",
+        minimumAge: "公開されている最低年齢:",
+        notPublished: "公開されている公式表には記載がありません",
+        courses: "公式技術更新講習",
+        hours: "時間",
+        courseHint: "* 申込資格に関する運用要件であり、Kihon・Kata・Kumite の技術項目ではありません。",
+        documents: "申込書類・条件:",
+        kyuRegularization: "級の登録整理:",
+        crossFederation: "他団体からの受審者",
+        governanceBadge: "技術ガバナンス・メタデータ",
+        governanceTitle: "JKA Brasil 公式資料と領域管理",
+        governanceIntro: "Madeira Karate デジタル道場では、稽古要件、審査運用規定、大会規定を混同しないよう、3つの領域を明確に分けて管理しています。",
+        domainTechnical: "1. 技術領域",
+        technicalTitle: "昇級・昇段課程",
+        technicalText: "各 Kyu/Dan に必要な Kihon、Kata、Kumite の公式技術内容です。",
+        domainAdmin: "2. 運用領域",
+        valid2026: "2026年適用",
+        examTitle: "JKA 級・段審査",
+        adminText: "必要期間、公開最低年齢、認定講習時間、必要書類など、年度ごとの要項に基づく運用条件です。",
+        domainSport: "3. 競技領域",
+        competitionTitle: "大会規定",
+        competitionText: "大会には独自の参加資格があり、昇級・昇段審査の要件とは別に扱います。",
+        feesTitle: "費用に関する注記:",
+        feesText: "SPEC 07 の管理方針に従い、申込料や証書費用は地域、年度、JKA Brasil の公式要項によって変動するため、固定ルールとしてシステムに保存しません。"
+      }
+    : {
+        notice2026: "Edital oficial 2026",
+        adminTitle: "Regras Administrativas para Exame de Dan",
+        adminRef: "Referência administrativa oficial JKA Brasil. Consulte sempre o edital vigente antes da inscrição.",
+        previousGrade: "Graduação Anterior Mínima:",
+        minimumTime: "Carência Obrigatória:",
+        minimumAge: "Idade Mínima Publicada:",
+        notPublished: "Não informada na tabela oficial publicada",
+        courses: "Cursos Oficiais de Atualização Técnica",
+        hours: "horas",
+        courseHint: "* Requisito administrativo de elegibilidade para inscrição, não constituindo item técnico de Kihon/Kata/Kumite.",
+        documents: "Documentação e Condições de Inscrição:",
+        kyuRegularization: "Regularização de Kyu:",
+        crossFederation: "Candidatos oriundos de outras federações",
+        governanceBadge: "Governança Técnica e Metadados",
+        governanceTitle: "Referências Oficiais JKA Brasil & Governança de Domínios",
+        governanceIntro: "No Dojo Digital Madeira Karate, mantemos a separação rigorosa entre três domínios fundamentais para assegurar a autenticidade e evitar confusões entre requisitos de treino e regras esportivas ou burocráticas:",
+        domainTechnical: "1. Domínio Técnico",
+        technicalTitle: "Programa de Graduação",
+        technicalText: "Conteúdo técnico oficial de Kihon, Kata e Kumite para cada Kyu/Dan. Define o que o karateca deve praticar e dominar.",
+        domainAdmin: "2. Domínio Administrativo",
+        valid2026: "Vigência 2026",
+        examTitle: "Exame de Grau JKA",
+        adminText: "Carência temporal, idade mínima publicada, 16h em cursos chancelados e documentação. Válidas conforme o edital anual vigente.",
+        domainSport: "3. Domínio Esportivo",
+        competitionTitle: "Base de Competição",
+        competitionText: "Regulamentos de campeonatos com elegibilidade própria. Nunca se confundem com requisitos de exame.",
+        feesTitle: "Nota sobre taxas e investimentos:",
+        feesText: "Em conformidade com a governança da SPEC 07, o Dojo Digital não reproduz taxas financeiras no sistema como regras fixas, pois valores de inscrição e diplomação variam por cidade, ano e edital oficial da JKA Brasil."
+      };
 
   return (
     <div className="space-y-10 animate-in fade-in duration-500 max-w-5xl mx-auto pb-16">
@@ -59,7 +152,7 @@ export function BeltsList() {
               rel="noopener noreferrer"
               className="text-amber-800 hover:underline font-semibold inline-flex items-center gap-1"
             >
-              Edital 2026 <ExternalLink className="w-3 h-3" />
+              {ui.notice2026} <ExternalLink className="w-3 h-3" />
             </a>
           </div>
         </div>
@@ -230,11 +323,11 @@ export function BeltsList() {
                         <div className="flex items-center gap-2">
                           <ShieldCheck className="w-4 h-4 text-amber-700 shrink-0" />
                           <h4 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-amber-900">
-                            Regras Administrativas para Exame de Dan ({adminRule.danLevel})
+                            {ui.adminTitle} ({adminRule.danLevel})
                           </h4>
                         </div>
                         <p className="text-[11px] text-amber-800/80 mt-0.5">
-                          Referência administrativa oficial JKA Brasil — <strong>{adminRule.sourceYear}</strong>. Consulte sempre o edital vigente antes da inscrição.
+                          {ui.adminRef} <strong>{adminRule.sourceYear}</strong>
                         </p>
                       </div>
 
@@ -244,25 +337,25 @@ export function BeltsList() {
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-1 text-xs font-semibold text-amber-900 hover:text-karate-red transition-colors underline shrink-0"
                       >
-                        Edital oficial 2026 <ExternalLink className="w-3 h-3" />
+                        {ui.notice2026} <ExternalLink className="w-3 h-3" />
                       </a>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
                       <div className="bg-white p-3.5 rounded-xl border border-amber-200/70 shadow-2xs space-y-1">
-                        <span className="text-[11px] text-neutral-500 font-medium block">Graduação Anterior Mínima:</span>
+                        <span className="text-[11px] text-neutral-500 font-medium block">{ui.previousGrade}</span>
                         <strong className="text-neutral-900 text-xs sm:text-sm font-semibold block">{adminRule.previousGrade}</strong>
                       </div>
 
                       <div className="bg-white p-3.5 rounded-xl border border-amber-200/70 shadow-2xs space-y-1">
-                        <span className="text-[11px] text-neutral-500 font-medium block">Carência Obrigatória:</span>
+                        <span className="text-[11px] text-neutral-500 font-medium block">{ui.minimumTime}</span>
                         <strong className="text-neutral-900 text-xs sm:text-sm font-semibold block">{adminRule.minimumTime}</strong>
                       </div>
 
                       <div className="bg-white p-3.5 rounded-xl border border-amber-200/70 shadow-2xs space-y-1">
-                        <span className="text-[11px] text-neutral-500 font-medium block">Idade Mínima Publicada:</span>
+                        <span className="text-[11px] text-neutral-500 font-medium block">{ui.minimumAge}</span>
                         <strong className="text-neutral-900 text-xs sm:text-sm font-semibold block">
-                          {adminRule.minimumAge ? adminRule.minimumAge : "Não informada na tabela oficial publicada"}
+                          {adminRule.minimumAge ? adminRule.minimumAge : ui.notPublished}
                         </strong>
                       </div>
                     </div>
@@ -272,14 +365,14 @@ export function BeltsList() {
                       <div className="flex items-center gap-2">
                         <Clock className="w-3.5 h-3.5 text-amber-700" />
                         <span className="text-xs font-bold text-amber-950">
-                          Cursos Oficiais de Atualização Técnica ({adminRule.courseHoursRequired} horas)
+                          {ui.courses} ({adminRule.courseHoursRequired} {ui.hours})
                         </span>
                       </div>
                       <p className="text-xs text-neutral-700 leading-relaxed">
                         {adminRule.courseNotes}
                       </p>
                       <span className="text-[10px] text-neutral-500 block italic">
-                        * Requisito administrativo de elegibilidade para inscrição, não constituindo item técnico de Kihon/Kata/Kumite.
+                        {ui.courseHint}
                       </span>
                     </div>
 
@@ -287,7 +380,7 @@ export function BeltsList() {
                     <div className="bg-white p-4 rounded-xl border border-amber-200/70 shadow-2xs space-y-2">
                       <div className="flex items-center gap-2">
                         <FileText className="w-3.5 h-3.5 text-amber-700" />
-                        <span className="text-xs font-bold text-amber-950">Documentação e Condições de Inscrição:</span>
+                        <span className="text-xs font-bold text-amber-950">{ui.documents}</span>
                       </div>
                       <ul className="text-xs text-neutral-700 space-y-1 list-disc list-inside">
                         {adminRule.documentationRequirements.map((doc, idx) => (
@@ -296,7 +389,7 @@ export function BeltsList() {
                       </ul>
                       {adminRule.regularizationNotes && (
                         <p className="text-[11px] text-amber-900/90 pt-1.5 border-t border-amber-100">
-                          <strong>Regularização de Kyu:</strong> {adminRule.regularizationNotes}
+                          <strong>{ui.kyuRegularization}</strong> {adminRule.regularizationNotes}
                         </p>
                       )}
                     </div>
@@ -305,7 +398,7 @@ export function BeltsList() {
                     {adminRule.crossFederationRules && (
                       <div className="bg-amber-100/60 p-4 rounded-xl border border-amber-300/80 space-y-1 text-xs text-amber-950">
                         <strong className="block font-bold">
-                          Candidatos oriundos de outras federações ({adminRule.crossFederationRules.eligibleGrades.join(", ")}):
+                          {ui.crossFederation} ({adminRule.crossFederationRules.eligibleGrades.join(", ")}):
                         </strong>
                         <p className="leading-relaxed">
                           {adminRule.crossFederationRules.description}
@@ -330,13 +423,13 @@ export function BeltsList() {
         <div className="space-y-2">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white text-xs font-bold uppercase tracking-wider">
             <BookOpen className="w-3.5 h-3.5 text-karate-gold" />
-            <span>Governança Técnica e Metadados</span>
+            <span>{ui.governanceBadge}</span>
           </div>
           <h3 className="text-2xl sm:text-3xl font-bold font-jp">
-            Referências Oficiais JKA Brasil & Governança de Domínios
+            {ui.governanceTitle}
           </h3>
           <p className="text-neutral-400 text-sm sm:text-base leading-relaxed max-w-3xl">
-            No Dojo Digital Madeira Karate, mantemos a separação rigorosa entre três domínios fundamentais para assegurar a autenticidade e evitar confusões entre requisitos de treino e regras esportivas ou burocráticas:
+            {ui.governanceIntro}
           </p>
         </div>
 
@@ -344,10 +437,10 @@ export function BeltsList() {
           {/* Domínio 1 */}
           <div className="bg-neutral-800/80 p-5 rounded-2xl border border-neutral-700/80 space-y-3 flex flex-col justify-between">
             <div className="space-y-2">
-              <span className="text-xs font-bold text-karate-gold uppercase tracking-wider block">1. Domínio Técnico</span>
-              <h4 className="text-base font-bold text-white">Programa de Graduação</h4>
+              <span className="text-xs font-bold text-karate-gold uppercase tracking-wider block">{ui.domainTechnical}</span>
+              <h4 className="text-base font-bold text-white">{ui.technicalTitle}</h4>
               <p className="text-xs text-neutral-300 leading-relaxed">
-                Conteúdo técnico oficial de Kihon, Kata e Kumite para cada Kyu/Dan. Define o que o karateca deve praticar e dominar.
+                {ui.technicalText}
               </p>
             </div>
             <a 
@@ -364,12 +457,12 @@ export function BeltsList() {
           <div className="bg-neutral-800/80 p-5 rounded-2xl border border-neutral-700/80 space-y-3 flex flex-col justify-between">
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-amber-400 uppercase tracking-wider block">2. Domínio Administrativo</span>
-                <span className="bg-amber-400/20 text-amber-300 text-[10px] font-bold px-2 py-0.5 rounded">Vigência 2026</span>
+                <span className="text-xs font-bold text-amber-400 uppercase tracking-wider block">{ui.domainAdmin}</span>
+                <span className="bg-amber-400/20 text-amber-300 text-[10px] font-bold px-2 py-0.5 rounded">{ui.valid2026}</span>
               </div>
-              <h4 className="text-base font-bold text-white">Exame de Grau JKA</h4>
+              <h4 className="text-base font-bold text-white">{ui.examTitle}</h4>
               <p className="text-xs text-neutral-300 leading-relaxed">
-                Carência temporal, idade mínima publicada, 16h em cursos chancelados e documentação. Válidas conforme o edital anual vigente.
+                {ui.adminText}
               </p>
             </div>
             <a 
@@ -386,12 +479,12 @@ export function BeltsList() {
           <div className="bg-neutral-800/80 p-5 rounded-2xl border border-neutral-700/80 space-y-3 flex flex-col justify-between">
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-blue-400 uppercase tracking-wider block">3. Domínio Esportivo</span>
+                <span className="text-xs font-bold text-blue-400 uppercase tracking-wider block">{ui.domainSport}</span>
                 <span className="bg-blue-400/20 text-blue-300 text-[10px] font-bold px-2 py-0.5 rounded">Vigência 2026</span>
               </div>
-              <h4 className="text-base font-bold text-white">Base de Competição</h4>
+              <h4 className="text-base font-bold text-white">{ui.competitionTitle}</h4>
               <p className="text-xs text-neutral-300 leading-relaxed">
-                Regulamentos de campeonatos com elegibilidade própria (ex: graduação mínima a partir de 4º Kyu). Nunca se confundem com requisitos de exame.
+                {ui.competitionText}
               </p>
             </div>
             <div className="space-y-1 pt-2">
@@ -418,7 +511,7 @@ export function BeltsList() {
         {/* Nota sobre taxas financeiras e segurança editorial */}
         <div className="p-4 rounded-2xl bg-neutral-800/60 border border-neutral-700 text-xs text-neutral-400 space-y-1.5">
           <p>
-            <strong className="text-neutral-200">Nota sobre taxas e investimentos:</strong> Em conformidade com a governança da SPEC 07, o Dojo Digital não reproduz taxas financeiras no sistema como regras fixas, pois valores de inscrição e diplomação variam por cidade, ano e edital oficial da JKA Brasil.
+            <strong className="text-neutral-200">{ui.feesTitle}</strong> {ui.feesText}
           </p>
           <p className="italic text-neutral-400">
             {JKA_DISCLAIMER}

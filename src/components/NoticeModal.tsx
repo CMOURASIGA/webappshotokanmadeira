@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { X, ChevronLeft, ChevronRight, ExternalLink, ImageOff, Calendar } from "lucide-react";
 import { Notice } from "../contexts/AppDataContext";
 import { InstagramEmbed } from "./InstagramEmbed";
+import { useLanguage } from "../i18n/LanguageContext";
 
 interface NoticeModalProps {
   notices: Notice[];
@@ -20,6 +21,12 @@ export function NoticeModal({
   onClose,
   onNavigate
 }: NoticeModalProps) {
+  const { language } = useLanguage();
+  const copy = language === "en"
+    ? { close: "Close", notice: "Announcement", imageError: "This announcement image could not be loaded", imageUnavailable: "Image temporarily unavailable", previous: "Previous announcement", next: "Next announcement", goTo: "Go to announcement", instagram: "Open on Instagram", openLink: "Open link", album: "View Full Album" }
+    : language === "ja"
+    ? { close: "閉じる", notice: "お知らせ", imageError: "このお知らせ画像を読み込めませんでした", imageUnavailable: "画像を一時的に表示できません", previous: "前のお知らせ", next: "次のお知らせ", goTo: "お知らせへ移動", instagram: "Instagram で開く", openLink: "リンクを開く", album: "アルバム全体を見る" }
+    : { close: "Fechar", notice: "Aviso", imageError: "Não foi possível carregar a arte deste aviso", imageUnavailable: "Imagem temporariamente indisponível", previous: "Aviso anterior", next: "Próximo aviso", goTo: "Ir para o aviso", instagram: "Abrir no Instagram", openLink: "Abrir link", album: "Ver Álbum Completo" };
   const [orientation, setOrientation] = useState<ImageOrientation>("unknown");
   const [imageLoading, setImageLoading] = useState(true);
   const [imageError, setImageError] = useState(false);
@@ -128,7 +135,7 @@ export function NoticeModal({
         {/* Botão Fechar no topo direito com alto contraste */}
         <button 
           onClick={onClose}
-          aria-label="Fechar"
+          aria-label={copy.close}
           className="absolute top-3 right-3 z-30 w-10 h-10 bg-black/60 hover:bg-black/90 active:scale-95 text-white rounded-full flex items-center justify-center transition-all shadow-lg border border-white/20 cursor-pointer backdrop-blur-sm"
         >
           <X size={20} />
@@ -145,7 +152,7 @@ export function NoticeModal({
               )}
               <img 
                 src={currentNotice.image} 
-                alt={currentNotice.title || "Aviso"}
+                alt={currentNotice.title || copy.notice}
                 width="1200"
                 height="675"
                 onLoad={(e) => {
@@ -179,8 +186,8 @@ export function NoticeModal({
                 <ImageOff className="w-7 h-7 text-neutral-400" />
               </div>
               <div className="space-y-1 text-center">
-                <p className="text-white font-medium text-base">Imagem temporariamente indisponível</p>
-                <p className="text-xs text-neutral-300">Não foi possível carregar a arte deste aviso</p>
+                <p className="text-white font-medium text-base">{copy.imageUnavailable}</p>
+                <p className="text-xs text-neutral-300">{copy.imageError}</p>
               </div>
             </div>
           ) : isInstagramNotice ? (
@@ -201,14 +208,14 @@ export function NoticeModal({
             <>
               <button 
                 onClick={(e) => { e.stopPropagation(); prevNotice(); }}
-                aria-label="Aviso anterior"
+                aria-label={copy.previous}
                 className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-11 sm:h-11 bg-black/60 hover:bg-black/90 active:scale-95 text-white rounded-full flex items-center justify-center transition-all shadow-lg border border-white/20 cursor-pointer backdrop-blur-sm"
               >
                 <ChevronLeft size={24} />
               </button>
               <button 
                 onClick={(e) => { e.stopPropagation(); nextNotice(); }}
-                aria-label="Próximo aviso"
+                aria-label={copy.next}
                 className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-11 sm:h-11 bg-black/60 hover:bg-black/90 active:scale-95 text-white rounded-full flex items-center justify-center transition-all shadow-lg border border-white/20 cursor-pointer backdrop-blur-sm"
               >
                 <ChevronRight size={24} />
@@ -221,7 +228,7 @@ export function NoticeModal({
                     <button 
                       key={idx}
                       onClick={() => onNavigate(idx)}
-                      aria-label={`Ir para o aviso ${idx + 1}`}
+                      aria-label={`${copy.goTo} ${idx + 1}`}
                       className="min-w-[24px] min-h-[24px] p-1 flex items-center justify-center cursor-pointer"
                     >
                       <span
@@ -261,7 +268,7 @@ export function NoticeModal({
                 rel="noopener noreferrer"
                 className="w-full max-w-sm bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 active:scale-[0.99] text-white font-bold py-2.5 px-4 rounded-xl transition-all text-center shadow-md flex items-center justify-center gap-2 text-sm sm:text-base"
               >
-                <span>Abrir no Instagram</span>
+                <span>{copy.instagram}</span>
                 <ExternalLink size={16} />
               </a>
             )}
@@ -273,7 +280,7 @@ export function NoticeModal({
                 rel="noopener noreferrer"
                 className="w-full max-w-sm bg-karate-red hover:bg-red-700 active:scale-[0.99] text-white font-bold py-2.5 px-4 rounded-xl transition-all text-center shadow-md flex items-center justify-center gap-2 text-sm sm:text-base"
               >
-                <span>{currentNotice.type === "aviso" ? "Abrir link" : "Ver Álbum Completo"}</span>
+                <span>{currentNotice.type === "aviso" ? copy.openLink : copy.album}</span>
                 <ExternalLink size={16} />
               </a>
             )}

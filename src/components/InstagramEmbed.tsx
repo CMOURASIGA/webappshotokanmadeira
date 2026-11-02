@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Instagram, ExternalLink, Loader2 } from "lucide-react";
+import { useLanguage } from "../i18n/LanguageContext";
 
 type InstagramEmbedProps = {
   url: string;
@@ -35,6 +36,12 @@ export function isInstagramPublicationUrl(url: string): boolean {
 }
 
 export function InstagramEmbed({ url, title, compact = false }: InstagramEmbedProps) {
+  const { language } = useLanguage();
+  const copy = language === "en"
+    ? { openOfficial: "Open publication on the official Instagram", official: "Official Publication", unavailable: "The embedded view for this publication could not be prepared.", open: "Open on Instagram", loading: "Loading Instagram post...", frameTitle: "Instagram Post" }
+    : language === "ja"
+    ? { openOfficial: "公式 Instagram で投稿を開く", official: "公式投稿", unavailable: "この投稿の埋め込み表示を準備できませんでした。", open: "Instagram で開く", loading: "Instagram 投稿を読み込み中...", frameTitle: "Instagram 投稿" }
+    : { openOfficial: "Abrir publicação no Instagram oficial", official: "Publicação Oficial", unavailable: "Não foi possível preparar a visualização incorporada desta publicação.", open: "Abrir no Instagram", loading: "Carregando publicação do Instagram...", frameTitle: "Publicação do Instagram" };
   const isInstagram = isInstagramPublicationUrl(url);
   if (!isInstagram && !url) return null;
 
@@ -48,7 +55,7 @@ export function InstagramEmbed({ url, title, compact = false }: InstagramEmbedPr
         href={targetUrl}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label={`Abrir publicação "${title || 'Instagram'}" no Instagram oficial`}
+        aria-label={`${copy.openOfficial}: ${title || "Instagram"}`}
         className="flex items-center justify-between p-3 rounded-xl bg-neutral-900 text-white hover:bg-neutral-800 transition-colors border border-neutral-800 group"
       >
         <div className="flex items-center gap-2.5 min-w-0">
@@ -56,7 +63,7 @@ export function InstagramEmbed({ url, title, compact = false }: InstagramEmbedPr
             <Instagram className="w-4 h-4 text-white" />
           </div>
           <div className="min-w-0">
-            <p className="text-xs font-semibold truncate text-neutral-100">{title || "Publicação Oficial"}</p>
+            <p className="text-xs font-semibold truncate text-neutral-100">{title || copy.official}</p>
             <p className="text-[10px] text-neutral-400 font-mono">@madeirakarateshotokan</p>
           </div>
         </div>
@@ -70,7 +77,7 @@ export function InstagramEmbed({ url, title, compact = false }: InstagramEmbedPr
       <div className="w-full min-h-[320px] flex flex-col items-center justify-center p-6 bg-neutral-950 text-white">
         <Instagram className="w-10 h-10 mb-3 text-rose-500" />
         <p className="text-sm text-neutral-300 text-center mb-4">
-          Não foi possível preparar a visualização incorporada desta publicação.
+          {copy.unavailable}
         </p>
         <a
           href={targetUrl}
@@ -78,7 +85,7 @@ export function InstagramEmbed({ url, title, compact = false }: InstagramEmbedPr
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-karate-red text-white font-semibold text-sm"
         >
-          Abrir no Instagram
+          {copy.open}
           <ExternalLink className="w-4 h-4" />
         </a>
       </div>
@@ -91,13 +98,13 @@ export function InstagramEmbed({ url, title, compact = false }: InstagramEmbedPr
         {!loaded && (
           <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-neutral-950 text-neutral-300 gap-3">
             <Loader2 className="w-7 h-7 animate-spin text-karate-red" />
-            <span className="text-xs">Carregando publicação do Instagram...</span>
+            <span className="text-xs">{copy.loading}</span>
           </div>
         )}
 
         <iframe
           src={embedUrl}
-          title={title || "Publicação do Instagram"}
+          title={title || copy.frameTitle}
           className="w-full h-[620px] sm:h-[720px] bg-white border-0"
           loading="lazy"
           allow="encrypted-media; picture-in-picture"
@@ -113,7 +120,7 @@ export function InstagramEmbed({ url, title, compact = false }: InstagramEmbedPr
           rel="noopener noreferrer"
           className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-karate-red hover:bg-red-700 text-white font-semibold text-xs sm:text-sm transition-colors"
         >
-          Abrir publicação no Instagram
+          {copy.open}
           <ExternalLink className="w-4 h-4" />
         </a>
       </div>
